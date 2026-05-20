@@ -39,14 +39,11 @@
   <div id="parent-view">
     <h2>🛠 保護者用設定画面</h2>
     <p>持ち物を登録して、NFCタグ用のURLを作成します。</p>
-    
     <div>
       <input type="text" id="item-input" placeholder="例: ✏️ えんぴつ">
       <button class="btn-add" onclick="addItem()">追加</button>
     </div>
-    
     <ul id="parent-item-list"></ul>
-    
     <button class="btn-generate" onclick="generateURL()">NFCタグ用URLを作成する</button>
     <div id="generated-url"></div>
   </div>
@@ -54,9 +51,6 @@
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const itemsParam = urlParams.get('items');
-    
-    let tempLongUrl = "";
-    let fallbackTimeout; // フリーズ防止用のタイマー変数
     
     // --- 子ども用モード ---
     if (itemsParam) {
@@ -134,7 +128,8 @@
         });
       }
 
-      function generateURL() {
+      // ★ 新しいURL短縮処理（中継サーバー ＋ TinyURL通信）
+      async function generateURL() {
         if (parentItems.length === 0) {
           alert('持ち物を1つ以上追加してください。');
           return;
@@ -142,49 +137,45 @@
         
         const baseUrl = window.location.href.split('?')[0];
         const encodedItems = encodeURIComponent(parentItems.join(','));
-        tempLongUrl = `${baseUrl}?items=${encodedItems}`;
+        const tempLongUrl = `${baseUrl}?items=${encodedItems}`;
         
         const urlDiv = document.getElementById('generated-url');
         urlDiv.style.display = 'block';
-        urlDiv.innerHTML = '短いURLを作成中... ⏳';
+        urlDiv.innerHTML = '短いURLを作成中... ⏳<br><span style="font-size:12px; color:#666;">（通信中：数秒お待ちください）</span>';
 
-        // ★ フリーズ防止：3秒経っても応答がない場合はエラーとみなして元のURLを表示
-        clearTimeout(fallbackTimeout);
-        fallbackTimeout = setTimeout(() => {
-          handleShortUrl({ error: "timeout" });
-        }, 3000);
-
-        // 外部APIの呼び出し
-        const script = document.createElement('script');
-        script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(tempLongUrl)}&callback=handleShortUrl`;
-        
-        // ★ エラー検知：ブラウザがブロックした場合は即座に元のURLを表示
-        script.onerror = () => {
-          handleShortUrl({ error: "blocked" });
-        };
-        document.body.appendChild(script);
-      }
-    }
-
-    // --- URL短縮用コールバック関数 ---
-    function handleShortUrl(data) {
-      clearTimeout(fallbackTimeout); // 応答があったらタイマーを止める
-      const urlDiv = document.getElementById('generated-url');
-      
-      if (data && data.shorturl) {
-        urlDiv.innerHTML = `
-          <strong>NFC用 URL（短縮版）:</strong><br>
-          <a href="${data.shorturl}" target="_blank">${data.shorturl}</a><br><br>
-          <button onclick="navigator.clipboard.writeText('${data.shorturl}').then(()=>alert('コピーしました！'))">短縮URLをコピーする</button>
-        `;
-      } else {
-        urlDiv.innerHTML = `
-          <span style="color:red;">※ブラウザの設定により短縮機能が制限されているため、通常のURLを発行しました。</span><br><br>
-          <strong>NFC用 URL:</strong><br>
-          <a href="${tempLongUrl}" target="_blank">${tempLongUrl}</a><br><br>
-          <button onclick="navigator.clipboard.writeText('${tempLongUrl}').then(()=>alert('コピーしました！'))">URLをコピーする</button>
-          <p style="font-size: 12px; margin-top: 10px;">※NFCタグの容量エラーが出る場合は、コピーしたURLを<a href="https://x.gd/" target="_blank">無料のURL短縮サイト</a>で短くしてから書き込んでください。</p>
-        `;
+        try {
+          // 1. TinyURLのAPI作成用URLを準備
+          const targetUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(tempLongUrl)}`;
+          // 2. ブラウザのブロックを回避するため、無料の中継サーバー（allorigins）を通す
+          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+          
+          // 3. 通信を実行
+          const response = await fetch(proxyUrl);
+          if (!response.ok) throw new Error('通信エラー');
+          
+          const data = await response.json();
+          
+          // 4. 短縮URLが正しく返ってきたか確認
+          if (data.contents && data.contents.startsWith('http')) {
+            const shortUrl = data.contents;
+            urlDiv.innerHTML = `
+              <strong>NFC用 URL（短縮版）:</strong><br>
+              <a href="${shortUrl}" target="_blank" style="font-size:18px;">${shortUrl}</a><br><br>
+              <button onclick="navigator.clipboard.writeText('${shortUrl}').then(()=>alert('コピーしました！'))" style="background:#28a745; color:white; width:100%; padding:15px;">URLをコピーする</button>
+            `;
+          } else {
+            throw new Error('無効なURLが返却されました');
+          }
+        } catch (error) {
+          // 万が一エラーが起きた場合の安全対策
+          urlDiv.innerHTML = `
+            <span style="color:red;">※ネットワーク制限により自動短縮に失敗しました。</span><br><br>
+            <strong>NFC用 URL（そのまま）:</strong><br>
+            <div style="font-size:10px; word-break:break-all; background:#ddd; padding:5px; margin:5px 0;">${tempLongUrl}</div><br>
+            <button onclick="navigator.clipboard.writeText('${tempLongUrl}').then(()=>alert('長いURLをコピーしました'))">長いURLをコピー</button>
+            <p style="font-size: 12px; margin-top: 10px;">※お手数ですが、コピーしたURLを別のブラウザタブで<a href="https://x.gd/" target="_blank">x.gd</a>等のサイトに貼り付けて短くしてください。</p>
+          `;
+        }
       }
     }
   </script>
