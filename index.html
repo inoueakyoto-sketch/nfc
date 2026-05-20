@@ -49,17 +49,122 @@
   </div>
 
   <script>
+    // ==============================
+    // 状態を管理する変数
+    // ==============================
+    let parentItems = [];
+    let childItems = [];
+    let checkedCount = 0;
+
+    // ==============================
+    // 保護者用機能（設定画面）
+    // ==============================
+    function addItem() {
+      const input = document.getElementById('item-input');
+      const value = input.value.trim();
+      if (value) {
+        parentItems.push(value);
+        input.value = '';
+        renderParentList();
+      }
+    }
+
+    function deleteItem(index) {
+      parentItems.splice(index, 1);
+      renderParentList();
+    }
+
+    function renderParentList() {
+      const list = document.getElementById('parent-item-list');
+      list.innerHTML = '';
+      parentItems.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${item}</span> <span class="delete-btn" onclick="deleteItem(${index})">✕ 削除</span>`;
+        list.appendChild(li);
+      });
+    }
+
+    async function generateURL() {
+      if (parentItems.length === 0) {
+        alert('持ち物を1つ以上追加してください。');
+        return;
+      }
+      
+      const baseUrl = window.location.href.split('?')[0];
+      const encodedItems = encodeURIComponent(parentItems.join(','));
+      const tempLongUrl = `${baseUrl}?items=${encodedItems}`;
+      
+      const urlDiv = document.getElementById('generated-url');
+      urlDiv.style.display = 'block';
+      urlDiv.innerHTML = '短いURLを作成中... ⏳<br><span style="font-size:12px; color:#666;">（通信中：数秒お待ちください）</span>';
+
+      try {
+        const targetUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(tempLongUrl)}`;
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+        
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error('通信エラー');
+        
+        const data = await response.json();
+        
+        if (data.contents && data.contents.startsWith('http')) {
+          const shortUrl = data.contents;
+          urlDiv.innerHTML = `
+            <strong>NFC用 URL（短縮版）:</strong><br>
+            <a href="${shortUrl}" target="_blank" style="font-size:18px;">${shortUrl}</a><br><br>
+            <button onclick="navigator.clipboard.writeText('${shortUrl}').then(()=>alert('コピーしました！'))" style="background:#28a745; color:white; width:100%; padding:15px; font-size:16px; border:none; border-radius:5px; cursor:pointer;">URLをコピーする</button>
+          `;
+        } else {
+          throw new Error('無効なURL');
+        }
+      } catch (error) {
+        urlDiv.innerHTML = `
+          <span style="color:red;">※通信制限により自動短縮に失敗しました。</span><br><br>
+          <strong>NFC用 URL（そのまま）:</strong><br>
+          <div style="font-size:10px; word-break:break-all; background:#ddd; padding:5px; margin:5px 0;">${tempLongUrl}</div><br>
+          <button onclick="navigator.clipboard.writeText('${tempLongUrl}').then(()=>alert('長いURLをコピーしました'))" style="padding:10px; cursor:pointer;">長いURLをコピー</button>
+          <p style="font-size: 12px; margin-top: 10px;">※お手数ですが、コピーしたURLを<a href="https://x.gd/" target="_blank">x.gd</a>等のサイトに貼り付けて短くしてください。</p>
+        `;
+      }
+    }
+
+    // ==============================
+    // 子ども用機能（チェックリスト）
+    // ==============================
+    function toggleCheck(cardElement) {
+      if (cardElement.classList.contains('checked')) {
+        cardElement.classList.remove('checked');
+        checkedCount--;
+      } else {
+        cardElement.classList.add('checked');
+        checkedCount++;
+      }
+      checkCompletion();
+    }
+
+    function checkCompletion() {
+      if (checkedCount === childItems.length) {
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff0', '#f00', '#0f0', '#00f', '#f0f'] });
+        document.getElementById('reward').style.display = 'block';
+        setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
+        setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.6 } }), 1000);
+      } else {
+        document.getElementById('reward').style.display = 'none';
+      }
+    }
+
+    // ==============================
+    // 画面の初期化処理（最初に実行される）
+    // ==============================
     const urlParams = new URLSearchParams(window.location.search);
     const itemsParam = urlParams.get('items');
-    
-    // --- 子ども用モード ---
+
     if (itemsParam) {
       document.getElementById('child-view').style.display = 'block';
-      const items = itemsParam.split(',');
+      childItems = itemsParam.split(',');
       const checklistContainer = document.getElementById('checklist');
-      let checkedCount = 0;
 
-      items.forEach((item) => {
+      childItems.forEach((item) => {
         if (!item.trim()) return;
         const card = document.createElement('div');
         card.className = 'item-card';
@@ -75,108 +180,8 @@
         card.appendChild(checkMark);
         checklistContainer.appendChild(card);
       });
-
-      function toggleCheck(cardElement) {
-        if (cardElement.classList.contains('checked')) {
-          cardElement.classList.remove('checked');
-          checkedCount--;
-        } else {
-          cardElement.classList.add('checked');
-          checkedCount++;
-        }
-        checkCompletion();
-      }
-
-      function checkCompletion() {
-        if (checkedCount === items.length) {
-          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff0', '#f00', '#0f0', '#00f', '#f0f'] });
-          document.getElementById('reward').style.display = 'block';
-          setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
-          setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.6 } }), 1000);
-        } else {
-          document.getElementById('reward').style.display = 'none';
-        }
-      }
-    } 
-    // --- 保護者用モード ---
-    else {
+    } else {
       document.getElementById('parent-view').style.display = 'block';
-      let parentItems = [];
-
-      function addItem() {
-        const input = document.getElementById('item-input');
-        const value = input.value.trim();
-        if (value) {
-          parentItems.push(value);
-          input.value = '';
-          renderParentList();
-        }
-      }
-
-      function deleteItem(index) {
-        parentItems.splice(index, 1);
-        renderParentList();
-      }
-
-      function renderParentList() {
-        const list = document.getElementById('parent-item-list');
-        list.innerHTML = '';
-        parentItems.forEach((item, index) => {
-          const li = document.createElement('li');
-          li.innerHTML = `<span>${item}</span> <span class="delete-btn" onclick="deleteItem(${index})">✕ 削除</span>`;
-          list.appendChild(li);
-        });
-      }
-
-      // ★ 新しいURL短縮処理（中継サーバー ＋ TinyURL通信）
-      async function generateURL() {
-        if (parentItems.length === 0) {
-          alert('持ち物を1つ以上追加してください。');
-          return;
-        }
-        
-        const baseUrl = window.location.href.split('?')[0];
-        const encodedItems = encodeURIComponent(parentItems.join(','));
-        const tempLongUrl = `${baseUrl}?items=${encodedItems}`;
-        
-        const urlDiv = document.getElementById('generated-url');
-        urlDiv.style.display = 'block';
-        urlDiv.innerHTML = '短いURLを作成中... ⏳<br><span style="font-size:12px; color:#666;">（通信中：数秒お待ちください）</span>';
-
-        try {
-          // 1. TinyURLのAPI作成用URLを準備
-          const targetUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(tempLongUrl)}`;
-          // 2. ブラウザのブロックを回避するため、無料の中継サーバー（allorigins）を通す
-          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-          
-          // 3. 通信を実行
-          const response = await fetch(proxyUrl);
-          if (!response.ok) throw new Error('通信エラー');
-          
-          const data = await response.json();
-          
-          // 4. 短縮URLが正しく返ってきたか確認
-          if (data.contents && data.contents.startsWith('http')) {
-            const shortUrl = data.contents;
-            urlDiv.innerHTML = `
-              <strong>NFC用 URL（短縮版）:</strong><br>
-              <a href="${shortUrl}" target="_blank" style="font-size:18px;">${shortUrl}</a><br><br>
-              <button onclick="navigator.clipboard.writeText('${shortUrl}').then(()=>alert('コピーしました！'))" style="background:#28a745; color:white; width:100%; padding:15px;">URLをコピーする</button>
-            `;
-          } else {
-            throw new Error('無効なURLが返却されました');
-          }
-        } catch (error) {
-          // 万が一エラーが起きた場合の安全対策
-          urlDiv.innerHTML = `
-            <span style="color:red;">※ネットワーク制限により自動短縮に失敗しました。</span><br><br>
-            <strong>NFC用 URL（そのまま）:</strong><br>
-            <div style="font-size:10px; word-break:break-all; background:#ddd; padding:5px; margin:5px 0;">${tempLongUrl}</div><br>
-            <button onclick="navigator.clipboard.writeText('${tempLongUrl}').then(()=>alert('長いURLをコピーしました'))">長いURLをコピー</button>
-            <p style="font-size: 12px; margin-top: 10px;">※お手数ですが、コピーしたURLを別のブラウザタブで<a href="https://x.gd/" target="_blank">x.gd</a>等のサイトに貼り付けて短くしてください。</p>
-          `;
-        }
-      }
     }
   </script>
 </body>
