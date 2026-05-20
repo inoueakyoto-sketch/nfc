@@ -69,7 +69,7 @@
     ul { list-style-type: none; padding: 0; text-align: left; }
     li { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; }
     .delete-btn { color: red; cursor: pointer; font-weight: bold; }
-    #generated-url { word-break: break-all; font-size: 14px; background: #eee; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;}
+    #generated-url { word-break: break-all; font-size: 14px; background: #eee; padding: 15px; border-radius: 5px; margin-top: 15px; display: none;}
   </style>
 </head>
 <body>
@@ -100,9 +100,11 @@
   </div>
 
   <script>
-    // URLのパラメータを取得
     const urlParams = new URLSearchParams(window.location.search);
     const itemsParam = urlParams.get('items');
+    
+    // 生成した長いURLを一時保存する変数
+    let tempLongUrl = "";
     
     // --- 子ども用モード ---
     if (itemsParam) {
@@ -111,19 +113,16 @@
       const checklistContainer = document.getElementById('checklist');
       let checkedCount = 0;
 
-      items.forEach((item, index) => {
+      items.forEach((item) => {
         if (!item.trim()) return;
         
-        // カード作成
         const card = document.createElement('div');
         card.className = 'item-card';
         card.onclick = () => toggleCheck(card);
 
-        // アイテム名
         const nameSpan = document.createElement('span');
         nameSpan.innerText = item;
 
-        // チェックマーク
         const checkMark = document.createElement('div');
         checkMark.className = 'check-mark';
         checkMark.innerText = '✔';
@@ -146,23 +145,14 @@
 
       function checkCompletion() {
         if (checkedCount === items.length) {
-          // トークエコノミー: 達成報酬の演出 (紙吹雪)
-          confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#ff0', '#f00', '#0f0', '#00f', '#f0f']
-          });
+          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff0', '#f00', '#0f0', '#00f', '#f0f'] });
           document.getElementById('reward').style.display = 'block';
-          
-          // 連続で紙吹雪を出す演出
           setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
           setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.6 } }), 1000);
         } else {
           document.getElementById('reward').style.display = 'none';
         }
       }
-
     } 
     // --- 保護者用モード ---
     else {
@@ -199,14 +189,42 @@
           alert('持ち物を1つ以上追加してください。');
           return;
         }
-        // 現在のURL（GitHub PagesのURL）を取得し、パラメータを付与
+        
+        // ベースとなるURLを作成
         const baseUrl = window.location.href.split('?')[0];
         const encodedItems = encodeURIComponent(parentItems.join(','));
-        const finalUrl = `${baseUrl}?items=${encodedItems}`;
+        tempLongUrl = `${baseUrl}?items=${encodedItems}`;
         
+        // UIを「作成中」にする
         const urlDiv = document.getElementById('generated-url');
         urlDiv.style.display = 'block';
-        urlDiv.innerHTML = `<strong>NFC用URL:</strong><br><a href="${finalUrl}" target="_blank">${finalUrl}</a><br><br><button onclick="navigator.clipboard.writeText('${finalUrl}').then(()=>alert('コピーしました！'))">URLをコピーする</button>`;
+        urlDiv.innerHTML = '短いURLを作成中... ⏳';
+
+        // 外部API (is.gd) を使ってURLを短縮する
+        const script = document.createElement('script');
+        script.src = `https://is.gd/create.php?format=json&url=${encodeURIComponent(tempLongUrl)}&callback=handleShortUrl`;
+        document.body.appendChild(script);
+      }
+    }
+
+    // --- URL短縮用コールバック関数 ---
+    function handleShortUrl(data) {
+      const urlDiv = document.getElementById('generated-url');
+      if (data.shorturl) {
+        // 短縮成功
+        urlDiv.innerHTML = `
+          <strong>NFC用 URL（短縮版）:</strong><br>
+          <a href="${data.shorturl}" target="_blank">${data.shorturl}</a><br><br>
+          <button onclick="navigator.clipboard.writeText('${data.shorturl}').then(()=>alert('コピーしました！'))">URLをコピーする</button>
+        `;
+      } else {
+        // 短縮失敗時（APIエラーなど）は元の長いURLを出す
+        urlDiv.innerHTML = `
+          <span style="color:red;">※短縮機能が混雑しているため、通常のURLを発行しました。</span><br><br>
+          <strong>NFC用 URL:</strong><br>
+          <a href="${tempLongUrl}" target="_blank">${tempLongUrl}</a><br><br>
+          <button onclick="navigator.clipboard.writeText('${tempLongUrl}').then(()=>alert('コピーしました！'))">URLをコピーする</button>
+        `;
       }
     }
   </script>
