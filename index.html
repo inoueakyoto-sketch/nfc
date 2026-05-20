@@ -8,28 +8,36 @@
   <style>
     body { font-family: 'Hiragino Maru Gothic ProN', 'Rounded M+ 1c', sans-serif; background-color: #f0f8ff; color: #333; margin: 0; padding: 20px; text-align: center; }
     h1, h2 { color: #4a90e2; }
-    #child-view { display: none; }
-    .item-card { background: #ffffff; margin: 15px auto; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; border: 3px solid transparent; }
+    
+    /* 子ども用UI */
+    #child-view { display: none; position: relative; }
+    .item-card { background: #ffffff; margin: 15px auto; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; border: 3px solid transparent; user-select: none; }
     .item-card:active { transform: scale(0.95); }
     .item-card.checked { background: #d4edda; color: #155724; border-color: #28a745; }
     .check-mark { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 24px; color: transparent; }
     .item-card.checked .check-mark { background: #28a745; border-color: #28a745; color: white; }
     .reward-text { font-size: 32px; color: #ff8c00; font-weight: bold; margin-top: 20px; display: none; animation: popup 0.5s ease-out; }
     @keyframes popup { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+    
+    /* 設定ボタン（子ども画面の右上） */
+    .settings-btn { position: absolute; top: 0; right: 10px; font-size: 24px; cursor: pointer; opacity: 0.5; background: none; border: none; }
+    
+    /* 保護者用UI */
     #parent-view { display: none; background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    input[type="text"] { width: 70%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
-    button { padding: 10px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+    input[type="text"] { width: 65%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
+    button { padding: 10px 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
     .btn-add { background: #4a90e2; color: white; }
-    .btn-generate { background: #ff8c00; color: white; width: 100%; margin-top: 20px; padding: 15px;}
+    .btn-save { background: #28a745; color: white; width: 100%; margin-top: 20px; padding: 15px; font-size: 18px; }
     ul { list-style-type: none; padding: 0; text-align: left; }
-    li { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; }
-    .delete-btn { color: red; cursor: pointer; font-weight: bold; }
-    #generated-url { word-break: break-all; font-size: 14px; background: #eee; padding: 15px; border-radius: 5px; margin-top: 15px; display: none;}
+    li { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+    .delete-btn { color: red; cursor: pointer; font-weight: bold; padding: 5px; }
+    .nfc-info { background: #eee; padding: 15px; border-radius: 5px; margin-top: 30px; text-align: left; font-size: 14px; }
   </style>
 </head>
 <body>
 
   <div id="child-view">
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
     <h1>🎒 もちものチェック</h1>
     <p>じゅんびができたら、タップしてね！</p>
     <div id="checklist"></div>
@@ -38,134 +46,105 @@
 
   <div id="parent-view">
     <h2>🛠 保護者用設定画面</h2>
-    <p>持ち物を登録して、NFCタグ用のURLを作成します。</p>
+    <p style="font-size: 14px; color: #d9534f; font-weight: bold;">※必ず「子どもが実際に使うスマホ」でこの設定を行ってください。</p>
+    
     <div>
       <input type="text" id="item-input" placeholder="例: ✏️ えんぴつ">
       <button class="btn-add" onclick="addItem()">追加</button>
     </div>
     <ul id="parent-item-list"></ul>
-    <button class="btn-generate" onclick="generateURL()">NFCタグ用URLを作成する</button>
-    <div id="generated-url"></div>
+    
+    <button class="btn-save" onclick="saveData()">このスマホに持ち物を保存する</button>
+
+    <div class="nfc-info">
+      <strong>【NFCタグへの書き込み】</strong><br>
+      保存ができたら、以下の短いURLをNFC Tools等でタグに書き込んでください。（※短縮URLは不要です）<br><br>
+      <input type="text" id="nfc-url" readonly style="width: 100%; box-sizing: border-box; background: #fff; margin-bottom: 10px;"><br>
+      <button onclick="copyUrl()" style="background:#666; color:white; width:100%;">URLをコピーする</button>
+    </div>
   </div>
 
   <script>
-    // ==============================
-    // 状態を管理する変数
-    // ==============================
-    let parentItems = [];
-    let childItems = [];
+    let savedItems = [];
     let checkedCount = 0;
 
-    // ==============================
-    // 保護者用機能（設定画面）
-    // ==============================
+    // --- 画面切り替え ---
+    function init() {
+      // スマホの記憶領域（localStorage）からデータを読み込む
+      const data = localStorage.getItem('school_checklist_items');
+      if (data) {
+        savedItems = JSON.parse(data);
+        if (savedItems.length > 0) {
+          renderChildView();
+          return;
+        }
+      }
+      // データがない場合は保護者画面を表示
+      renderParentView();
+    }
+
+    // --- 保護者用機能 ---
+    function renderParentView() {
+      document.getElementById('child-view').style.display = 'none';
+      document.getElementById('parent-view').style.display = 'block';
+      
+      // NFC用URL（現在のURLからパラメータ等を抜いた大元のURL）を表示
+      document.getElementById('nfc-url').value = window.location.href.split('?')[0].split('#')[0];
+      updateParentList();
+    }
+
     function addItem() {
       const input = document.getElementById('item-input');
       const value = input.value.trim();
       if (value) {
-        parentItems.push(value);
+        savedItems.push(value);
         input.value = '';
-        renderParentList();
+        updateParentList();
       }
     }
 
     function deleteItem(index) {
-      parentItems.splice(index, 1);
-      renderParentList();
+      savedItems.splice(index, 1);
+      updateParentList();
     }
 
-    function renderParentList() {
+    function updateParentList() {
       const list = document.getElementById('parent-item-list');
       list.innerHTML = '';
-      parentItems.forEach((item, index) => {
+      savedItems.forEach((item, index) => {
         const li = document.createElement('li');
         li.innerHTML = `<span>${item}</span> <span class="delete-btn" onclick="deleteItem(${index})">✕ 削除</span>`;
         list.appendChild(li);
       });
     }
 
-    async function generateURL() {
-      if (parentItems.length === 0) {
+    function saveData() {
+      if (savedItems.length === 0) {
         alert('持ち物を1つ以上追加してください。');
         return;
       }
-      
-      const baseUrl = window.location.href.split('?')[0];
-      const encodedItems = encodeURIComponent(parentItems.join(','));
-      const tempLongUrl = `${baseUrl}?items=${encodedItems}`;
-      
-      const urlDiv = document.getElementById('generated-url');
-      urlDiv.style.display = 'block';
-      urlDiv.innerHTML = '短いURLを作成中... ⏳<br><span style="font-size:12px; color:#666;">（通信中：数秒お待ちください）</span>';
-
-      try {
-        const targetUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(tempLongUrl)}`;
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
-        
-        const response = await fetch(proxyUrl);
-        if (!response.ok) throw new Error('通信エラー');
-        
-        const data = await response.json();
-        
-        if (data.contents && data.contents.startsWith('http')) {
-          const shortUrl = data.contents;
-          urlDiv.innerHTML = `
-            <strong>NFC用 URL（短縮版）:</strong><br>
-            <a href="${shortUrl}" target="_blank" style="font-size:18px;">${shortUrl}</a><br><br>
-            <button onclick="navigator.clipboard.writeText('${shortUrl}').then(()=>alert('コピーしました！'))" style="background:#28a745; color:white; width:100%; padding:15px; font-size:16px; border:none; border-radius:5px; cursor:pointer;">URLをコピーする</button>
-          `;
-        } else {
-          throw new Error('無効なURL');
-        }
-      } catch (error) {
-        urlDiv.innerHTML = `
-          <span style="color:red;">※通信制限により自動短縮に失敗しました。</span><br><br>
-          <strong>NFC用 URL（そのまま）:</strong><br>
-          <div style="font-size:10px; word-break:break-all; background:#ddd; padding:5px; margin:5px 0;">${tempLongUrl}</div><br>
-          <button onclick="navigator.clipboard.writeText('${tempLongUrl}').then(()=>alert('長いURLをコピーしました'))" style="padding:10px; cursor:pointer;">長いURLをコピー</button>
-          <p style="font-size: 12px; margin-top: 10px;">※お手数ですが、コピーしたURLを<a href="https://x.gd/" target="_blank">x.gd</a>等のサイトに貼り付けて短くしてください。</p>
-        `;
-      }
+      // スマホ本体に保存
+      localStorage.setItem('school_checklist_items', JSON.stringify(savedItems));
+      alert('持ち物をこのスマホに保存しました！');
+      renderChildView();
     }
 
-    // ==============================
-    // 子ども用機能（チェックリスト）
-    // ==============================
-    function toggleCheck(cardElement) {
-      if (cardElement.classList.contains('checked')) {
-        cardElement.classList.remove('checked');
-        checkedCount--;
-      } else {
-        cardElement.classList.add('checked');
-        checkedCount++;
-      }
-      checkCompletion();
+    function copyUrl() {
+      const url = document.getElementById('nfc-url').value;
+      navigator.clipboard.writeText(url).then(() => alert('コピーしました！'));
     }
 
-    function checkCompletion() {
-      if (checkedCount === childItems.length) {
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff0', '#f00', '#0f0', '#00f', '#f0f'] });
-        document.getElementById('reward').style.display = 'block';
-        setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
-        setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.6 } }), 1000);
-      } else {
-        document.getElementById('reward').style.display = 'none';
-      }
-    }
-
-    // ==============================
-    // 画面の初期化処理（最初に実行される）
-    // ==============================
-    const urlParams = new URLSearchParams(window.location.search);
-    const itemsParam = urlParams.get('items');
-
-    if (itemsParam) {
+    // --- 子ども用機能 ---
+    function renderChildView() {
+      document.getElementById('parent-view').style.display = 'none';
       document.getElementById('child-view').style.display = 'block';
-      childItems = itemsParam.split(',');
-      const checklistContainer = document.getElementById('checklist');
+      document.getElementById('reward').style.display = 'none';
+      
+      const container = document.getElementById('checklist');
+      container.innerHTML = '';
+      checkedCount = 0;
 
-      childItems.forEach((item) => {
-        if (!item.trim()) return;
+      savedItems.forEach((item) => {
         const card = document.createElement('div');
         card.className = 'item-card';
         card.onclick = () => toggleCheck(card);
@@ -178,11 +157,38 @@
 
         card.appendChild(nameSpan);
         card.appendChild(checkMark);
-        checklistContainer.appendChild(card);
+        container.appendChild(card);
       });
-    } else {
-      document.getElementById('parent-view').style.display = 'block';
     }
+
+    function toggleCheck(cardElement) {
+      if (cardElement.classList.contains('checked')) {
+        cardElement.classList.remove('checked');
+        checkedCount--;
+      } else {
+        cardElement.classList.add('checked');
+        checkedCount++;
+      }
+      
+      if (checkedCount === savedItems.length) {
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff0', '#f00', '#0f0', '#00f', '#f0f'] });
+        document.getElementById('reward').style.display = 'block';
+        setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
+        setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.6 } }), 1000);
+      } else {
+        document.getElementById('reward').style.display = 'none';
+      }
+    }
+
+    // 子ども画面から保護者画面へ戻る
+    function openSettings() {
+      if(confirm('保護者用の設定画面を開きますか？')) {
+        renderParentView();
+      }
+    }
+
+    // 起動時に実行
+    init();
   </script>
 </body>
 </html>
