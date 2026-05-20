@@ -15,7 +15,7 @@
     .btn-primary { background: #4a90e2; color: white; width: 100%; max-width: 500px; padding: 15px; font-size: 18px; margin-top: 20px; }
     .panel-container { background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left;}
 
-    #child-view, #child-home-view, #error-view { position: relative; }
+    #child-view, #child-home-view, #error-view, #import-confirm-view { position: relative; }
     .item-card { background: #ffffff; margin: 15px auto; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; user-select: none; }
     .item-card:active { transform: scale(0.95); }
     .item-card.checked { background: #d4edda; color: #155724; border-color: #28a745; }
@@ -53,6 +53,21 @@
     </div>
   </div>
 
+  <div id="import-confirm-view" class="view">
+    <h2>📥 リストのうけとり</h2>
+    <div class="panel-container">
+      <p style="font-weight: bold;">以下のリストを受信しました。<br>このリストで間違いないですか？</p>
+      
+      <h3 id="confirm-list-title" style="margin-top: 20px; border-bottom: 2px solid #eee; padding-bottom: 5px; color: #ff8c00;"></h3>
+      <ul id="confirm-list-items" style="list-style: none; padding: 0; background: #f9f9f9; border-radius: 5px; padding: 10px;"></ul>
+      
+      <div style="display: flex; justify-content: space-between; margin-top: 30px;">
+        <button id="btn-confirm-no" class="btn" style="background:#ccc; color:#333; width:48%; padding:15px; font-size:18px;">いいえ</button>
+        <button id="btn-confirm-yes" class="btn" style="background:#28a745; color:white; width:48%; padding:15px; font-size:18px;">はい</button>
+      </div>
+    </div>
+  </div>
+
   <div id="error-view" class="view">
     <button class="settings-btn" onclick="unlockAdmin()">⚙️</button>
     <div class="panel-container" style="margin-top: 50px; border: 2px solid #d9534f;">
@@ -75,7 +90,11 @@
     <h2>🛠 リスト管理画面</h2>
     <div id="dashboard-lists"></div>
     <button class="btn btn-primary" onclick="openEditView(null)">➕ 新しいリストを作る</button>
-    <button class="btn" style="background:#eee; color:#333; width:100%; max-width:500px; padding:15px; margin-top:20px;" onclick="lockToChildMode()">🔒 子どもモードに戻る</button>
+    
+    <hr style="margin: 30px 0 10px 0; border: 0; border-top: 1px solid #ccc;">
+    
+    <button class="btn" style="background:#d9534f; color:white; width:100%; max-width:500px; padding:15px;" onclick="resetPraiseCollection()">🔄 ほめ言葉図鑑をリセットする</button>
+    <button class="btn" style="background:#eee; color:#333; width:100%; max-width:500px; padding:15px; margin-top:15px;" onclick="lockToChildMode()">🔒 子どもモードに戻る</button>
   </div>
 
   <div id="edit-view" class="view">
@@ -195,19 +214,44 @@
       const listId = urlParams.get('id');
       const action = urlParams.get('action');
 
+      // ★ QRコードを読み取ってインポートする時の処理
       if (action === 'import') {
         const importId = urlParams.get('id');
         const importTitle = urlParams.get('title');
         const importItems = urlParams.get('items');
         
         if (importId && importTitle && importItems) {
-          appData[importId] = { title: importTitle, items: importItems.split(',') };
-          localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-          localStorage.setItem('nfc_app_role', 'child');
-          
-          alert(`✨ リスト「${importTitle}」を保存しました！`);
-          window.history.replaceState({}, '', window.location.href.split('?')[0]);
-          renderChildHome();
+          // すぐに保存せず、確認画面を表示する
+          document.getElementById('confirm-list-title').innerText = importTitle;
+          const confirmList = document.getElementById('confirm-list-items');
+          confirmList.innerHTML = '';
+          importItems.split(',').forEach(item => {
+            const li = document.createElement('li');
+            li.style.padding = '8px 0';
+            li.style.borderBottom = '1px dashed #ccc';
+            li.innerText = `・${item}`;
+            confirmList.appendChild(li);
+          });
+
+          // 「はい」を押した時
+          document.getElementById('btn-confirm-yes').onclick = () => {
+            appData[importId] = { title: importTitle, items: importItems.split(',') };
+            localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+            localStorage.setItem('nfc_app_role', 'child'); // 子どもモードに切り替え
+            
+            alert(`✨ リスト「${importTitle}」を登録しました！`);
+            window.history.replaceState({}, '', window.location.href.split('?')[0]);
+            renderChildHome();
+          };
+
+          // 「いいえ」を押した時
+          document.getElementById('btn-confirm-no').onclick = () => {
+            alert('登録をやめました。');
+            window.history.replaceState({}, '', window.location.href.split('?')[0]);
+            init(); // 元の画面に戻る
+          };
+
+          switchView('import-confirm-view');
           return;
         }
       }
@@ -248,6 +292,18 @@
     function lockToChildMode() {
       localStorage.setItem('nfc_app_role', 'child');
       renderChildHome();
+    }
+    
+    // ★ リセット機能
+    function resetPraiseCollection() {
+      if (confirm('本当に図鑑（コレクション）をリセットしますか？\n※集めた言葉や、今日のチェック履歴がすべて消えて最初からになります。')) {
+        collectedPraises = [];
+        localStorage.setItem('nfc_praise_collection', JSON.stringify([]));
+        localStorage.setItem('nfc_daily_praises', JSON.stringify({date: "", items: []}));
+        updateCollectionStatus();
+        alert('図鑑をリセットしました！最初からスタートします。');
+        renderDashboard();
+      }
     }
 
     function renderDashboard() {
@@ -359,7 +415,9 @@
       const collected = collectedPraises.length;
       const text = `📖 あつめた言葉： ${collected} / ${total}`;
       document.getElementById('home-collection').innerText = text;
-      document.getElementById('child-collection').innerText = text;
+      
+      const childCol = document.getElementById('child-collection');
+      if (childCol) childCol.innerText = text;
     }
 
     function renderChildHome() {
@@ -382,7 +440,6 @@
       childCurrentList.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'item-card';
-        // id と index を toggleCheck に渡す
         card.onclick = () => toggleCheck(card, id, index);
         card.innerHTML = `<span>${item}</span><div class="check-mark">✔</div>`;
         container.appendChild(card);
@@ -391,27 +448,21 @@
 
     function toggleCheck(cardElement, listId, itemIndex) {
       if (cardElement.classList.contains('checked')) {
-        // チェックを外す処理（報酬はなし）
         cardElement.classList.remove('checked');
         checkedCount--;
       } else {
-        // チェックをつける処理
         cardElement.classList.add('checked');
         checkedCount++;
         
-        // ★ 無限増殖（スパム）防止機能：日付で管理
         const today = new Date().toLocaleDateString('ja-JP');
         let dailyData = JSON.parse(localStorage.getItem('nfc_daily_praises') || '{"date":"","items":[]}');
 
-        // 日付が変わっていたら履歴をリセット
         if (dailyData.date !== today) {
           dailyData = { date: today, items: [] };
         }
 
-        // 「リストID_項目番号」のユニークキーを作成（例：17001234_0）
         const itemKey = `${listId}_${itemIndex}`;
 
-        // 今日まだ褒められていない項目なら、ガチャを回して記録する
         if (!dailyData.items.includes(itemKey)) {
           dailyData.items.push(itemKey);
           localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData));
