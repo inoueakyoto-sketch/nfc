@@ -11,22 +11,47 @@
     .view { display: none; }
     .active-view { display: block; }
     
-    /* 汎用パーツ */
     .btn { padding: 10px 15px; font-size: 14px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin: 5px 5px 0 0; }
     .btn-primary { background: #4a90e2; color: white; width: 100%; max-width: 500px; padding: 15px; font-size: 18px; margin-top: 20px; }
     .panel-container { background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left;}
 
-    /* 子ども用UI */
     #child-view, #child-home-view, #error-view { position: relative; }
     .item-card { background: #ffffff; margin: 15px auto; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; user-select: none; }
     .item-card:active { transform: scale(0.95); }
     .item-card.checked { background: #d4edda; color: #155724; border-color: #28a745; }
     .check-mark { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 24px; color: transparent; }
     .item-card.checked .check-mark { background: #28a745; border-color: #28a745; color: white; }
+    
     .reward-text { font-size: 32px; color: #ff8c00; font-weight: bold; margin-top: 20px; display: none; animation: popup 0.5s ease-out; }
     @keyframes popup { 0% { transform: scale(0); } 100% { transform: scale(1); } }
     .settings-btn { position: absolute; top: 0; right: 10px; font-size: 24px; cursor: pointer; opacity: 0.5; background: none; border: none; }
     
+    /* コレクション状況の表示 */
+    .collection-status { background: #fff; border: 2px solid #ff8c00; color: #ff8c00; font-weight: bold; padding: 10px; border-radius: 20px; display: inline-block; margin-top: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+    /* 🌟 新しい演出：ほめ言葉ポップアップ */
+    .praise-popup {
+      position: fixed;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      z-index: 1000;
+      pointer-events: none;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 5px solid #ff8c00;
+      width: 80%;
+      max-width: 350px;
+    }
+    .praise-popup.show { transform: translate(-50%, -50%) scale(1); }
+    .praise-number { font-size: 16px; color: #666; font-weight: bold; margin-bottom: 10px; text-align: left; border-bottom: 2px dashed #ccc; padding-bottom: 5px; }
+    .praise-message { font-size: 26px; color: #d9534f; font-weight: bold; margin: 15px 0; }
+    .praise-progress { font-size: 14px; color: #4a90e2; font-weight: bold; text-align: right; }
+
     /* 保護者用UI */
     .dashboard-card { background: #fff; padding: 15px; margin: 15px auto; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; text-align: left; }
     .dashboard-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
@@ -40,10 +65,10 @@
 
   <div id="child-home-view" class="view">
     <button class="settings-btn" onclick="unlockAdmin()">⚙️</button>
-    <div style="margin-top: 100px;">
+    <div style="margin-top: 80px;">
       <h1 style="font-size: 60px; margin: 0;">📱</h1>
       <h2>スマホをNFCシールに<br>かざしてね！</h2>
-      <p style="color:#666;">（QRコードを読み込んだ場合は<br>設定が保存されています）</p>
+      <div id="home-collection" class="collection-status"></div>
     </div>
   </div>
 
@@ -51,11 +76,8 @@
     <button class="settings-btn" onclick="unlockAdmin()">⚙️</button>
     <div class="panel-container" style="margin-top: 50px; border: 2px solid #d9534f;">
       <h2 style="color: #d9534f;">⚠️ リストが見つかりません</h2>
-      <p>このスマホには、読み込んだタグのデータが保存されていません。</p>
       <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; font-size: 14px;">
-        <strong>【よくある原因と解決策】</strong><br>
-        LINEなどのアプリ内ブラウザやQRリーダーアプリでQRコードを読み込むと、データが正常に引き継がれません。<br><br>
-        お手数ですが、一度保護者のスマホでQRコードを表示し、子どものスマホの<strong>「標準のカメラアプリ」</strong>で読み取り、必ず<strong>「Safari」または「Chrome」</strong>で開いて保存し直してください。
+        QRコードを標準の「カメラアプリ」で読み取り、「Safari」または「Chrome」で開いて保存し直してください。
       </div>
     </div>
   </div>
@@ -63,7 +85,7 @@
   <div id="child-view" class="view">
     <button class="settings-btn" onclick="unlockAdmin()">⚙️</button>
     <h1 id="child-title">🎒 もちものチェック</h1>
-    <p>じゅんびができたら、タップしてね！</p>
+    <div id="child-collection" class="collection-status" style="font-size: 14px; padding: 5px 15px; margin-bottom: 10px;"></div>
     <div id="checklist"></div>
     <div id="reward" class="reward-text">🌟 ぜんぶできたね！ 🌟<br>よくできました！</div>
   </div>
@@ -80,22 +102,16 @@
     <div class="panel-container">
       <label style="font-weight:bold;">リストの名前 (例: 🎒ランドセル)</label><br>
       <input type="text" id="list-title-input" style="width: 100%; box-sizing: border-box; margin: 5px 0 20px 0;"><br>
-      
       <label style="font-weight:bold;">1つずつ追加</label><br>
       <div style="display: flex;">
         <input type="text" id="item-input" placeholder="例: ✏️ えんぴつ">
         <button class="btn" style="background:#4a90e2; color:white; margin:0 0 0 5px;" onclick="addItem()">追加</button>
       </div>
-
       <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-
       <label style="font-weight:bold;">📋 スプレッドシートから一括追加</label><br>
-      <p style="font-size: 12px; color:#666; margin: 5px 0;">Excelやスプレッドシートの列をコピーして、下に貼り付けてください。</p>
-      <textarea id="bulk-input" rows="4" placeholder="✏️ えんぴつ&#10;📓 ノート&#10;📏 定規"></textarea>
+      <textarea id="bulk-input" rows="4"></textarea>
       <button class="btn" style="background:#28a745; color:white; width: 100%; margin-top: 5px;" onclick="addBulkItems()">一括追加する</button>
-      
       <div id="edit-item-list" style="margin-top: 25px; border-top: 2px solid #eee; padding-top: 15px;"></div>
-      
       <button class="btn btn-primary" style="background:#4a90e2;" onclick="saveList()">💾 この端末に保存する</button>
       <button class="btn btn-primary" style="background:#eee; color:#333; margin-top:10px;" onclick="goToDashboard()">キャンセル</button>
     </div>
@@ -104,9 +120,7 @@
   <div id="share-view" class="view">
     <h2>📲 他のスマホに配る</h2>
     <div class="panel-container" style="text-align: center;">
-      <p style="font-size: 14px; text-align: left;">子どもが使うスマホの<strong>「標準カメラ」</strong>で、このQRコードを読み取り、<strong>SafariやChrome</strong>で開かせてください。</p>
       <img id="qr-img" src="" alt="QR Code" style="margin: 20px 0; width: 150px; height: 150px;">
-      <br>
       <button class="btn btn-primary" style="background:#eee; color:#333; margin-top:30px;" onclick="goToDashboard()">戻る</button>
     </div>
   </div>
@@ -118,12 +132,38 @@
     let childCurrentList = [];
     let checkedCount = 0;
 
-    // --- 初期化処理 ---
+    // 🌟 完成されたほめ言葉のリスト（今回はサンプルとして100個登録）
+    // ※ここにカンマ区切りで追加していくことで、1000個まで増やせます！
+    const praiseList = [
+      "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！",
+      "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！",
+      "自分でできてエライ！", "確認バッチリだね！", "いいペースだね！", "天才かもしれない！", "お見事です！",
+      "素晴らしい行動力！", "最高だね！", "忘れ物なし！素晴らしい！", "今日も笑顔でいこう！", "ハナマル満点！",
+      "一発でできたね！", "スピード解決だね！", "良い習慣がついてるね！", "さすが、よく分かってる！", "応援してるよ！",
+      "ハイタッチ！", "ニコニコ笑顔がいいね！", "パーフェクト！", "一歩前進だね！", "やる気に満ちてるね！",
+      "その意気だ！", "見事な手際！", "自分で気づけてすごい！", "毎日えらいね！", "今日も一日楽しもう！",
+      "バツグンだね！", "準備の達人！", "100点満点！", "かっこよすぎる！", "先生もびっくりするよ！",
+      "ママ（パパ）も鼻が高いよ！", "さすがだね！", "よくできました！", "その集中力、すごい！", "バッチリ決まったね！",
+      "いいぞいいぞ！", "スーパープレー！", "今日もがんばろう！", "素敵だね！", "グッジョブ！",
+      "ミラクル！", "チャンピオンだ！", "大正解！", "すばやいね！", "ていねいで綺麗！",
+      "今日も絶好調！", "自信をもって！", "その笑顔が一番！", "やるじゃん！", "大天才のひらめき！",
+      "毎日すごいね！", "さすがの腕前！", "準備オッケー！", "今日も絶好調！", "その調子でゴー！",
+      "いい感じ！", "やる気スイッチONだね！", "すてきな心意気！", "バッチリ準備OK！", "今日もハッピー！",
+      "頼もしいね！", "一安心だね！", "確認のプロ！", "さすがのチェック力！", "今日も元気だね！",
+      "パーフェクト達成！", "すごいぞ、その調子！", "毎日がんばってるね！", "えらい！花丸！", "今日も素晴らしい！",
+      "さすがの準備！", "バッチリすぎる！", "かっこいい！", "今日も最高！", "その意気込みがいいね！",
+      "完璧だね！", "準備万端！", "今日も一日楽しんで！", "さすが！", "その調子！",
+      "よく頑張ったね！", "大成功！", "天才！", "バッチリ！", "最高！",
+      "グッド！", "エクセレント！", "ワンダフル！", "ビューティフル！", "ブラボー！"
+    ];
+
+    // スマホの「図鑑（コレクション）」に保存された番号のリスト
+    let collectedPraises = JSON.parse(localStorage.getItem('nfc_praise_collection') || '[]');
+
     function init() {
       const saved = localStorage.getItem('nfc_multi_checklists');
       if (saved) appData = JSON.parse(saved);
 
-      // 初回アクセス時に権限がなければ、親（admin）とする
       if (!localStorage.getItem('nfc_app_role')) {
         localStorage.setItem('nfc_app_role', 'admin');
       }
@@ -132,7 +172,6 @@
       const listId = urlParams.get('id');
       const action = urlParams.get('action');
 
-      // 1. QRコードからインポートされた場合
       if (action === 'import') {
         const importId = urlParams.get('id');
         const importTitle = urlParams.get('title');
@@ -141,28 +180,24 @@
         if (importId && importTitle && importItems) {
           appData[importId] = { title: importTitle, items: importItems.split(',') };
           localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-          
-          // ★ インポート完了と同時に強制的に「子どもモード」にする
           localStorage.setItem('nfc_app_role', 'child');
           
-          alert(`✨ リスト「${importTitle}」を保存しました！\n（子どもモードに設定されました）`);
+          alert(`✨ リスト「${importTitle}」を保存しました！`);
           window.history.replaceState({}, '', window.location.href.split('?')[0]);
           renderChildHome();
           return;
         }
       }
 
-      // 2. NFCタグを読み込んだ場合（ID指定あり）
       if (listId) {
         if (appData[listId]) {
-          renderChildView(listId); // データがあればリスト表示
+          renderChildView(listId);
         } else {
-          switchView('error-view'); // データがなければエラー画面
+          switchView('error-view');
         }
         return;
       }
 
-      // 3. 通常のアクセス（ルートURL）
       const role = localStorage.getItem('nfc_app_role');
       if (role === 'admin') {
         renderDashboard();
@@ -176,7 +211,6 @@
       document.getElementById(viewId).classList.add('active-view');
     }
 
-    // ================= 権限管理 =================
     function unlockAdmin() {
       const pin = prompt("保護者用パスワード（半角数字4桁）を入力してください。\n※初期設定は 0000 です。");
       if (pin === "0000") {
@@ -198,26 +232,21 @@
       switchView('dashboard-view');
       const container = document.getElementById('dashboard-lists');
       container.innerHTML = '';
-
       const keys = Object.keys(appData);
+      
       if (keys.length === 0) {
-        container.innerHTML = '<p style="color:#666; background:#fff; padding:20px; border-radius:10px;">まだリストがありません。<br>下のボタンから追加してください。</p>';
+        container.innerHTML = '<p>まだリストがありません。</p>';
         return;
       }
 
       const baseUrl = window.location.href.split('?')[0].split('#')[0];
-
       keys.forEach(id => {
         const list = appData[id];
         const nfcUrl = `${baseUrl}?id=${id}`;
-        
         const card = document.createElement('div');
         card.className = 'dashboard-card';
         card.innerHTML = `
           <div class="dashboard-title">${list.title}</div>
-          <div style="font-size:12px; color:#666; margin-bottom:10px; background:#f9f9f9; padding:5px; border-radius:3px;">
-            <strong>【NFCタグ用 URL】</strong><br><span style="word-break:break-all;">${nfcUrl}</span>
-          </div>
           <button class="btn" style="background:#28a745; color:white;" onclick="openShareView('${id}')">📲 子どもに配る</button>
           <button class="btn" style="background:#666; color:white;" onclick="copyText('${nfcUrl}')">タグURLコピー</button>
           <button class="btn" style="background:#ff8c00; color:white;" onclick="openEditView('${id}')">編集</button>
@@ -236,16 +265,14 @@
     }
 
     function copyText(text) {
-      navigator.clipboard.writeText(text).then(() => alert('NFCシールに書き込むためのURLをコピーしました！'));
+      navigator.clipboard.writeText(text).then(() => alert('NFCシール用URLをコピーしました！'));
     }
 
-    // ================= 共有（配る）機能 =================
     function openShareView(id) {
       const list = appData[id];
       const baseUrl = window.location.href.split('?')[0].split('#')[0];
       const importUrl = `${baseUrl}?action=import&id=${id}&title=${encodeURIComponent(list.title)}&items=${encodeURIComponent(list.items.join(','))}`;
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(importUrl)}`;
-      
       document.getElementById('qr-img').src = qrApiUrl;
       switchView('share-view');
     }
@@ -269,38 +296,20 @@
     function addItem() {
       const input = document.getElementById('item-input');
       const val = input.value.trim();
-      if(val) {
-        tempItems.push(val);
-        input.value = '';
-        renderEditItems();
-      }
+      if(val) { tempItems.push(val); input.value = ''; renderEditItems(); }
     }
 
-    // ★ 新機能：スプレッドシートからの一括追加
     function addBulkItems() {
-      const textarea = document.getElementById('bulk-input');
-      const lines = textarea.value.split('\n');
-      let addedCount = 0;
-      
+      const lines = document.getElementById('bulk-input').value.split('\n');
       lines.forEach(line => {
         const val = line.trim();
-        if(val) {
-          tempItems.push(val);
-          addedCount++;
-        }
+        if(val) tempItems.push(val);
       });
-      
-      if (addedCount > 0) {
-        textarea.value = '';
-        renderEditItems();
-        alert(`${addedCount}件のアイテムを追加しました！`);
-      }
-    }
-
-    function removeTempItem(index) {
-      tempItems.splice(index, 1);
+      document.getElementById('bulk-input').value = '';
       renderEditItems();
     }
+
+    function removeTempItem(index) { tempItems.splice(index, 1); renderEditItems(); }
 
     function renderEditItems() {
       const container = document.getElementById('edit-item-list');
@@ -315,30 +324,33 @@
 
     function saveList() {
       const title = document.getElementById('list-title-input').value.trim();
-      if (!title) return alert('リストの名前を入力してください。');
-      if (tempItems.length === 0) return alert('項目を1つ以上追加してください。');
-
+      if (!title || tempItems.length === 0) return alert('入力内容を確認してください。');
       const id = currentEditingId || Date.now().toString();
       appData[id] = { title: title, items: tempItems };
-      
       localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-      alert('保存しました！');
       renderDashboard();
     }
-
-    function goToDashboard() {
-      window.history.replaceState({}, '', window.location.href.split('?')[0]);
-      renderDashboard();
-    }
+    
+    function goToDashboard() { renderDashboard(); }
 
     // ================= 子ども用画面 =================
+    function updateCollectionStatus() {
+      const total = praiseList.length; // 配列の数を分母とする
+      const collected = collectedPraises.length;
+      const text = `📖 あつめた言葉： ${collected} / ${total}`;
+      document.getElementById('home-collection').innerText = text;
+      document.getElementById('child-collection').innerText = text;
+    }
+
     function renderChildHome() {
       switchView('child-home-view');
+      updateCollectionStatus();
     }
 
     function renderChildView(id) {
       switchView('child-view');
       document.getElementById('reward').style.display = 'none';
+      updateCollectionStatus();
       
       const listData = appData[id];
       document.getElementById('child-title').innerText = listData.title;
@@ -347,20 +359,11 @@
 
       const container = document.getElementById('checklist');
       container.innerHTML = '';
-
       childCurrentList.forEach((item) => {
         const card = document.createElement('div');
         card.className = 'item-card';
         card.onclick = () => toggleCheck(card);
-
-        const nameSpan = document.createElement('span');
-        nameSpan.innerText = item;
-        const checkMark = document.createElement('div');
-        checkMark.className = 'check-mark';
-        checkMark.innerText = '✔';
-
-        card.appendChild(nameSpan);
-        card.appendChild(checkMark);
+        card.innerHTML = `<span>${item}</span><div class="check-mark">✔</div>`;
         container.appendChild(card);
       });
     }
@@ -372,16 +375,56 @@
       } else {
         cardElement.classList.add('checked');
         checkedCount++;
+        triggerPraise(); // ★チェック時にほめ言葉＆コレクション追加
       }
       
       if (checkedCount === childCurrentList.length) {
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff0', '#f00', '#0f0', '#00f', '#f0f'] });
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }});
         document.getElementById('reward').style.display = 'block';
         setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
-        setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.6 } }), 1000);
       } else {
         document.getElementById('reward').style.display = 'none';
       }
+    }
+
+    // 🌟 ランダムにほめ言葉を引き、コレクションに追加する機能
+    function triggerPraise() {
+      const total = praiseList.length;
+      const randomIndex = Math.floor(Math.random() * total);
+      const message = praiseList[randomIndex];
+      const number = randomIndex + 1; // 配列の0番目は No.1 とする
+
+      // コレクション（図鑑）に新しい番号として保存
+      let isNew = false;
+      if (!collectedPraises.includes(number)) {
+        collectedPraises.push(number);
+        localStorage.setItem('nfc_praise_collection', JSON.stringify(collectedPraises));
+        isNew = true;
+        updateCollectionStatus(); // 画面のカウンターを更新
+      }
+      
+      // ポップアップの作成
+      let popup = document.getElementById('praise-popup');
+      if (!popup) {
+        popup = document.createElement('div');
+        popup.id = 'praise-popup';
+        popup.className = 'praise-popup';
+        document.body.appendChild(popup);
+      }
+      
+      // 中身の表示設定
+      popup.innerHTML = `
+        <div class="praise-number">🏷 No.${number} / ${total} ${isNew ? '<span style="color:red; font-size:12px;">（NEW!）</span>' : ''}</div>
+        <div class="praise-message">${message}</div>
+        <div class="praise-progress">図鑑：${collectedPraises.length} / ${total}</div>
+      `;
+      
+      popup.classList.add('show');
+      
+      // 1.8秒後に自動で閉じる
+      setTimeout(() => {
+        popup.classList.remove('show');
+      }, 1800);
     }
 
     init();
