@@ -379,23 +379,44 @@
 
       const container = document.getElementById('checklist');
       container.innerHTML = '';
-      childCurrentList.forEach((item) => {
+      childCurrentList.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'item-card';
-        card.onclick = () => toggleCheck(card);
+        // id と index を toggleCheck に渡す
+        card.onclick = () => toggleCheck(card, id, index);
         card.innerHTML = `<span>${item}</span><div class="check-mark">✔</div>`;
         container.appendChild(card);
       });
     }
 
-    function toggleCheck(cardElement) {
+    function toggleCheck(cardElement, listId, itemIndex) {
       if (cardElement.classList.contains('checked')) {
+        // チェックを外す処理（報酬はなし）
         cardElement.classList.remove('checked');
         checkedCount--;
       } else {
+        // チェックをつける処理
         cardElement.classList.add('checked');
         checkedCount++;
-        triggerPraise(); 
+        
+        // ★ 無限増殖（スパム）防止機能：日付で管理
+        const today = new Date().toLocaleDateString('ja-JP');
+        let dailyData = JSON.parse(localStorage.getItem('nfc_daily_praises') || '{"date":"","items":[]}');
+
+        // 日付が変わっていたら履歴をリセット
+        if (dailyData.date !== today) {
+          dailyData = { date: today, items: [] };
+        }
+
+        // 「リストID_項目番号」のユニークキーを作成（例：17001234_0）
+        const itemKey = `${listId}_${itemIndex}`;
+
+        // 今日まだ褒められていない項目なら、ガチャを回して記録する
+        if (!dailyData.items.includes(itemKey)) {
+          dailyData.items.push(itemKey);
+          localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData));
+          triggerPraise(); 
+        }
       }
       
       if (checkedCount === childCurrentList.length) {
