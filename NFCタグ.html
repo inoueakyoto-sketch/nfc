@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>もちものチェック</title>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      font-family: 'Hiragino Maru Gothic ProN', 'Rounded M+ 1c', sans-serif;
+      background-color: #f0f8ff;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1, h2 { color: #4a90e2; }
+    
+    /* 子ども用UI */
+    #child-view { display: none; }
+    .item-card {
+      background: #ffffff;
+      margin: 15px auto;
+      padding: 20px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+    }
+    .item-card:active { transform: scale(0.95); }
+    .item-card.checked {
+      background: #d4edda;
+      color: #155724;
+      border-color: #28a745;
+    }
+    .check-mark {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 3px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: transparent;
+    }
+    .item-card.checked .check-mark {
+      background: #28a745; border-color: #28a745; color: white;
+    }
+    .reward-text {
+      font-size: 32px; color: #ff8c00; font-weight: bold; margin-top: 20px; display: none;
+      animation: popup 0.5s ease-out;
+    }
+    @keyframes popup { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+
+    /* 保護者用UI */
+    #parent-view { display: none; background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    input[type="text"] { width: 70%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
+    button { padding: 10px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+    .btn-add { background: #4a90e2; color: white; }
+    .btn-generate { background: #ff8c00; color: white; width: 100%; margin-top: 20px; padding: 15px;}
+    ul { list-style-type: none; padding: 0; text-align: left; }
+    li { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; }
+    .delete-btn { color: red; cursor: pointer; font-weight: bold; }
+    #generated-url { word-break: break-all; font-size: 14px; background: #eee; padding: 10px; border-radius: 5px; margin-top: 10px; display: none;}
+  </style>
+</head>
+<body>
+
+  <div id="child-view">
+    <h1>🎒 もちものチェック</h1>
+    <p>じゅんびができたら、タップしてね！</p>
+    <div id="checklist"></div>
+    <div id="reward" class="reward-text">🌟 ぜんぶできたね！ 🌟<br>よくできました！</div>
+  </div>
+
+  <div id="parent-view">
+    <h2>🛠 保護者用設定画面</h2>
+    <p>持ち物を登録して、NFCタグ用のURLを作成します。<br>※視覚的に分かりやすいよう、絵文字（🎒、✏️など）を入れるのがおすすめです。</p>
+    
+    <div>
+      <input type="text" id="item-input" placeholder="例: ✏️ えんぴつ">
+      <button class="btn-add" onclick="addItem()">追加</button>
+    </div>
+    
+    <ul id="parent-item-list"></ul>
+    
+    <button class="btn-generate" onclick="generateURL()">NFCタグ用URLを作成する</button>
+    <div id="generated-url"></div>
+    <p style="font-size: 12px; color: #666; margin-top: 20px;">
+      ※作成されたURLをコピーし、スマートフォン用のNFC書き込みアプリ（NFC Tools等）を使用してNFCシールに書き込んでください。
+    </p>
+  </div>
+
+  <script>
+    // URLのパラメータを取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const itemsParam = urlParams.get('items');
+    
+    // --- 子ども用モード ---
+    if (itemsParam) {
+      document.getElementById('child-view').style.display = 'block';
+      const items = itemsParam.split(',');
+      const checklistContainer = document.getElementById('checklist');
+      let checkedCount = 0;
+
+      items.forEach((item, index) => {
+        if (!item.trim()) return;
+        
+        // カード作成
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.onclick = () => toggleCheck(card);
+
+        // アイテム名
+        const nameSpan = document.createElement('span');
+        nameSpan.innerText = item;
+
+        // チェックマーク
+        const checkMark = document.createElement('div');
+        checkMark.className = 'check-mark';
+        checkMark.innerText = '✔';
+
+        card.appendChild(nameSpan);
+        card.appendChild(checkMark);
+        checklistContainer.appendChild(card);
+      });
+
+      function toggleCheck(cardElement) {
+        if (cardElement.classList.contains('checked')) {
+          cardElement.classList.remove('checked');
+          checkedCount--;
+        } else {
+          cardElement.classList.add('checked');
+          checkedCount++;
+        }
+        checkCompletion();
+      }
+
+      function checkCompletion() {
+        if (checkedCount === items.length) {
+          // トークエコノミー: 達成報酬の演出 (紙吹雪)
+          confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#ff0', '#f00', '#0f0', '#00f', '#f0f']
+          });
+          document.getElementById('reward').style.display = 'block';
+          
+          // 連続で紙吹雪を出す演出
+          setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
+          setTimeout(() => confetti({ particleCount: 100, spread: 120, origin: { y: 0.6 } }), 1000);
+        } else {
+          document.getElementById('reward').style.display = 'none';
+        }
+      }
+
+    } 
+    // --- 保護者用モード ---
+    else {
+      document.getElementById('parent-view').style.display = 'block';
+      let parentItems = [];
+
+      function addItem() {
+        const input = document.getElementById('item-input');
+        const value = input.value.trim();
+        if (value) {
+          parentItems.push(value);
+          input.value = '';
+          renderParentList();
+        }
+      }
+
+      function deleteItem(index) {
+        parentItems.splice(index, 1);
+        renderParentList();
+      }
+
+      function renderParentList() {
+        const list = document.getElementById('parent-item-list');
+        list.innerHTML = '';
+        parentItems.forEach((item, index) => {
+          const li = document.createElement('li');
+          li.innerHTML = `<span>${item}</span> <span class="delete-btn" onclick="deleteItem(${index})">✕ 削除</span>`;
+          list.appendChild(li);
+        });
+      }
+
+      function generateURL() {
+        if (parentItems.length === 0) {
+          alert('持ち物を1つ以上追加してください。');
+          return;
+        }
+        // 現在のURL（GitHub PagesのURL）を取得し、パラメータを付与
+        const baseUrl = window.location.href.split('?')[0];
+        const encodedItems = encodeURIComponent(parentItems.join(','));
+        const finalUrl = `${baseUrl}?items=${encodedItems}`;
+        
+        const urlDiv = document.getElementById('generated-url');
+        urlDiv.style.display = 'block';
+        urlDiv.innerHTML = `<strong>NFC用URL:</strong><br><a href="${finalUrl}" target="_blank">${finalUrl}</a><br><br><button onclick="navigator.clipboard.writeText('${finalUrl}').then(()=>alert('コピーしました！'))">URLをコピーする</button>`;
+      }
+    }
+  </script>
+</body>
+</html>
