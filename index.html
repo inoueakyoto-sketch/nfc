@@ -131,7 +131,7 @@
     <div class="panel-container" style="margin-top: 50px; border: 2px solid #d9534f;">
       <h2 style="color: #d9534f;">⚠️ リストが見つかりません</h2>
       <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; font-size: 14px;">
-        データベースに該当するIDのリストがありません。URLが正しいかご確認ください。
+        データベースに該当するIDのリストがありません。URLが正しいか、またはオフラインでないかご確認ください。
       </div>
     </div>
   </div>
@@ -205,8 +205,8 @@
     let listToDelete = null;
 
     const rawPraises = [
-      "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！", "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！", "自分でできてエライ！", "確認バッチリだね！", "いいペースだね！", "天才かもしれない！", "お見事です！", "素晴らしい行動力！", "最高だね！", "忘れ物なし！素晴らしい！", "今日も笑顔でいこう！", "ハナマル満点！", "一発でできたね！", "スピード解決だね！", "良い習慣がついてるね！", "さすが、よく分かってる！", "応援してるよ！", "ハイタッチ！", "ニコニコ笑顔がいいね！", "パーフェクト！", "一歩前進だね！", "やる気に満ちてるね！", "その意意だ！", "見事な手際！", "自分で気づけてすごい！", "毎日えらいね！", "今日も一日楽しもう！", "バツグンだね！", "準備の達人！", "100点満点！", "かっこよすぎる！", "先生もびっくりするよ！", "ママもパパも鼻が高いよ！", "さすがだね！", "よくできました！", "その集中力、すごい！", "バッチリ決まったね！", "いいぞいいぞ！", "スーパープレー！", "今日もがんばろう！", "素敵だね！", "グッジョブ！", "毎日すごいね！", "さすがの腕前！", "準備オッケー！", "今日も絶好調！", "いい感じ！", "やる気スイッチONだね！", "すてきな心意気！", "バッチリ準備OK！", "今日もハッピー！", "頼もしいね！", "一安心だね！", "確認のプロ！", "さすがのチェック力！", "今日も元気だね！", "パーフェクト達成！", "すごいぞ、その調子！", "毎日がんばってるね！", "えらい！花丸！", "今日も素晴らしい！", "さすがの準備！", "バッチリすぎる！", "かっこいい！", "今日も最高！", "その意気込みがいいね！", "完璧だね！", "準備万端！", "今日も一日楽しんで！", "さすが！", "その調子！", "マジックみたいだ！", "あっという間に終わったね！", "職人技だね！", "見ていて気持ちがいいよ！", "頼りにしてるよ！", "心がホカホカするよ！", "見ているこっちも嬉しい！", "がんばる姿が素敵！", "毎日成長してるね！", "すごいパワーを感じる！", "どんどん進むね！", "止まらない勢いだ！", "ノリノリだね！", "イケイケゴーゴー！", "テンションMAX！", "心がピカピカだね！", "太陽みたいに眩しい！", "星みたいにキラキラ！", "虹みたいな笑顔！", "お花みたいに素敵！", "大吉だ！", "超ラッキー！", "ハッピーエンド間違いなし！", "ウキウキするね！", "ワクワクが止まらない！", "ササッと終わったね！", "クルッと解決！", "パッと目が覚めるね！", "いい波乗ってんね！", "風を切って走ってる！", "心にズキュンときた！", "胸がキュンとした！", "ホッコリしたよ！", "ウルッときちゃった！", "ジーンときたよ！", "言葉が出ないくらいすごい！", "目からウロコだ！", "ほっぺたが落ちそう！", "頭が下がる思いだよ！", "拍手喝采！", "スタンディングオベーション！", "アンコール！", "ブラビッシモ！", "トレビアン！", "マーベラス！", "ファンタスティック！", "エクセレント！", "アメージング！", "インクレディブル！", "ワンダフル！",
-      "レベルアップの音がした！", "経験値ゲットだぜ！", "勇者みたいな行動力！", "ミッションクリア！", "レアな才能はっけん！", "チーターみたいに速い！", "ライオンみたいにカッコいい！", "イルカみたいに賢いね！", "フクロウみたいによく見てる！", "ウサギみたいにピョンピョン進むね！", "宇宙一のスピード！", "ギネス記録にのりそう！", "ノーベル賞ものの大発見！", "金メダル級のすばらしさ！", "世界チャンピオンだ！", "大天才のひらめき！", "スーパーヒーロー参上！", "まるで魔法使い！", "プロフェッショナルだね！", "名人レベル到達！", "師匠と呼ばせて！", "ミラクル連発だね！", "大金星！", "ウルトラC級の技！", "ホームラン！", "ナイスシュート！", "ロケットみたいに速い！", "新幹線クラスのスピード！", "ジェット機みたい！", "光の速さだ！", "タイムアタック大成功！", "探偵みたいによく気づいたね！", "博士級の知識だ！", "リーダーの素質アリ！", "スターの輝き！", "みんなの憧れだね！", "伝説の始まりだ！", "歴史に名を刻んだね！", "神業でたー！", "オーラが出てるよ！", "奇跡の連続だね！", "忍者のように素早い！", "お侍さんのようにカッコいい！", "殿様クラスの大物！", "将軍のような貫禄！", "お姫様みたいに上品！", "地球を救うパワーだ！", "宇宙の果てまで響くよ！", "銀河系で一番！", "ブラックホール級 of 吸引力！", "流れ星に願いが届いたね！", "100万ボルトのパワー！", "エネルギー満タン！", "フルスロットル！", "エンジン全開！", "ターボチャージャー作動！", "ダイヤモンドみたいに硬い意志！", "ルビーみたいに情熱的！", "サファイアみたいに冷静！", "エメラルドみたいに優しい！", "ゴールド級の輝き！", "百獣の王だ！", "空の王者だ！", "海の覇者だ！", "森の守り神！", "大自然のパワー！", "超ド級の活躍！", "メガトンパンチ級の衝撃！", "ギガントすごい！", "テラ素晴らしい！", "ペタかっこいい！", "お見事、座布団一枚！", "よっ、日本一！", "あっぱれ！", "お祭り騒ぎだ！", "花火が上がったね！", "ドカーンと大成功！", "ピカッと閃いたね！", "雲の上を歩く気分！", "空まで飛んでいきそう！", "宇宙旅行に行けそうだ！",
+      "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！", "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！", "自分でできてエライ！", "確認バッチリだね！", "いいペースだね！", "天才かもしれない！", "お見事です！", "素晴らしい行動力！", "最高だね！", "忘れ物なし！素晴らしい！", "今日も笑顔でいこう！", "ハナマル満点！", "一発でできたね！", "スピード解決だね！", "良い習慣がついてるね！", "さすが、よく分かってる！", "応援してるよ！", "ハイタッチ！", "ニコニコ笑顔がいいね！", "パーフェクト！", "一歩前進だね！", "やる気に満ちてるね！", "その意気だ！", "見事な手際！", "自分で気づけてすごい！", "毎日えらいね！", "今日も一日楽しもう！", "バツグンだね！", "準備の達人！", "100点満点！", "かっこよすぎる！", "先生もびっくりするよ！", "ママもパパも鼻が高いよ！", "さすがだね！", "よくできました！", "その集中力、すごい！", "バッチリ決まったね！", "いいぞいいぞ！", "スーパープレー！", "今日もがんばろう！", "素敵だね！", "グッジョブ！", "毎日すごいね！", "さすがの腕前！", "準備オッケー！", "今日も絶好調！", "いい感じ！", "やる気スイッチONだね！", "すてきな心意気！", "バッチリ準備OK！", "今日もハッピー！", "頼もしいね！", "一安心だね！", "確認のプロ！", "さすがのチェック力！", "今日も元気だね！", "パーフェクト達成！", "すごいぞ、その調子！", "毎日がんばってるね！", "えらい！花丸！", "今日も素晴らしい！", "さすがの準備！", "バッチリすぎる！", "かっこいい！", "今日も最高！", "その意気込みがいいね！", "完璧だね！", "準備万端！", "今日も一日楽しんで！", "さすが！", "その調子！", "マジックみたいだ！", "あっという間に終わったね！", "職人技だね！", "見ていて気持ちがいいよ！", "頼りにしてるよ！", "心がホカホカするよ！", "見ているこっちも嬉しい！", "がんばる姿が素敵！", "毎日成長してるね！", "すごいパワーを感じる！", "どんどん進むね！", "止まらない勢いだ！", "ノリノリだね！", "イケイケゴーゴー！", "テンションMAX！", "心がピカピカだね！", "太陽みたいに眩しい！", "星みたいにキラキラ！", "虹みたいな笑顔！", "お花みたいに素敵！", "大吉だ！", "超ラッキー！", "ハッピーエンド間違いなし！", "ウキウキするね！", "ワクワクが止まらない！", "ササッと終わったね！", "クルッと解決！", "パッと目が覚めるね！", "いい波乗ってんね！", "風を切って走ってる！", "心にズキュンときた！", "胸がキュンとした！", "ホッコリしたよ！", "ウルッときちゃった！", "ジーンときたよ！", "言葉が出ないくらいすごい！", "目からウロコだ！", "ほっぺたが落ちそう！", "頭が下がる思いだよ！", "拍手喝采！", "スタンディングオベーション！", "アンコール！", "ブラビッシモ！", "トレビアン！", "マーベラス！", "ファンタスティック！", "エクセレント！", "アメージング！", "インクレディブル！", "ワンダフル！",
+      "レベルアップの音がした！", "経験値ゲットだぜ！", "勇者みたいな行動力！", "ミッションクリア！", "レアな才能はっけん！", "チーターみたいに速い！", "ライオンみたいにカッコいい！", "イルカみたいに賢いね！", "フクロウみたいによく見てる！", "ウサギみたいにピョンピョン進むね！", "宇宙一のスピード！", "ギネス記録にのりそう！", "ノーベル賞ものの大発見！", "金メダル級のすばらしさ！", "世界チャンピオンだ！", "大天才のひらめき！", "スーパーヒーロー参上！", "まるで魔法使い！", "プロフェッショナルだね！", "名人レベル到達！", "師匠と呼ばせて！", "ミラクル連発だね！", "大金星！", "ウルトラC級の技！", "ホームラン！", "ナイスシュート！", "ロケットみたいに速い！", "新幹線クラスのスピード！", "ジェット機みたい！", "光の速さだ！", "タイムアタック大成功！", "探偵みたいによく気づいたね！", "博士級の知識だ！", "リーダーの素質アリ！", "スターの輝き！", "みんなの憧れだね！", "伝説の始まりだ！", "歴史に名を刻んだね！", "神業でたー！", "オーラが出てるよ！", "奇跡の連続だね！", "忍者のように素早い！", "お侍さんのようにカッコいい！", "殿様クラスの大物！", "将軍のような貫禄！", "お姫様みたいに上品！", "地球を救うパワーだ！", "宇宙の果てまで響くよ！", "銀河系で一番！", "ブラックホール級の吸引力！", "流れ星に願いが届いたね！", "100万ボルトのパワー！", "エネルギー満タン！", "フルスロットル！", "エンジン全開！", "ターボチャージャー作動！", "ダイヤモンドみたいに硬い意志！", "ルビーみたいに情熱的！", "サファイアみたいに冷静！", "エメラルドみたいに優しい！", "ゴールド級の輝き！", "百獣の王だ！", "空の王者だ！", "海の覇者だ！", "森の守り神！", "大自然のパワー！", "超ド級の活躍！", "メガトンパンチ級の衝撃！", "ギガントすごい！", "テラ素晴らしい！", "ペタかっこいい！", "お見事、座布団一枚！", "よっ、日本一！", "あっぱれ！", "お祭り騒ぎだ！", "花火が上がったね！", "ドカーンと大成功！", "ピカッと閃いたね！", "雲の上を歩く気分！", "空まで飛んでいきそう！", "宇宙旅行に行けそうだ！",
       "スーパーウルトラハイパーすごい！", "ちょ〜〜〜えらい！", "めっちゃかっこいい！", "バリバリ伝説！", "ゴリゴリ進むね！", "無敵モード突入！", "スター状態だね！", "フィーバータイム！", "確変中！", "ボーナスステージ！", "神引きだね！", "宝箱を発見したね！", "伝説の剣を手に入れた！", "魔法の杖を使いこなしてる！", "天空の城に到達！", "ドラゴンをテイムした！", "妖精さんが拍手してる！", "小人さんが手伝ってくれた？", "天使の微笑みだ！", "女神さまもニッコリ！", "神様もびっくり！", "一石二鳥だね！", "三つ巴の大勝利！", "四つ葉のクローバー見つけた気分！", "五つ星ホテル級！", "第六感が冴えてる！", "七色の虹がかかった！", "八面六臂の大活躍！", "九死に一生の奇跡！", "十全十美だ！", "百点満点！", "千年に一人の逸材！", "万歳三唱！", "億万長者の気分！", "兆級のすばらしさ！", "京（けい）レベルの大発見！", "無量大数すごい！", "無限大の可能性！", "限界突破！", "リミットブレイク！", "覚醒したね！", "ニュータイプだ！", "フォースと共にあらんことを！", "君は魔法使いだ！", "海賊王に俺はなる！", "スーパーサイヤ人だ！", "呼吸の型が完璧！", "領域展開に成功！", "ゴムゴムのぉ〜大成功！", "オラ、ワクワクすっぞ！",
       "真実はいつも一つ！", "月に代わっておしおき成功！", "ポケモンマスターになれる！", "スマブラで大乱闘勝利！", "マリオカートで1位！", "テトリスで全消し！", "パズドラで10連コンボ！", "モンストでストライクショット！", "にゃんこ大戦争で完全勝利！", "音ゲーの神様！", "エイムが完璧！", "ビクロイ！", "ドン勝だ！", "チャンピオン部隊だ！", "最高傑作だね！",
       "ノーベル平和賞じゅしょう！", "うちゅうひこうしになれる！", "だいとうりょうもビックリ！", "おうさまもひれふすレベル！", "かみさまも道をゆずるスゴさ！"
@@ -223,29 +223,43 @@
 
     let collectedPraises = [];
 
+    // 🌟 安全に通信を行うための関数（8秒でタイムアウトさせる）
+    const fetchWithTimeout = (url, options, timeout = 8000) => {
+      return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
+      ]);
+    };
+
     function init() {
       const urlParams = new URLSearchParams(window.location.search);
       const listId = urlParams.get('id');
       const action = urlParams.get('action');
 
       if (urlParams.get('reset') === '1') {
-        localStorage.clear();
+        try { localStorage.clear(); } catch(e){}
         alert('アプリのデータをすべてリセットし、最新の状態にしました！');
         window.location.href = window.location.href.split('?')[0];
         return;
       }
 
+      // 🌟 安全装置：ストレージ関連のエラーをすべて無効化
       try {
         const saved = localStorage.getItem('nfc_multi_checklists');
         if (saved) { appData = JSON.parse(saved); }
       } catch (error) { appData = {}; }
 
-      try { collectedPraises = JSON.parse(localStorage.getItem('nfc_praise_collection') || '[]'); } catch (e) { collectedPraises = []; }
+      try { 
+        collectedPraises = JSON.parse(localStorage.getItem('nfc_praise_collection') || '[]'); 
+      } catch (e) { collectedPraises = []; }
 
-      if (!localStorage.getItem('nfc_app_role')) { localStorage.setItem('nfc_app_role', 'admin'); }
+      let appRole = 'admin';
+      try {
+        if (!localStorage.getItem('nfc_app_role')) { localStorage.setItem('nfc_app_role', 'admin'); }
+        appRole = localStorage.getItem('nfc_app_role') || 'admin';
+      } catch (e) { console.warn("Storage restricted"); }
 
       if (action === 'import') {
-        // インポート処理
         const importId = urlParams.get('id');
         const importTitle = urlParams.get('title');
         const importItemsStr = urlParams.get('items');
@@ -262,8 +276,10 @@
           });
           document.getElementById('btn-confirm-yes').onclick = () => {
             appData[importId] = { title: importTitle, items: parsedItems };
-            localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-            localStorage.setItem('nfc_app_role', 'child');
+            try {
+              localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+              localStorage.setItem('nfc_app_role', 'child');
+            } catch(e){}
             alert(`✨ リスト「${importTitle}」を登録しました！`);
             window.history.replaceState({}, '', window.location.href.split('?')[0]);
             renderChildHome();
@@ -279,22 +295,35 @@
         if (currentLoadedId !== listId) { currentLoadedId = listId; fetchListFromCloud(listId); }
         return;
       }
-      const role = localStorage.getItem('nfc_app_role');
-      if (role === 'admin') { renderDashboard(); } else { renderChildHome(); }
+      
+      if (appRole === 'admin') { renderDashboard(); } else { renderChildHome(); }
     }
 
     function fetchListFromCloud(listId) {
       switchView('loading-view');
-      fetch(`${GAS_URL}?action=getList&id=${listId}`)
-        .then(response => response.json())
+      
+      // 🌟 安全装置：通信が止まっても8秒でエラー画面に切り替える
+      fetchWithTimeout(`${GAS_URL}?action=getList&id=${listId}`, {}, 8000)
+        .then(response => {
+          if(!response.ok) throw new Error("Network error");
+          return response.json();
+        })
         .then(data => {
           if (data && data.items && data.items.length > 0) {
-            appData[listId] = data; localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+            appData[listId] = data; 
+            try { localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData)); } catch(e){}
             showConfirmView(listId, data);
-          } else { switchView('error-view'); }
+          } else { 
+            throw new Error("No data");
+          }
         })
         .catch(err => {
-          if (appData[listId]) { showConfirmView(listId, appData[listId]); } else { switchView('error-view'); }
+          // 通信エラー時は、ローカルのバックアップを表示
+          if (appData[listId]) { 
+            showConfirmView(listId, appData[listId]); 
+          } else { 
+            switchView('error-view'); 
+          }
         });
     }
 
@@ -324,12 +353,15 @@
     function unlockAdmin() {
       const pin = prompt("保護者用パスワードを入力してください。");
       if (pin === "0000") {
-        localStorage.setItem('nfc_app_role', 'admin');
+        try { localStorage.setItem('nfc_app_role', 'admin'); } catch(e){}
         window.history.replaceState({}, '', window.location.href.split('?')[0]); renderDashboard();
       } else if (pin !== null) { alert("パスワードが違います。"); }
     }
 
-    function lockToChildMode() { localStorage.setItem('nfc_app_role', 'child'); renderChildHome(); }
+    function lockToChildMode() { 
+      try{ localStorage.setItem('nfc_app_role', 'child'); } catch(e){} 
+      renderChildHome(); 
+    }
 
     function renderDashboard() {
       switchView('dashboard-view');
@@ -369,14 +401,16 @@
       saveBtn.innerText = "⏳ 保存中..."; saveBtn.disabled = true;
       const params = new URLSearchParams();
       params.append('data', JSON.stringify({ action: 'saveList', id: id, title: title, items: tempItems }));
-      fetch(GAS_URL, { 
+      
+      fetchWithTimeout(GAS_URL, { 
         method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString()
-      })
+      }, 10000)
         .then(() => {
-          appData[id] = { title: title, items: tempItems }; localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+          appData[id] = { title: title, items: tempItems }; 
+          try { localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData)); } catch(e){}
           alert('✅ クラウド（スプレッドシート）にデータを保存しました！'); renderDashboard();
         })
-        .catch(err => { alert('通信エラーが起きました。'); })
+        .catch(err => { alert('通信エラーが起きました。通信環境をご確認ください。'); })
         .finally(() => { saveBtn.innerText = "💾 クラウド（スプシ）に保存する"; saveBtn.disabled = false; });
     }
 
@@ -386,17 +420,20 @@
     function executeDelete(mode) {
       if (!listToDelete) return; const id = listToDelete;
       if (mode === 'local') {
-        delete appData[id]; localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+        delete appData[id]; 
+        try { localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData)); } catch(e){}
         alert('スマホの一覧から削除しました！'); listToDelete = null; renderDashboard();
       } else if (mode === 'cloud') {
         const deleteBtn = document.getElementById("btn-del-cloud"); const originalText = deleteBtn.innerHTML;
         deleteBtn.innerHTML = "⏳ 削除中..."; deleteBtn.disabled = true;
         const params = new URLSearchParams(); params.append('data', JSON.stringify({ action: 'deleteList', id: id }));
-        fetch(GAS_URL, { 
+        
+        fetchWithTimeout(GAS_URL, { 
           method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() 
-        })
+        }, 10000)
           .then(() => {
-            delete appData[id]; localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+            delete appData[id]; 
+            try { localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData)); } catch(e){}
             alert('☁️ クラウドとスマホから完全に削除しました！'); listToDelete = null; renderDashboard();
           })
           .catch(err => { alert('通信エラーが起きました。'); })
@@ -436,7 +473,12 @@
     function goToDashboard() { renderDashboard(); }
     function resetPraiseCollection() {
       if (confirm('本当に図鑑をリセットしますか？')) {
-        collectedPraises = []; localStorage.setItem('nfc_praise_collection', JSON.stringify([])); localStorage.setItem('nfc_daily_praises', JSON.stringify({date: "", items: []})); renderDashboard();
+        collectedPraises = []; 
+        try {
+          localStorage.setItem('nfc_praise_collection', JSON.stringify([])); 
+          localStorage.setItem('nfc_daily_praises', JSON.stringify({date: "", items: []})); 
+        } catch(e){}
+        renderDashboard();
       }
     }
 
@@ -481,31 +523,35 @@
         }, 2500);
         card.onclick = () => { if (!canCheck) return; checkItem(card, listId, currentItemIndex); };
       } else {
-        // 🌟 すべて完了した瞬間にクラウド（スプシ）へ通知を送信
         logCheckToCloud(listId);
         showCompletionSummary();
       }
     }
 
-    // 🌟 追加：チェック完了の履歴をスプシへ飛ばす関数
     function logCheckToCloud(listId) {
       const title = document.getElementById('child-title').innerText;
       const params = new URLSearchParams();
       params.append('data', JSON.stringify({ action: 'logCheck', id: listId, title: title }));
       fetch(GAS_URL, { 
         method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString()
-      }).catch(err => console.error("履歴の送信に失敗しました", err));
+      }).catch(err => console.error(err));
     }
 
     function checkItem(cardElement, listId, itemIndex) {
       if (cardElement.classList.contains('checked')) return; cardElement.classList.add('checked');
       if (navigator.vibrate) { navigator.vibrate(50); }
+      
       const today = new Date().toLocaleDateString('ja-JP');
-      let dailyData = JSON.parse(localStorage.getItem('nfc_daily_praises') || '{"date":"","items":[]}');
-      if (dailyData.date !== today) { dailyData = { date: today, items: [] }; }
+      let dailyData = { date: today, items: [] };
+      try {
+        const parsed = JSON.parse(localStorage.getItem('nfc_daily_praises') || '{"date":"","items":[]}');
+        if (parsed && parsed.date === today) dailyData = parsed;
+      } catch(e) {}
+
       const itemKey = `${listId}_${itemIndex}`; let delay = 600; 
       if (!dailyData.items.includes(itemKey)) {
-        dailyData.items.push(itemKey); localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData));
+        dailyData.items.push(itemKey); 
+        try { localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData)); } catch(e){}
         triggerPraise(); delay = 2300; 
       }
       setTimeout(() => { currentItemIndex++; renderCurrentChildItem(listId); }, delay);
@@ -514,12 +560,21 @@
     function rollGacha() {
       const rand = Math.random() * 100; let targetRarity = 'N';
       if (rand < 1) targetRarity = 'UR'; else if (rand < 5) targetRarity = 'SSR'; else if (rand < 20) targetRarity = 'SR'; else if (rand < 50) targetRarity = 'R'; else targetRarity = 'N';                     
-      const pool = praises.filter(p => p.rarity === targetRarity); return pool[Math.floor(Math.random() * pool.length)];
+      
+      // 🌟 安全装置：リストが空になるバグを回避
+      let pool = praises.filter(p => p.rarity === targetRarity); 
+      if (!pool || pool.length === 0) pool = praises; 
+      
+      return pool[Math.floor(Math.random() * pool.length)];
     }
 
     function triggerPraise() {
       const selectedPraise = rollGacha(); const number = selectedPraise.id; let isNew = false;
-      if (!collectedPraises.includes(number)) { collectedPraises.push(number); localStorage.setItem('nfc_praise_collection', JSON.stringify(collectedPraises)); isNew = true; }
+      if (!collectedPraises.includes(number)) { 
+        collectedPraises.push(number); 
+        try { localStorage.setItem('nfc_praise_collection', JSON.stringify(collectedPraises)); } catch(e){}
+        isNew = true; 
+      }
       sessionPraises.push({ ...selectedPraise, isNew });
       let popup = document.getElementById('praise-popup');
       if (!popup) { popup = document.createElement('div'); popup.id = 'praise-popup'; popup.className = 'praise-popup'; document.body.appendChild(popup); }
