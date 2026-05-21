@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>もちものチェック</title>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     body { font-family: 'Hiragino Maru Gothic ProN', 'Rounded M+ 1c', sans-serif; background-color: #f0f8ff; color: #333; margin: 0; padding: 20px; text-align: center; }
     h1, h2, h3 { color: #4a90e2; }
@@ -80,6 +80,8 @@
       <h1 style="font-size: 50px;">⏳</h1>
       <h2>よみこみ中...</h2>
       <p style="color: #666; font-size: 12px; margin-top: 20px;">※画面が変わらない場合は、<br>ブラウザの更新ボタンを押してください</p>
+      
+      <button id="rescue-btn" class="btn" style="display:none; background:#d9534f; color:white; width:80%; max-width:300px; padding:15px; margin-top:30px; font-size:16px;" onclick="forceResetApp()">⚠️ エラーを直す（リセット）</button>
     </div>
   </div>
 
@@ -192,6 +194,26 @@
   </div>
 
   <script>
+    // 🌟 アプリ全体を監視する最強のエラーキャッチャー（フリーズを絶対に防ぐ）
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.error("エラー発生:", message);
+      const rescueBtn = document.getElementById('rescue-btn');
+      if(rescueBtn) rescueBtn.style.display = 'inline-block';
+      return true;
+    };
+
+    function forceResetApp() {
+      try { localStorage.clear(); } catch(e){}
+      alert('アプリのデータをリセットして安全な状態に戻しました！');
+      window.location.href = window.location.href.split('?')[0];
+    }
+
+    // フリーズ対策：5秒間読み込み画面が続いたら脱出ボタンを出す
+    setTimeout(() => {
+      const rescueBtn = document.getElementById('rescue-btn');
+      if(rescueBtn) rescueBtn.style.display = 'inline-block';
+    }, 5000);
+
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwijAoAZbYCpmrr7PWy45SdvR0HSKU4cE-IZ7Ufs-VpaQgMhi71EFU8irWtZ-XTONP40A/exec";
 
     let appData = {};
@@ -223,7 +245,7 @@
 
     let collectedPraises = [];
 
-    // 🌟 安全に通信を行うための関数（8秒でタイムアウトさせる）
+    // 🌟 通信が永遠に固まるのを防ぐ安全装置
     const fetchWithTimeout = (url, options, timeout = 8000) => {
       return Promise.race([
         fetch(url, options),
@@ -232,77 +254,86 @@
     };
 
     function init() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const listId = urlParams.get('id');
-      const action = urlParams.get('action');
-
-      if (urlParams.get('reset') === '1') {
-        try { localStorage.clear(); } catch(e){}
-        alert('アプリのデータをすべてリセットし、最新の状態にしました！');
-        window.location.href = window.location.href.split('?')[0];
-        return;
-      }
-
-      // 🌟 安全装置：ストレージ関連のエラーをすべて無効化
+      // 全体のプログラムを安全な箱(try-catch)で包む
       try {
-        const saved = localStorage.getItem('nfc_multi_checklists');
-        if (saved) { appData = JSON.parse(saved); }
-      } catch (error) { appData = {}; }
+        const urlParams = new URLSearchParams(window.location.search);
+        const listId = urlParams.get('id');
+        const action = urlParams.get('action');
 
-      try { 
-        collectedPraises = JSON.parse(localStorage.getItem('nfc_praise_collection') || '[]'); 
-      } catch (e) { collectedPraises = []; }
-
-      let appRole = 'admin';
-      try {
-        if (!localStorage.getItem('nfc_app_role')) { localStorage.setItem('nfc_app_role', 'admin'); }
-        appRole = localStorage.getItem('nfc_app_role') || 'admin';
-      } catch (e) { console.warn("Storage restricted"); }
-
-      if (action === 'import') {
-        const importId = urlParams.get('id');
-        const importTitle = urlParams.get('title');
-        const importItemsStr = urlParams.get('items');
-        if (importId && importTitle && importItemsStr) {
-          document.getElementById('confirm-list-title').innerText = importTitle;
-          const confirmList = document.getElementById('confirm-list-items'); confirmList.innerHTML = '';
-          const parsedItems = importItemsStr.split(',').map(itemStr => {
-            const parts = itemStr.split('|'); return { name: parts[0], hint: parts[1] || '🎒 バッグにいれてね...' };
-          });
-          parsedItems.forEach(item => {
-            const li = document.createElement('li'); li.style.padding = '8px 0'; li.style.borderBottom = '1px dashed #ccc';
-            li.innerHTML = `<strong>・${item.name}</strong><br><span style="font-size:12px; color:#666;">（${item.hint}）</span>`;
-            confirmList.appendChild(li);
-          });
-          document.getElementById('btn-confirm-yes').onclick = () => {
-            appData[importId] = { title: importTitle, items: parsedItems };
-            try {
-              localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-              localStorage.setItem('nfc_app_role', 'child');
-            } catch(e){}
-            alert(`✨ リスト「${importTitle}」を登録しました！`);
-            window.history.replaceState({}, '', window.location.href.split('?')[0]);
-            renderChildHome();
-          };
-          document.getElementById('btn-confirm-no').onclick = () => {
-            window.history.replaceState({}, '', window.location.href.split('?')[0]); renderChildHome();
-          };
-          switchView('import-confirm-view'); return;
+        if (urlParams.get('reset') === '1') {
+          forceResetApp();
+          return;
         }
-      }
 
-      if (listId) {
-        if (currentLoadedId !== listId) { currentLoadedId = listId; fetchListFromCloud(listId); }
-        return;
+        // 🌟【安全装置1】appDataが「null」になって固まるバグを完全回避
+        try {
+          const saved = localStorage.getItem('nfc_multi_checklists');
+          if (saved && saved !== "null" && saved !== "undefined") {
+            appData = JSON.parse(saved);
+            if (typeof appData !== 'object' || appData === null) {
+              appData = {};
+            }
+          }
+        } catch (error) { appData = {}; }
+
+        try { 
+          collectedPraises = JSON.parse(localStorage.getItem('nfc_praise_collection') || '[]'); 
+        } catch (e) { collectedPraises = []; }
+
+        let appRole = 'admin';
+        try {
+          if (!localStorage.getItem('nfc_app_role')) { localStorage.setItem('nfc_app_role', 'admin'); }
+          appRole = localStorage.getItem('nfc_app_role') || 'admin';
+        } catch (e) { console.warn("Storage restricted"); }
+
+        if (action === 'import') {
+          const importId = urlParams.get('id');
+          const importTitle = urlParams.get('title');
+          const importItemsStr = urlParams.get('items');
+          if (importId && importTitle && importItemsStr) {
+            document.getElementById('confirm-list-title').innerText = importTitle;
+            const confirmList = document.getElementById('confirm-list-items'); confirmList.innerHTML = '';
+            const parsedItems = importItemsStr.split(',').map(itemStr => {
+              const parts = itemStr.split('|'); return { name: parts[0], hint: parts[1] || '🎒 バッグにいれてね...' };
+            });
+            parsedItems.forEach(item => {
+              const li = document.createElement('li'); li.style.padding = '8px 0'; li.style.borderBottom = '1px dashed #ccc';
+              li.innerHTML = `<strong>・${item.name}</strong><br><span style="font-size:12px; color:#666;">（${item.hint}）</span>`;
+              confirmList.appendChild(li);
+            });
+            document.getElementById('btn-confirm-yes').onclick = () => {
+              appData[importId] = { title: importTitle, items: parsedItems };
+              try {
+                localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+                localStorage.setItem('nfc_app_role', 'child');
+              } catch(e){}
+              alert(`✨ リスト「${importTitle}」を登録しました！`);
+              window.history.replaceState({}, '', window.location.href.split('?')[0]);
+              renderChildHome();
+            };
+            document.getElementById('btn-confirm-no').onclick = () => {
+              window.history.replaceState({}, '', window.location.href.split('?')[0]); renderChildHome();
+            };
+            switchView('import-confirm-view'); return;
+          }
+        }
+
+        if (listId) {
+          if (currentLoadedId !== listId) { currentLoadedId = listId; fetchListFromCloud(listId); }
+          return;
+        }
+        
+        if (appRole === 'admin') { renderDashboard(); } else { renderChildHome(); }
+      } catch (e) {
+        // init処理のどこかでエラーが起きても強制表示
+        console.error(e);
+        document.getElementById('rescue-btn').style.display = 'inline-block';
       }
-      
-      if (appRole === 'admin') { renderDashboard(); } else { renderChildHome(); }
     }
 
     function fetchListFromCloud(listId) {
       switchView('loading-view');
       
-      // 🌟 安全装置：通信が止まっても8秒でエラー画面に切り替える
       fetchWithTimeout(`${GAS_URL}?action=getList&id=${listId}`, {}, 8000)
         .then(response => {
           if(!response.ok) throw new Error("Network error");
@@ -318,8 +349,8 @@
           }
         })
         .catch(err => {
-          // 通信エラー時は、ローカルのバックアップを表示
-          if (appData[listId]) { 
+          // 通信エラー時：ローカルにデータがあれば表示、なければエラー画面
+          if (appData && appData[listId]) { 
             showConfirmView(listId, appData[listId]); 
           } else { 
             switchView('error-view'); 
@@ -350,6 +381,12 @@
       }
     });
 
+    function switchView(viewId) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
+      const target = document.getElementById(viewId);
+      if(target) target.classList.add('active-view');
+    }
+
     function unlockAdmin() {
       const pin = prompt("保護者用パスワードを入力してください。");
       if (pin === "0000") {
@@ -366,8 +403,11 @@
     function renderDashboard() {
       switchView('dashboard-view');
       const container = document.getElementById('dashboard-lists'); container.innerHTML = '';
-      const keys = Object.keys(appData);
+      
+      // 安全にキーを取得
+      const keys = appData ? Object.keys(appData) : [];
       if (keys.length === 0) { container.innerHTML = '<p>まだリストがありません。</p>'; return; }
+      
       const baseUrl = window.location.href.split('?')[0].split('#')[0];
       keys.forEach(id => {
         const list = appData[id]; const nfcUrl = `${baseUrl}?id=${id}`;
@@ -543,9 +583,13 @@
       
       const today = new Date().toLocaleDateString('ja-JP');
       let dailyData = { date: today, items: [] };
+      
+      // 🌟【安全装置2】チェックボタンで固まるバグを完全回避
       try {
-        const parsed = JSON.parse(localStorage.getItem('nfc_daily_praises') || '{"date":"","items":[]}');
-        if (parsed && parsed.date === today) dailyData = parsed;
+        const parsed = JSON.parse(localStorage.getItem('nfc_daily_praises'));
+        if (parsed && typeof parsed === 'object' && parsed.date === today && Array.isArray(parsed.items)) {
+          dailyData = parsed;
+        }
       } catch(e) {}
 
       const itemKey = `${listId}_${itemIndex}`; let delay = 600; 
@@ -561,10 +605,9 @@
       const rand = Math.random() * 100; let targetRarity = 'N';
       if (rand < 1) targetRarity = 'UR'; else if (rand < 5) targetRarity = 'SSR'; else if (rand < 20) targetRarity = 'SR'; else if (rand < 50) targetRarity = 'R'; else targetRarity = 'N';                     
       
-      // 🌟 安全装置：リストが空になるバグを回避
+      // 🌟【安全装置3】ガチャの中身が空っぽで固まるバグを完全回避
       let pool = praises.filter(p => p.rarity === targetRarity); 
       if (!pool || pool.length === 0) pool = praises; 
-      
       return pool[Math.floor(Math.random() * pool.length)];
     }
 
@@ -584,7 +627,8 @@
 
     function showCompletionSummary() {
       if (navigator.vibrate) { navigator.vibrate([100, 50, 100, 50, 200]); }
-      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }});
+      try { confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }}); } catch(e) {}
+      
       const rewardDiv = document.getElementById('reward'); rewardDiv.style.display = 'block';
       let summaryHTML = `🌟 ぜんぶできたね！ 🌟<br>よくできました！`;
       if (sessionPraises.length > 0) {
@@ -599,6 +643,7 @@
       rewardDiv.innerHTML = summaryHTML;
     }
 
+    // すべての準備ができたら実行
     init();
   </script>
 </body>
