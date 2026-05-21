@@ -15,9 +15,9 @@
     .btn-primary { background: #4a90e2; color: white; width: 100%; max-width: 500px; padding: 15px; font-size: 18px; margin-top: 20px; }
     .panel-container { background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left;}
 
-    #child-view, #child-home-view, #error-view, #import-confirm-view { position: relative; }
+    #child-view, #child-home-view, #error-view, #import-confirm-view, #collection-view { position: relative; }
     
-    /* 🌟 1つずつ表示用のスタイル */
+    /* 1つずつ表示用 */
     .progress-text { font-size: 22px; font-weight: bold; color: #4a90e2; margin-bottom: 10px; }
     .item-card { background: #ffffff; margin: 15px auto; padding: 30px 20px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); font-size: 28px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; user-select: none; border: 4px solid transparent;}
     .item-card:active { transform: scale(0.95); }
@@ -29,23 +29,49 @@
     @keyframes popup { 0% { transform: scale(0); } 100% { transform: scale(1); } }
     .settings-btn { position: absolute; top: 0; right: 10px; font-size: 24px; cursor: pointer; opacity: 0.5; background: none; border: none; }
     
-    .collection-status { background: #fff; border: 2px solid #ff8c00; color: #ff8c00; font-weight: bold; padding: 10px; border-radius: 20px; display: inline-block; margin-top: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    /* 🌟 レア度バッジのスタイル */
+    .rarity-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 14px; font-weight: bold; color: white; margin-right: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .r-N { background: #95a5a6; } /* グレー */
+    .r-R { background: #3498db; } /* ブルー */
+    .r-SR { background: #9b59b6; } /* パープル */
+    .r-SSR { background: #f1c40f; color: #d35400; text-shadow: 1px 1px 0 #fff; } /* ゴールド */
+    .r-UR { 
+      background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+      background-size: 300% 300%;
+      animation: rainbow 2s ease infinite;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+      border: 1px solid #fff;
+    }
+    @keyframes rainbow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-    /* 🌟 今回集めた言葉一覧（リザルト）のスタイル */
+    /* コレクション表示ボタン */
+    .collection-btn { background: #fff; border: 3px solid #ff8c00; color: #ff8c00; font-weight: bold; padding: 12px 20px; border-radius: 30px; display: inline-block; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-size: 18px; cursor: pointer; transition: all 0.2s; width: 80%; max-width: 300px;}
+    .collection-btn:active { transform: scale(0.95); }
+
+    /* リザルト画面 */
     .summary-box { background: #fff; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left; }
     .summary-box h3 { color: #ff8c00; text-align: center; margin-top: 0; border-bottom: 2px dashed #ff8c00; padding-bottom: 10px; font-size: 20px; }
     .summary-list { list-style: none; padding: 0; margin: 0; }
-    .summary-list li { padding: 12px 5px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: bold; color: #333;}
-    .summary-list li:last-child { border-bottom: none; }
+    .summary-list li { padding: 15px 5px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: bold; color: #333;}
     .new-badge { background: #d9534f; color: white; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; animation: pulse 1s infinite; white-space: nowrap; }
-    .got-badge { background: #eee; color: #888; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; white-space: nowrap; }
+    .got-badge { background: #eee; color: #888; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; white-space: nowrap; font-weight: normal;}
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-    .praise-popup { position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(255, 255, 255, 0.95); color: #333; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 1000; pointer-events: none; transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 5px solid #ff8c00; width: 80%; max-width: 350px; }
+    /* ガチャポップアップ */
+    .praise-popup { position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(255, 255, 255, 0.95); color: #333; padding: 25px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); z-index: 1000; pointer-events: none; transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 4px solid #ff8c00; width: 85%; max-width: 350px; }
     .praise-popup.show { transform: translate(-50%, -50%) scale(1); }
-    .praise-number { font-size: 16px; color: #666; font-weight: bold; margin-bottom: 10px; text-align: left; border-bottom: 2px dashed #ccc; padding-bottom: 5px; }
-    .praise-message { font-size: 26px; color: #d9534f; font-weight: bold; margin: 15px 0; }
-    .praise-progress { font-size: 14px; color: #4a90e2; font-weight: bold; text-align: right; }
+    .praise-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #ccc; padding-bottom: 10px; margin-bottom: 15px; }
+    .praise-number { font-size: 14px; color: #666; font-weight: bold; }
+    .praise-message { font-size: 26px; color: #d9534f; font-weight: bold; margin: 15px 0; line-height: 1.3;}
+
+    /* 🌟 図鑑（コレクション）画面のスタイル */
+    .stats-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    .stat-box { background: #fff; padding: 8px 12px; border-radius: 10px; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; max-height: 60vh; overflow-y: auto; padding: 10px; background: #fff; border-radius: 10px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); }
+    .col-item { background: #eee; padding: 15px 10px; border-radius: 8px; text-align: center; font-size: 14px; color: #aaa; font-weight: bold; border: 2px solid #ddd; }
+    .col-item.unlocked { background: #fff; color: #333; border-color: #ff8c00; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .col-rarity { margin-bottom: 5px; }
 
     /* 保護者用UI */
     .dashboard-card { background: #fff; padding: 15px; margin: 15px auto; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; text-align: left; }
@@ -63,18 +89,23 @@
     <div style="margin-top: 80px;">
       <h1 style="font-size: 60px; margin: 0;">📱</h1>
       <h2>スマホをNFCシールに<br>かざしてね！</h2>
-      <div id="home-collection" class="collection-status"></div>
+      <button class="collection-btn" onclick="openCollection('child-home-view')">📖 ほめ言葉図鑑を見る</button>
     </div>
+  </div>
+
+  <div id="collection-view" class="view">
+    <button class="settings-btn" onclick="closeCollection()">🔙</button>
+    <h2>📖 ほめ言葉図鑑</h2>
+    <div id="collection-stats" class="stats-container"></div>
+    <div id="collection-grid" class="collection-grid"></div>
   </div>
 
   <div id="import-confirm-view" class="view">
     <h2>📥 リストのうけとり</h2>
     <div class="panel-container">
       <p style="font-weight: bold;">以下のリストを受信しました。<br>このリストで間違いないですか？</p>
-      
       <h3 id="confirm-list-title" style="margin-top: 20px; border-bottom: 2px solid #eee; padding-bottom: 5px; color: #ff8c00;"></h3>
       <ul id="confirm-list-items" style="list-style: none; padding: 0; background: #f9f9f9; border-radius: 5px; padding: 10px;"></ul>
-      
       <div style="display: flex; justify-content: space-between; margin-top: 30px;">
         <button id="btn-confirm-no" class="btn" style="background:#ccc; color:#333; width:48%; padding:15px; font-size:18px;">いいえ</button>
         <button id="btn-confirm-yes" class="btn" style="background:#28a745; color:white; width:48%; padding:15px; font-size:18px;">はい</button>
@@ -94,21 +125,19 @@
 
   <div id="child-view" class="view">
     <button class="settings-btn" onclick="unlockAdmin()">⚙️</button>
-    <h1 id="child-title">🎒 もちものチェック</h1>
-    <div id="child-collection" class="collection-status" style="font-size: 14px; padding: 5px 15px; margin-bottom: 10px;"></div>
+    <h1 id="child-title" style="margin-bottom: 5px;">🎒 もちものチェック</h1>
     
     <div id="checklist"></div>
-    
     <div id="reward" class="reward-text"></div>
   </div>
 
   <div id="dashboard-view" class="view">
     <h2>🛠 リスト管理画面</h2>
+    <button class="collection-btn" style="margin: 0 auto 20px auto; display: block;" onclick="openCollection('dashboard-view')">📖 ほめ言葉図鑑を見る</button>
     <div id="dashboard-lists"></div>
     <button class="btn btn-primary" onclick="openEditView(null)">➕ 新しいリストを作る</button>
     
     <hr style="margin: 30px 0 10px 0; border: 0; border-top: 1px solid #ccc;">
-    
     <button class="btn" style="background:#d9534f; color:white; width:100%; max-width:500px; padding:15px;" onclick="resetPraiseCollection()">🔄 ほめ言葉図鑑をリセットする</button>
     <button class="btn" style="background:#eee; color:#333; width:100%; max-width:500px; padding:15px; margin-top:15px;" onclick="lockToChildMode()">🔒 子どもモードに戻る</button>
   </div>
@@ -146,77 +175,34 @@
     let currentEditingId = null;
     let tempItems = [];
     
-    // 🌟 進行状況を管理する変数
     let childCurrentList = [];
     let currentItemIndex = 0;
-    let sessionPraises = []; // 今回のリストで引いた言葉のリスト
+    let sessionPraises = []; 
+    let previousViewForCollection = 'child-home-view';
 
-    const praiseList = [
-      "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！",
-      "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！",
-      "自分でできてエライ！", "確認バッチリだね！", "いいペースだね！", "天才かもしれない！", "お見事です！",
-      "素晴らしい行動力！", "最高だね！", "忘れ物なし！素晴らしい！", "今日も笑顔でいこう！", "ハナマル満点！",
-      "一発でできたね！", "スピード解決だね！", "良い習慣がついてるね！", "さすが、よく分かってる！", "応援してるよ！",
-      "ハイタッチ！", "ニコニコ笑顔がいいね！", "パーフェクト！", "一歩前進だね！", "やる気に満ちてるね！",
-      "その意気だ！", "見事な手際！", "自分で気づけてすごい！", "毎日えらいね！", "今日も一日楽しもう！",
-      "バツグンだね！", "準備の達人！", "100点満点！", "かっこよすぎる！", "先生もびっくりするよ！",
-      "ママもパパも鼻が高いよ！", "さすがだね！", "よくできました！", "その集中力、すごい！", "バッチリ決まったね！",
-      "いいぞいいぞ！", "スーパープレー！", "今日もがんばろう！", "素敵だね！", "グッジョブ！",
-      "レベルアップの音がした！", "経験値ゲットだぜ！", "勇者みたいな行動力！", "ミッションクリア！", "レアな才能はっけん！",
-      "チーターみたいに速い！", "ライオンみたいにカッコいい！", "イルカみたいに賢いね！", "フクロウみたいによく見てる！", "ウサギみたいにピョンピョン進むね！",
-      "宇宙一のスピード！", "ギネス記録にのりそう！", "ノーベル賞ものの大発見！", "金メダル級のすばらしさ！", "世界チャンピオンだ！",
-      "大天才のひらめき！", "毎日すごいね！", "さすがの腕前！", "準備オッケー！", "今日も絶好調！",
-      "いい感じ！", "やる気スイッチONだね！", "すてきな心意気！", "バッチリ準備OK！", "今日もハッピー！",
-      "頼もしいね！", "一安心だね！", "確認のプロ！", "さすがのチェック力！", "今日も元気だね！",
-      "パーフェクト達成！", "すごいぞ、その調子！", "毎日がんばってるね！", "えらい！花丸！", "今日も素晴らしい！",
-      "さすがの準備！", "バッチリすぎる！", "かっこいい！", "今日も最高！", "その意気込みがいいね！",
-      "完璧だね！", "準備万端！", "今日も一日楽しんで！", "さすが！", "その調子！",
-      "マジックみたいだ！", "あっという間に終わったね！", "職人技だね！", "見ていて気持ちがいいよ！", "頼りにしてるよ！",
-      "スーパーヒーロー参上！", "まるで魔法使い！", "プロフェッショナルだね！", "名人レベル到達！", "師匠と呼ばせて！",
-      "心がホカホカするよ！", "見ているこっちも嬉しい！", "がんばる姿が素敵！", "毎日成長してるね！", "すごいパワーを感じる！",
-      "ミラクル連発だね！", "大金星！", "ウルトラC級の技！", "ホームラン！", "ナイスシュート！",
-      "ロケットみたいに速い！", "新幹線クラスのスピード！", "ジェット機みたい！", "光の速さだ！", "タイムアタック大成功！",
-      "探偵みたいによく気づいたね！", "博士級の知識だ！", "リーダーの素質アリ！", "スターの輝き！", "みんなの憧れだね！",
-      "どんどん進むね！", "止まらない勢いだ！", "ノリノリだね！", "イケイケゴーゴー！", "テンションMAX！",
-      "心がピカピカだね！", "太陽みたいに眩しい！", "星みたいにキラキラ！", "虹みたいな笑顔！", "お花みたいに素敵！",
-      "伝説の始まりだ！", "歴史に名を刻んだね！", "神業でたー！", "オーラが出てるよ！", "奇跡の連続だね！",
-      "忍者のように素早い！", "お侍さんのようにカッコいい！", "殿様クラスの大物！", "将軍のような貫禄！", "お姫様みたいに上品！",
-      "大吉だ！", "超ラッキー！", "ハッピーエンド間違いなし！", "ウキウキするね！", "ワクワクが止まらない！",
-      "地球を救うパワーだ！", "宇宙の果てまで響くよ！", "銀河系で一番！", "ブラックホール級の吸引力！", "流れ星に願いが届いたね！",
-      "100万ボルトのパワー！", "エネルギー満タン！", "フルスロットル！", "エンジン全開！", "ターボチャージャー作動！",
-      "ダイヤモンドみたいに硬い意志！", "ルビーみたいに情熱的！", "サファイアみたいに冷静！", "エメラルドみたいに優しい！", "ゴールド級の輝き！",
-      "百獣の王だ！", "空の王者だ！", "海の覇者だ！", "森の守り神！", "大自然のパワー！",
-      "超ド級の活躍！", "メガトンパンチ級の衝撃！", "ギガントすごい！", "テラ素晴らしい！", "ペタかっこいい！",
-      "お見事、座布団一枚！", "よっ、日本一！", "あっぱれ！", "お祭り騒ぎだ！", "花火が上がったね！",
-      "ドカーンと大成功！", "ピカッと閃いたね！", "ササッと終わったね！", "クルッと解決！", "パッと目が覚めるね！",
-      "いい波乗ってんね！", "風を切って走ってる！", "雲の上を歩く気分！", "空まで飛んでいきそう！", "宇宙旅行に行けそうだ！",
-      "心にズキュンときた！", "胸がキュンとした！", "ホッコリしたよ！", "ウルッときちゃった！", "ジーンときたよ！",
-      "言葉が出ないくらいすごい！", "目からウロコだ！", "ほっぺたが落ちそう！", "頭が下がる思いだよ！", "拍手喝采！",
-      "スタンディングオベーション！", "アンコール！", "ブラビッシモ！", "トレビアン！", "マーベラス！",
-      "ファンタスティック！", "エクセレント！", "アメージング！", "インクレディブル！", "ワンダフル！",
-      "スーパーウルトラハイパーすごい！", "ちょ〜〜〜えらい！", "めっちゃかっこいい！", "バリバリ伝説！", "ゴリゴリ進むね！",
-      "無敵モード突入！", "スター状態だね！", "フィーバータイム！", "確変中！", "ボーナスステージ！",
-      "神引きだね！", "SSR（ダブルエスアール）級！", "ウルトラレアな才能！", "レジェンドレア確定！", "シークレット引き当てた！",
-      "宝箱を発見したね！", "伝説の剣を手に入れた！", "魔法の杖を使いこなしてる！", "天空の城に到達！", "ドラゴンをテイムした！",
-      "妖精さんが拍手してる！", "小人さんが手伝ってくれた？", "天使の微笑みだ！", "女神さまもニッコリ！", "神様もびっくり！",
-      "一石二鳥だね！", "三つ巴の大勝利！", "四つ葉のクローバー見つけた気分！", "五つ星ホテル級！", "第六感が冴えてる！",
-      "七色の虹がかかった！", "八面六臂の大活躍！", "九死に一生の奇跡！", "十全十美だ！", "百点満点！",
-      "千年に一人の逸材！", "万歳三唱！", "億万長者の気分！", "兆級のすばらしさ！", "京（けい）レベルの大発見！",
-      "無量大数すごい！", "無限大の可能性！", "限界突破！", "リミットブレイク！", "覚醒したね！",
-      "ニュータイプだ！", "フォースと共にあらんことを！", "君は魔法使いだ！", "海賊王に俺はなる！", "スーパーサイヤ人だ！",
-      "呼吸の型が完璧！", "領域展開に成功！", "ゴムゴムのぉ〜大成功！", "オラ、ワクワクすっぞ！", "真実はいつも一つ！",
-      "月に代わっておしおき成功！", "アンパンマンみたいに優しい！", "ドラえもんの道具みたい！", "ピカチュウ級の可愛さ！", "マリオみたいにジャンプ！",
-      "ゼルダ姫も喜んでる！", "カービィみたいに何でもできる！", "スプラトゥーンみたいにカラフル！", "マイクラで大建築した気分！", "あつ森で星5つの島だね！",
-      "ポケモンマスターになれる！", "スマブラで大乱闘勝利！", "マリオカートで1位！", "テトリスで全消し！", "パズドラで10連コンボ！",
-      "モンストでストライクショット！", "にゃんこ大戦争で完全勝利！", "太鼓の達人でフルコンボ！", "プロセカでオールパーフェクト！", "音ゲーの神様！",
-      "エイムが完璧！", "ヘッドショット決まった！", "ビクロイ！", "ドン勝だ！", "チャンピオン部隊だ！",
-      "最高傑作だね！", "名作の誕生！", "国宝に指定しよう！", "世界遺産レベル！", "宇宙遺産だ！",
-      "君の笑顔がプライスレス！", "お金じゃ買えない価値がある！", "一生の宝物だ！", "歴史の教科書に載るよ！", "銅像を建てよう！",
-      "偉人伝になるよ！", "映画化決定！", "全米が泣いた！", "アカデミー賞受賞！", "グラミー賞も夢じゃない！",
-      "オリンピックで金メダル！", "ワールドカップで優勝！", "甲子園でホームラン！", "ウィンブルドンで優勝！", "マスターズでホールインワン！",
-      "ツールドフランスでマイヨジョーヌ！", "F1でポールトゥウィン！", "横綱昇進！", "三冠王達成！", "国民栄誉賞！",
-      "ノーベル平和賞！", "宇宙飛行士になれる！", "大統領もびっくり！", "王様もひれ伏す！", "神様も道を譲る！"
+    // 🌟 300個のほめ言葉（生データ）
+    const rawPraises = [
+      // --- N (Normal): 150個 (Index 0 ~ 149) ---
+      "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！", "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！", "自分でできてエライ！", "確認バッチリだね！", "いいペースだね！", "天才かもしれない！", "お見事です！", "素晴らしい行動力！", "最高だね！", "忘れ物なし！素晴らしい！", "今日も笑顔でいこう！", "ハナマル満点！", "一発でできたね！", "スピード解決だね！", "良い習慣がついてるね！", "さすが、よく分かってる！", "応援してるよ！", "ハイタッチ！", "ニコニコ笑顔がいいね！", "パーフェクト！", "一歩前進だね！", "やる気に満ちてるね！", "その意気だ！", "見事な手際！", "自分で気づけてすごい！", "毎日えらいね！", "今日も一日楽しもう！", "バツグンだね！", "準備の達人！", "100点満点！", "かっこよすぎる！", "先生もびっくりするよ！", "ママもパパも鼻が高いよ！", "さすがだね！", "よくできました！", "その集中力、すごい！", "バッチリ決まったね！", "いいぞいいぞ！", "スーパープレー！", "今日もがんばろう！", "素敵だね！", "グッジョブ！", "毎日すごいね！", "さすがの腕前！", "準備オッケー！", "今日も絶好調！", "いい感じ！", "やる気スイッチONだね！", "すてきな心意気！", "バッチリ準備OK！", "今日もハッピー！", "頼もしいね！", "一安心だね！", "確認のプロ！", "さすがのチェック力！", "今日も元気だね！", "パーフェクト達成！", "すごいぞ、その調子！", "毎日がんばってるね！", "えらい！花丸！", "今日も素晴らしい！", "さすがの準備！", "バッチリすぎる！", "かっこいい！", "今日も最高！", "その意気込みがいいね！", "完璧だね！", "準備万端！", "今日も一日楽しんで！", "さすが！", "その調子！", "マジックみたいだ！", "あっという間に終わったね！", "職人技だね！", "見ていて気持ちがいいよ！", "頼りにしてるよ！", "心がホカホカするよ！", "見ているこっちも嬉しい！", "がんばる姿が素敵！", "毎日成長してるね！", "すごいパワーを感じる！", "どんどん進むね！", "止まらない勢いだ！", "ノリノリだね！", "イケイケゴーゴー！", "テンションMAX！", "心がピカピカだね！", "太陽みたいに眩しい！", "星みたいにキラキラ！", "虹みたいな笑顔！", "お花みたいに素敵！", "大吉だ！", "超ラッキー！", "ハッピーエンド間違いなし！", "ウキウキするね！", "ワクワクが止まらない！", "ササッと終わったね！", "クルッと解決！", "パッと目が覚めるね！", "いい波乗ってんね！", "風を切って走ってる！", "心にズキュンときた！", "胸がキュンとした！", "ホッコリしたよ！", "ウルッときちゃった！", "ジーンときたよ！", "言葉が出ないくらいすごい！", "目からウロコだ！", "ほっぺたが落ちそう！", "頭が下がる思いだよ！", "拍手喝采！", "スタンディングオベーション！", "アンコール！", "ブラビッシモ！", "トレビアン！", "マーベラス！", "ファンタスティック！", "エクセレント！", "アメージング！", "インクレディブル！", "ワンダフル！",
+      // --- R (Rare): 80個 (Index 150 ~ 229) ---
+      "レベルアップの音がした！", "経験値ゲットだぜ！", "勇者みたいな行動力！", "ミッションクリア！", "レアな才能はっけん！", "チーターみたいに速い！", "ライオンみたいにカッコいい！", "イルカみたいに賢いね！", "フクロウみたいによく見てる！", "ウサギみたいにピョンピョン進むね！", "宇宙一のスピード！", "ギネス記録にのりそう！", "ノーベル賞ものの大発見！", "金メダル級のすばらしさ！", "世界チャンピオンだ！", "大天才のひらめき！", "スーパーヒーロー参上！", "まるで魔法使い！", "プロフェッショナルだね！", "名人レベル到達！", "師匠と呼ばせて！", "ミラクル連発だね！", "大金星！", "ウルトラC級の技！", "ホームラン！", "ナイスシュート！", "ロケットみたいに速い！", "新幹線クラスのスピード！", "ジェット機みたい！", "光の速さだ！", "タイムアタック大成功！", "探偵みたいによく気づいたね！", "博士級の知識だ！", "リーダーの素質アリ！", "スターの輝き！", "みんなの憧れだね！", "伝説の始まりだ！", "歴史に名を刻んだね！", "神業でたー！", "オーラが出てるよ！", "奇跡の連続だね！", "忍者のように素早い！", "お侍さんのようにカッコいい！", "殿様クラスの大物！", "将軍のような貫禄！", "お姫様みたいに上品！", "地球を救うパワーだ！", "宇宙の果てまで響くよ！", "銀河系で一番！", "ブラックホール級の吸引力！", "流れ星に願いが届いたね！", "100万ボルトのパワー！", "エネルギー満タン！", "フルスロットル！", "エンジン全開！", "ターボチャージャー作動！", "ダイヤモンドみたいに硬い意志！", "ルビーみたいに情熱的！", "サファイアみたいに冷静！", "エメラルドみたいに優しい！", "ゴールド級の輝き！", "百獣の王だ！", "空の王者だ！", "海の覇者だ！", "森の守り神！", "大自然のパワー！", "超ド級の活躍！", "メガトンパンチ級の衝撃！", "ギガントすごい！", "テラ素晴らしい！", "ペタかっこいい！", "お見事、座布団一枚！", "よっ、日本一！", "あっぱれ！", "お祭り騒ぎだ！", "花火が上がったね！", "ドカーンと大成功！", "ピカッと閃いたね！", "雲の上を歩く気分！", "空まで飛んでいきそう！", "宇宙旅行に行けそうだ！",
+      // --- SR (Super Rare): 50個 (Index 230 ~ 279) ---
+      "スーパーウルトラハイパーすごい！", "ちょ〜〜〜えらい！", "めっちゃかっこいい！", "バリバリ伝説！", "ゴリゴリ進むね！", "無敵モード突入！", "スター状態だね！", "フィーバータイム！", "確変中！", "ボーナスステージ！", "神引きだね！", "宝箱を発見したね！", "伝説の剣を手に入れた！", "魔法の杖を使いこなしてる！", "天空の城に到達！", "ドラゴンをテイムした！", "妖精さんが拍手してる！", "小人さんが手伝ってくれた？", "天使の微笑みだ！", "女神さまもニッコリ！", "神様もびっくり！", "一石二鳥だね！", "三つ巴の大勝利！", "四つ葉のクローバー見つけた気分！", "五つ星ホテル級！", "第六感が冴えてる！", "七色の虹がかかった！", "八面六臂の大活躍！", "九死に一生の奇跡！", "十全十美だ！", "百点満点！", "千年に一人の逸材！", "万歳三唱！", "億万長者の気分！", "兆級のすばらしさ！", "京（けい）レベルの大発見！", "無量大数すごい！", "無限大の可能性！", "限界突破！", "リミットブレイク！", "覚醒したね！", "ニュータイプだ！", "フォースと共にあらんことを！", "君は魔法使いだ！", "海賊王に俺はなる！", "スーパーサイヤ人だ！", "呼吸の型が完璧！", "領域展開に成功！", "ゴムゴムのぉ〜大成功！", "オラ、ワクワクすっぞ！",
+      // --- SSR (Specially Super Rare): 15個 (Index 280 ~ 294) ---
+      "真実はいつも一つ！", "月に代わっておしおき成功！", "ポケモンマスターになれる！", "スマブラで大乱闘勝利！", "マリオカートで1位！", "テトリスで全消し！", "パズドラで10連コンボ！", "モンストでストライクショット！", "にゃんこ大戦争で完全勝利！", "音ゲーの神様！", "エイムが完璧！", "ビクロイ（ビクトリーロイヤル）！", "ドン勝だ！", "チャンピオン部隊だ！", "最高傑作だね！",
+      // --- UR (Ultra Rare): 5個 (Index 295 ~ 299) ---
+      "ノーベル平和賞じゅしょう！", "うちゅうひこうしになれる！", "だいとうりょうもビックリ！", "おうさまもひれふすレベル！", "かみさまも道をゆずるスゴさ！"
     ];
+
+    // 🌟 レア度を付与したオブジェクト配列を作成
+    const praises = rawPraises.map((msg, index) => {
+      let rarity = 'N';
+      if (index >= 295) rarity = 'UR';
+      else if (index >= 280) rarity = 'SSR';
+      else if (index >= 230) rarity = 'SR';
+      else if (index >= 150) rarity = 'R';
+      return { id: index + 1, message: msg, rarity: rarity };
+    });
 
     let collectedPraises = JSON.parse(localStorage.getItem('nfc_praise_collection') || '[]');
 
@@ -312,12 +298,12 @@
         collectedPraises = [];
         localStorage.setItem('nfc_praise_collection', JSON.stringify([]));
         localStorage.setItem('nfc_daily_praises', JSON.stringify({date: "", items: []}));
-        updateCollectionStatus();
         alert('図鑑をリセットしました！最初からスタートします。');
         renderDashboard();
       }
     }
 
+    // ================= ダッシュボード =================
     function renderDashboard() {
       switchView('dashboard-view');
       const container = document.getElementById('dashboard-lists');
@@ -353,11 +339,7 @@
         renderDashboard();
       }
     }
-
-    function copyText(text) {
-      navigator.clipboard.writeText(text).then(() => alert('NFCシール用URLをコピーしました！'));
-    }
-
+    function copyText(text) { navigator.clipboard.writeText(text).then(() => alert('NFCシール用URLをコピーしました！')); }
     function openShareView(id) {
       const list = appData[id];
       const baseUrl = window.location.href.split('?')[0].split('#')[0];
@@ -367,6 +349,7 @@
       switchView('share-view');
     }
 
+    // ================= 編集画面 =================
     function openEditView(id) {
       switchView('edit-view');
       if (id && appData[id]) {
@@ -381,25 +364,18 @@
       document.getElementById('bulk-input').value = '';
       renderEditItems();
     }
-
     function addItem() {
       const input = document.getElementById('item-input');
       const val = input.value.trim();
       if(val) { tempItems.push(val); input.value = ''; renderEditItems(); }
     }
-
     function addBulkItems() {
       const lines = document.getElementById('bulk-input').value.split('\n');
-      lines.forEach(line => {
-        const val = line.trim();
-        if(val) tempItems.push(val);
-      });
+      lines.forEach(line => { const val = line.trim(); if(val) tempItems.push(val); });
       document.getElementById('bulk-input').value = '';
       renderEditItems();
     }
-
     function removeTempItem(index) { tempItems.splice(index, 1); renderEditItems(); }
-
     function renderEditItems() {
       const container = document.getElementById('edit-item-list');
       container.innerHTML = '';
@@ -410,7 +386,6 @@
         container.appendChild(div);
       });
     }
-
     function saveList() {
       const title = document.getElementById('list-title-input').value.trim();
       if (!title || tempItems.length === 0) return alert('入力内容を確認してください。');
@@ -419,56 +394,77 @@
       localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
       renderDashboard();
     }
-    
     function goToDashboard() { renderDashboard(); }
 
-    function updateCollectionStatus() {
-      const total = praiseList.length;
-      const collected = collectedPraises.length;
-      const text = `📖 あつめた言葉： ${collected} / ${total}`;
-      document.getElementById('home-collection').innerText = text;
+    // ================= 図鑑（コレクション）機能 =================
+    function openCollection(previousView) {
+      previousViewForCollection = previousView;
+      switchView('collection-view');
       
-      const childCol = document.getElementById('child-collection');
-      if (childCol) childCol.innerText = text;
+      const statsContainer = document.getElementById('collection-stats');
+      const gridContainer = document.getElementById('collection-grid');
+      gridContainer.innerHTML = '';
+      
+      // レア度ごとのカウント
+      const counts = { N: { total: 150, got: 0 }, R: { total: 80, got: 0 }, SR: { total: 50, got: 0 }, SSR: { total: 15, got: 0 }, UR: { total: 5, got: 0 } };
+      
+      praises.forEach(p => {
+        const isUnlocked = collectedPraises.includes(p.id);
+        if (isUnlocked) counts[p.rarity].got++;
+        
+        const div = document.createElement('div');
+        div.className = `col-item ${isUnlocked ? 'unlocked' : ''}`;
+        
+        if (isUnlocked) {
+          div.innerHTML = `<div class="col-rarity"><span class="rarity-badge r-${p.rarity}">${p.rarity}</span><br><span style="font-size:10px;color:#999;">No.${p.id}</span></div><div>${p.message}</div>`;
+        } else {
+          div.innerHTML = `<div style="margin-bottom:5px; font-size:10px;">No.${p.id}</div><div style="font-size:24px;">🔒</div><div>???</div>`;
+        }
+        gridContainer.appendChild(div);
+      });
+
+      statsContainer.innerHTML = `
+        <div class="stat-box" style="border-bottom: 3px solid #95a5a6;">N: ${counts.N.got}/${counts.N.total}</div>
+        <div class="stat-box" style="border-bottom: 3px solid #3498db;">R: ${counts.R.got}/${counts.R.total}</div>
+        <div class="stat-box" style="border-bottom: 3px solid #9b59b6;">SR: ${counts.SR.got}/${counts.SR.total}</div>
+        <div class="stat-box" style="border-bottom: 3px solid #f1c40f;">SSR: ${counts.SSR.got}/${counts.SSR.total}</div>
+        <div class="stat-box" style="border-bottom: 3px solid #ff00cc;">UR: ${counts.UR.got}/${counts.UR.total}</div>
+      `;
     }
 
+    function closeCollection() {
+      switchView(previousViewForCollection);
+    }
+
+    // ================= 子ども用画面・ガチャ機能 =================
     function renderChildHome() {
       switchView('child-home-view');
-      updateCollectionStatus();
     }
 
-    // 🌟 1つずつ表示する機能のスタート
     function renderChildView(id) {
       switchView('child-view');
       document.getElementById('reward').style.display = 'none';
-      updateCollectionStatus();
       
       const listData = appData[id];
       document.getElementById('child-title').innerText = listData.title;
       childCurrentList = listData.items;
       
-      // 変数のリセット
       currentItemIndex = 0;
       sessionPraises = [];
-      
       renderCurrentChildItem(id);
     }
 
-    // 🌟 現在の番号のアイテムだけを画面に描画する
     function renderCurrentChildItem(listId) {
       const container = document.getElementById('checklist');
       container.innerHTML = '';
       
-      // まだチェックする項目が残っている場合
       if (currentItemIndex < childCurrentList.length) {
         const item = childCurrentList[currentItemIndex];
         
-        // 進捗テキストの表示（例： 1 / 5 個目）
         const progressText = document.createElement('div');
         progressText.className = 'progress-text';
         progressText.innerText = `📦 ${currentItemIndex + 1} / ${childCurrentList.length} こめ`;
         
-        // カードの表示
         const card = document.createElement('div');
         card.className = 'item-card';
         card.onclick = () => checkItem(card, listId, currentItemIndex);
@@ -476,60 +472,66 @@
         
         container.appendChild(progressText);
         container.appendChild(card);
-      } 
-      // すべてチェックし終わった場合（リザルト画面へ）
-      else {
+      } else {
         showCompletionSummary();
       }
     }
 
-    // 🌟 アイテムをタップした時の処理
     function checkItem(cardElement, listId, itemIndex) {
-      if (cardElement.classList.contains('checked')) return; // 連打防止
-      
+      if (cardElement.classList.contains('checked')) return; 
       cardElement.classList.add('checked');
       
       const today = new Date().toLocaleDateString('ja-JP');
       let dailyData = JSON.parse(localStorage.getItem('nfc_daily_praises') || '{"date":"","items":[]}');
 
-      if (dailyData.date !== today) {
-        dailyData = { date: today, items: [] };
-      }
+      if (dailyData.date !== today) { dailyData = { date: today, items: [] }; }
 
       const itemKey = `${listId}_${itemIndex}`;
-      let delay = 600; // すでに引いたことがある場合は短めに次の問題へ進む
+      let delay = 600; 
 
-      // まだ今日褒められていない項目ならガチャを回す
       if (!dailyData.items.includes(itemKey)) {
         dailyData.items.push(itemKey);
         localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData));
         triggerPraise(); 
-        delay = 1800; // ポップアップが表示されるため、長めに待ってから次へ進む
+        delay = 2000; // ガチャ演出を見せるために待機時間を少し長めに
       }
 
-      // 少し待ってから次の項目を描画
       setTimeout(() => {
         currentItemIndex++;
         renderCurrentChildItem(listId);
       }, delay);
     }
 
+    // 🌟 排出率に基づいたガチャ抽選ロジック
+    function rollGacha() {
+      const rand = Math.random() * 100;
+      let targetRarity = 'N';
+      
+      if (rand < 1) targetRarity = 'UR';           // 1%
+      else if (rand < 5) targetRarity = 'SSR';     // 4%  (1~5)
+      else if (rand < 20) targetRarity = 'SR';     // 15% (5~20)
+      else if (rand < 50) targetRarity = 'R';      // 30% (20~50)
+      else targetRarity = 'N';                     // 50% (50~100)
+
+      // 選ばれたレア度の中からランダムに1つ選ぶ
+      const pool = praises.filter(p => p.rarity === targetRarity);
+      const selected = pool[Math.floor(Math.random() * pool.length)];
+      return selected;
+    }
+
     function triggerPraise() {
-      const total = praiseList.length;
-      const randomIndex = Math.floor(Math.random() * total);
-      const message = praiseList[randomIndex];
-      const number = randomIndex + 1;
+      const selectedPraise = rollGacha();
+      const number = selectedPraise.id;
 
       let isNew = false;
       if (!collectedPraises.includes(number)) {
         collectedPraises.push(number);
         localStorage.setItem('nfc_praise_collection', JSON.stringify(collectedPraises));
         isNew = true;
-        updateCollectionStatus(); 
       }
       
-      // 今回のリザルト用に記録
-      sessionPraises.push({ number, message, isNew });
+      // リザルト画面用に記録
+      sessionPraises.push({ ...selectedPraise, isNew });
       
       let popup = document.getElementById('praise-popup');
       if (!popup) {
@@ -540,16 +542,19 @@
       }
       
       popup.innerHTML = `
-        <div class="praise-number">🏷 No.${number} / ${total} ${isNew ? '<span style="color:red; font-size:12px;">（NEW!）</span>' : ''}</div>
-        <div class="praise-message">${message}</div>
-        <div class="praise-progress">図鑑：${collectedPraises.length} / ${total}</div>
+        <div class="praise-header">
+          <span class="rarity-badge r-${selectedPraise.rarity}">${selectedPraise.rarity}</span>
+          <span class="praise-number">No.${number} ${isNew ? '<span style="color:red; font-size:12px;">(NEW!)</span>' : ''}</span>
+        </div>
+        <div class="praise-message">${selectedPraise.message}</div>
+        <div class="praise-progress">図鑑：${collectedPraises.length} / 300</div>
       `;
       
       popup.classList.add('show');
-      setTimeout(() => { popup.classList.remove('show'); }, 1500);
+      setTimeout(() => { popup.classList.remove('show'); }, 1800);
     }
 
-    // 🌟 ぜんぶ終わった後のリザルト（まとめ）画面
+    // 🌟 リザルト（まとめ）画面
     function showCompletionSummary() {
       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }});
       setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
@@ -559,7 +564,6 @@
       
       let summaryHTML = `🌟 ぜんぶできたね！ 🌟<br>よくできました！`;
       
-      // 今回引いた言葉があれば一覧表示する
       if (sessionPraises.length > 0) {
         summaryHTML += `<div class="summary-box">
           <h3>🎁 今回あつめた言葉 🎁</h3>
@@ -568,20 +572,23 @@
         sessionPraises.forEach(p => {
           summaryHTML += `<li>
             <div style="flex-grow: 1;">
-              <span style="color:#888; font-size:12px;">No.${p.number}</span><br>
+              <div style="margin-bottom: 5px;">
+                <span class="rarity-badge r-${p.rarity}">${p.rarity}</span>
+                <span style="color:#888; font-size:12px;">No.${p.id}</span>
+              </div>
               <span style="color:#d9534f; font-size:18px;">${p.message}</span>
             </div>
             ${p.isNew ? '<span class="new-badge">NEW!</span>' : '<span class="got-badge">ゲット済</span>'}
           </li>`;
         });
         
-        summaryHTML += `</ul></div>`;
-      } 
-      // スパム防止に引っかかって今回1つも引けなかった場合
-      else {
+        summaryHTML += `</ul></div>
+        <button class="collection-btn" style="width: 100%; margin-top: 15px;" onclick="openCollection('child-view')">📖 ほめ言葉図鑑を見る</button>`;
+      } else {
         summaryHTML += `<div class="summary-box" style="text-align:center; color:#666; font-size:16px;">
           きょうの言葉はぜんぶ集め終わってるよ！<br>またあした挑戦してね！
-        </div>`;
+        </div>
+        <button class="collection-btn" style="width: 100%; margin-top: 15px;" onclick="openCollection('child-view')">📖 ほめ言葉図鑑を見る</button>`;
       }
       
       rewardDiv.innerHTML = summaryHTML;
