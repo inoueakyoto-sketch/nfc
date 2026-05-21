@@ -133,8 +133,7 @@
     <h2>📝 リストの作成・編集</h2>
     <div class="panel-container">
       <label style="font-weight:bold;">リストの名前 (例: 🎒ランドセル)</label><br>
-      <input type="text" id="list-title-input" style="margin: 5px 0 20px 0;"><br>
-      
+      <input type="text" id="list-title-input" style="width: 100%; box-sizing: border-box; margin: 5px 0 20px 0;"><br>
       <label style="font-weight:bold;">1つずつ追加</label><br>
       <div style="display: flex; flex-direction: column; gap: 5px; margin: 5px 0 10px 0;">
         <input type="text" id="item-input" placeholder="もちもの (例: ✏️ えんぴつ)">
@@ -143,16 +142,12 @@
           <button class="btn" style="background:#4a90e2; color:white; margin:0 0 0 5px;" onclick="addItem()">追加</button>
         </div>
       </div>
-      
       <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-      
       <label style="font-weight:bold;">📋 スプレッドシートから一括追加</label><br>
-      <p style="font-size:12px; color:#666; margin:5px 0;">「もちもの」と「アクション」の<strong style="color:#d9534f;">2列</strong>をコピーして貼り付けてください。（1列だけでもOK）</p>
+      <p style="font-size:12px; color:#666; margin:5px 0;">「もちもの」と「アクション」の2列をコピーして貼り付けてください。</p>
       <textarea id="bulk-input" rows="4" placeholder="✏️ えんぴつ [タブ] ふでばこに入れた？&#10;📓 ノート [タブ] ランドセルに入れた？"></textarea>
       <button class="btn" style="background:#28a745; color:white; width: 100%; margin-top: 5px;" onclick="addBulkItems()">一括追加する</button>
-      
       <div id="edit-item-list" style="margin-top: 25px; border-top: 2px solid #eee; padding-top: 15px;"></div>
-      
       <button class="btn btn-primary" style="background:#4a90e2;" onclick="saveList()">💾 この端末に保存する</button>
       <button class="btn btn-primary" style="background:#eee; color:#333; margin-top:10px;" onclick="goToDashboard()">キャンセル</button>
     </div>
@@ -169,14 +164,16 @@
   <script>
     let appData = {};
     let currentEditingId = null;
-    let tempItems = []; // 🌟 {name: "えんぴつ", hint: "ふでばこにいれた？"} の配列
+    let tempItems = [];
     
     let childCurrentList = [];
     let currentItemIndex = 0;
     let sessionPraises = []; 
     let previousViewForCollection = 'child-home-view';
+    
+    // 🌟 現在表示中のリストID（二重読み込み防止用）
+    let currentLoadedId = null;
 
-    // 🌟 300個のほめ言葉データ
     const rawPraises = [
       "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！", "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！", "自分でできてエライ！", "確認バッチリだね！", "いいペースだね！", "天才かもしれない！", "お見事です！", "素晴らしい行動力！", "最高だね！", "忘れ物なし！素晴らしい！", "今日も笑顔でいこう！", "ハナマル満点！", "一発でできたね！", "スピード解決だね！", "良い習慣がついてるね！", "さすが、よく分かってる！", "応援してるよ！", "ハイタッチ！", "ニコニコ笑顔がいいね！", "パーフェクト！", "一歩前進だね！", "やる気に満ちてるね！", "その意気だ！", "見事な手際！", "自分で気づけてすごい！", "毎日えらいね！", "今日も一日楽しもう！", "バツグンだね！", "準備の達人！", "100点満点！", "かっこよすぎる！", "先生もびっくりするよ！", "ママもパパも鼻が高いよ！", "さすがだね！", "よくできました！", "その集中力、すごい！", "バッチリ決まったね！", "いいぞいいぞ！", "スーパープレー！", "今日もがんばろう！", "素敵だね！", "グッジョブ！", "毎日すごいね！", "さすがの腕前！", "準備オッケー！", "今日も絶好調！", "いい感じ！", "やる気スイッチONだね！", "すてきな心意気！", "バッチリ準備OK！", "今日もハッピー！", "頼もしいね！", "一安心だね！", "確認のプロ！", "さすがのチェック力！", "今日も元気だね！", "パーフェクト達成！", "すごいぞ、その調子！", "毎日がんばってるね！", "えらい！花丸！", "今日も素晴らしい！", "さすがの準備！", "バッチリすぎる！", "かっこいい！", "今日も最高！", "その意気込みがいいね！", "完璧だね！", "準備万端！", "今日も一日楽しんで！", "さすが！", "その調子！", "マジックみたいだ！", "あっという間に終わったね！", "職人技だね！", "見ていて気持ちがいいよ！", "頼りにしてるよ！", "心がホカホカするよ！", "見ているこっちも嬉しい！", "がんばる姿が素敵！", "毎日成長してるね！", "すごいパワーを感じる！", "どんどん進むね！", "止まらない勢いだ！", "ノリノリだね！", "イケイケゴーゴー！", "テンションMAX！", "心がピカピカだね！", "太陽みたいに眩しい！", "星みたいにキラキラ！", "虹みたいな笑顔！", "お花みたいに素敵！", "大吉だ！", "超ラッキー！", "ハッピーエンド間違いなし！", "ウキウキするね！", "ワクワクが止まらない！", "ササッと終わったね！", "クルッと解決！", "パッと目が覚めるね！", "いい波乗ってんね！", "風を切って走ってる！", "心にズキュンときた！", "胸がキュンとした！", "ホッコリしたよ！", "ウルッときちゃった！", "ジーンときたよ！", "言葉が出ないくらいすごい！", "目からウロコだ！", "ほっぺたが落ちそう！", "頭が下がる思いだよ！", "拍手喝采！", "スタンディングオベーション！", "アンコール！", "ブラビッシモ！", "トレビアン！", "マーベラス！", "ファンタスティック！", "エクセレント！", "アメージング！", "インクレディブル！", "ワンダフル！",
       "レベルアップの音がした！", "経験値ゲットだぜ！", "勇者みたいな行動力！", "ミッションクリア！", "レアな才能はっけん！", "チーターみたいに速い！", "ライオンみたいにカッコいい！", "イルカみたいに賢いね！", "フクロウみたいによく見てる！", "ウサギみたいにピョンピョン進むね！", "宇宙一のスピード！", "ギネス記録にのりそう！", "ノーベル賞ものの大発見！", "金メダル級のすばらしさ！", "世界チャンピオンだ！", "大天才のひらめき！", "スーパーヒーロー参上！", "まるで魔法使い！", "プロフェッショナルだね！", "名人レベル到達！", "師匠と呼ばせて！", "ミラクル連発だね！", "大金星！", "ウルトラC級の技！", "ホームラン！", "ナイスシュート！", "ロケットみたいに速い！", "新幹線クラスのスピード！", "ジェット機みたい！", "光の速さだ！", "タイムアタック大成功！", "探偵みたいによく気づいたね！", "博士級の知識だ！", "リーダーの素質アリ！", "スターの輝き！", "みんなの憧れだね！", "伝説の始まりだ！", "歴史に名を刻んだね！", "神業でたー！", "オーラが出てるよ！", "奇跡の連続だね！", "忍者のように素早い！", "お侍さんのようにカッコいい！", "殿様クラスの大物！", "将軍のような貫禄！", "お姫様みたいに上品！", "地球を救うパワーだ！", "宇宙の果てまで響くよ！", "銀河系で一番！", "ブラックホール級の吸引力！", "流れ星に願いが届いたね！", "100万ボルトのパワー！", "エネルギー満タン！", "フルスロットル！", "エンジン全開！", "ターボチャージャー作動！", "ダイヤモンドみたいに硬い意志！", "ルビーみたいに情熱的！", "サファイアみたいに冷静！", "エメラルドみたいに優しい！", "ゴールド級の輝き！", "百獣の王だ！", "空の王者だ！", "海の覇者だ！", "森の守り神！", "大自然のパワー！", "超ド級の活躍！", "メガトンパンチ級の衝撃！", "ギガントすごい！", "テラ素晴らしい！", "ペタかっこいい！", "お見事、座布団一枚！", "よっ、日本一！", "あっぱれ！", "お祭り騒ぎだ！", "花火が上がったね！", "ドカーンと大成功！", "ピカッと閃いたね！", "雲の上を歩く気分！", "空まで飛んでいきそう！", "宇宙旅行に行けそうだ！",
@@ -200,7 +197,6 @@
       const saved = localStorage.getItem('nfc_multi_checklists');
       if (saved) {
         let parsedData = JSON.parse(saved);
-        // 🌟 古いデータ形式（文字列の配列）を新しい形式（オブジェクトの配列）に自動変換
         for (let key in parsedData) {
           if (parsedData[key].items && parsedData[key].items.length > 0) {
             if (typeof parsedData[key].items[0] === 'string') {
@@ -220,11 +216,10 @@
       const listId = urlParams.get('id');
       const action = urlParams.get('action');
 
-      // 🌟 QRコードからのインポート処理
       if (action === 'import') {
         const importId = urlParams.get('id');
         const importTitle = urlParams.get('title');
-        const importItemsStr = urlParams.get('items'); // "name|hint,name|hint" の形式
+        const importItemsStr = urlParams.get('items'); 
         
         if (importId && importTitle && importItemsStr) {
           document.getElementById('confirm-list-title').innerText = importTitle;
@@ -264,8 +259,14 @@
         }
       }
 
+      // 🌟 URLにリストIDがある場合は、前のリストと違う時だけ再描画する（二重表示防止）
       if (listId) {
-        if (appData[listId]) { renderChildView(listId); } 
+        if (appData[listId]) { 
+          if (currentLoadedId !== listId) {
+            currentLoadedId = listId;
+            renderChildView(listId); 
+          }
+        } 
         else { switchView('error-view'); }
         return;
       }
@@ -274,6 +275,29 @@
       if (role === 'admin') { renderDashboard(); } 
       else { renderChildHome(); }
     }
+
+    // 🌟 スマホのタブ使い回しバグ対策：画面がアクティブになったらURLを監視して強制切り替え
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const listId = urlParams.get('id');
+        if (listId && listId !== currentLoadedId && appData[listId]) {
+          currentLoadedId = listId;
+          renderChildView(listId);
+        }
+      }
+    });
+
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const listId = urlParams.get('id');
+        if (listId && listId !== currentLoadedId && appData[listId]) {
+          currentLoadedId = listId;
+          renderChildView(listId);
+        }
+      }
+    });
 
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
@@ -313,12 +337,22 @@
         const nfcUrl = `${baseUrl}?id=${id}`;
         const card = document.createElement('div');
         card.className = 'dashboard-card';
+        
+        // 🌟 コピーミスを防ぐため、URLを明示＆デザイン改善
         card.innerHTML = `
           <div class="dashboard-title">${list.title}</div>
-          <button class="btn" style="background:#28a745; color:white;" onclick="openShareView('${id}')">📲 子どもに配る</button>
-          <button class="btn" style="background:#666; color:white;" onclick="copyText('${nfcUrl}')">タグURLコピー</button>
-          <button class="btn" style="background:#ff8c00; color:white;" onclick="openEditView('${id}')">編集</button>
-          <button class="btn" style="background:#d9534f; color:white;" onclick="deleteList('${id}')">削除</button>
+          <div style="font-size: 11px; color: #666; margin-bottom: 15px; background: #eee; padding: 10px; border-radius: 5px; word-break: break-all; border: 1px solid #ccc;">
+            <strong>【タグ書き込み用 URL】</strong><br>
+            <span style="user-select: all;">${nfcUrl}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
+            <button class="btn" style="background:#666; color:white; flex-grow:1;" onclick="copyText('${nfcUrl}')">📋 URLをコピー</button>
+            <button class="btn" style="background:#28a745; color:white; flex-grow:1;" onclick="openShareView('${id}')">📲 子どもに配る</button>
+          </div>
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:5px;">
+            <button class="btn" style="background:#ff8c00; color:white; flex-grow:1;" onclick="openEditView('${id}')">✏️ 編集</button>
+            <button class="btn" style="background:#d9534f; color:white; flex-grow:1;" onclick="deleteList('${id}')">🗑 削除</button>
+          </div>
         `;
         container.appendChild(card);
       });
@@ -332,9 +366,19 @@
       }
     }
 
-    function copyText(text) { navigator.clipboard.writeText(text).then(() => alert('NFCシール用URLをコピーしました！')); }
-    
-    // 🌟 共有URL生成時のエンコード処理を変更
+    // 🌟 コピー機能の堅牢化（失敗時も通知する）
+    function copyText(text) { 
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          alert('NFCシール用URLをコピーしました！\nNFC Tools等のアプリでタグに書き込んでください。');
+        }).catch(err => {
+          alert('コピーに失敗しました。お手数ですが画面上のURLを直接長押ししてコピーしてください。');
+        });
+      } else {
+        alert('このブラウザではコピーボタンが使えません。画面上のURLを長押ししてコピーしてください。');
+      }
+    }
+
     function openShareView(id) {
       const list = appData[id];
       const baseUrl = window.location.href.split('?')[0].split('#')[0];
@@ -360,7 +404,6 @@
       renderEditItems();
     }
 
-    // 🌟 1つずつ追加の処理
     function addItem() {
       const nameInput = document.getElementById('item-input');
       const hintInput = document.getElementById('hint-input');
@@ -375,22 +418,15 @@
       }
     }
 
-    // 🌟 スプレッドシートからの2列一括追加
     function addBulkItems() {
       const lines = document.getElementById('bulk-input').value.split('\n');
       let addedCount = 0;
-      
       lines.forEach(line => { 
-        const parts = line.split('\t'); // タブで分割（スプシの列をコピーするとタブになる）
+        const parts = line.split('\t'); 
         const nameVal = (parts[0] || '').trim();
         const hintVal = (parts[1] || '').trim() || '🎒 バッグにいれてね...';
-        
-        if(nameVal) {
-          tempItems.push({ name: nameVal, hint: hintVal });
-          addedCount++;
-        }
+        if(nameVal) { tempItems.push({ name: nameVal, hint: hintVal }); addedCount++; }
       });
-      
       document.getElementById('bulk-input').value = '';
       renderEditItems();
       if (addedCount > 0) alert(`${addedCount}件のアイテムを追加しました！`);
@@ -425,8 +461,9 @@
       localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
       renderDashboard();
     }
-    
+
     function goToDashboard() { renderDashboard(); }
+    
     function resetPraiseCollection() {
       if (confirm('本当に図鑑をリセットしますか？\n※集めた言葉や、今日のチェック履歴がすべて消えて最初からになります。')) {
         collectedPraises = [];
@@ -489,7 +526,6 @@
       renderCurrentChildItem(id);
     }
 
-    // 🌟 タイマー（ロック）機能 ＋ カスタム指示テキストの反映
     function renderCurrentChildItem(listId) {
       const container = document.getElementById('checklist');
       container.innerHTML = '';
