@@ -19,22 +19,14 @@
     
     /* 1つずつ表示用 */
     .progress-text { font-size: 22px; font-weight: bold; color: #4a90e2; margin-bottom: 10px; }
-    
-    /* 🌟 アイテムカードのベーススタイル */
     .item-card { background: #ffffff; margin: 15px auto; padding: 30px 20px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); font-size: 28px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; transition: all 0.3s ease; user-select: none; border: 4px solid transparent; position: relative; overflow: hidden; }
     .item-card:active { transform: scale(0.95); }
-    
-    /* 🌟 ロック中（待機中）のスタイル */
     .item-card.locked { background: #f5f5f5; border-color: #ccc; cursor: not-allowed; transform: none; color: #666; }
     .item-card.locked:active { transform: none; }
     .item-card.locked .check-mark { border-color: #aaa; color: #aaa; }
-    
-    /* 🌟 チェック済みのスタイル */
     .item-card.checked { background: #d4edda; color: #155724; border-color: #28a745; }
     .check-mark { width: 50px; height: 50px; border-radius: 50%; border: 4px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 30px; color: transparent; transition: all 0.3s ease;}
     .item-card.checked .check-mark { background: #28a745; border-color: #28a745; color: white; transform: scale(1.1); }
-    
-    /* 🌟 ゲージアニメーション用 */
     .timer-line { position: absolute; bottom: 0; left: 0; height: 10px; background: #4a90e2; width: 0%; transition: width 2.5s linear; }
     
     .reward-text { font-size: 32px; color: #ff8c00; font-weight: bold; margin-top: 20px; display: none; animation: popup 0.5s ease-out; }
@@ -55,7 +47,6 @@
     .summary-box { background: #fff; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left; }
     .summary-box h3 { color: #ff8c00; text-align: center; margin-top: 0; border-bottom: 2px dashed #ff8c00; padding-bottom: 10px; font-size: 20px; }
     .summary-list { list-style: none; padding: 0; margin: 0; }
-    
     .new-badge { background: #d9534f; color: white; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; animation: pulse 1s infinite; white-space: nowrap; font-weight:bold;}
     .got-badge { background: #eee; color: #888; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; white-space: nowrap; font-weight: normal;}
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -72,12 +63,11 @@
     .col-item.unlocked { background: #fff; color: #333; border-color: #ff8c00; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .col-rarity { margin-bottom: 5px; }
 
-    /* 保護者用UI */
     .dashboard-card { background: #fff; padding: 15px; margin: 15px auto; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; text-align: left; }
     .dashboard-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-    input[type="text"] { width: 65%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
+    input[type="text"] { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;}
     textarea { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-    .list-item { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+    .list-item { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; flex-direction: column; align-items: flex-start; }
     .delete-text { color: red; cursor: pointer; font-weight: bold; padding: 5px; }
   </style>
 </head>
@@ -143,17 +133,26 @@
     <h2>📝 リストの作成・編集</h2>
     <div class="panel-container">
       <label style="font-weight:bold;">リストの名前 (例: 🎒ランドセル)</label><br>
-      <input type="text" id="list-title-input" style="width: 100%; box-sizing: border-box; margin: 5px 0 20px 0;"><br>
+      <input type="text" id="list-title-input" style="margin: 5px 0 20px 0;"><br>
+      
       <label style="font-weight:bold;">1つずつ追加</label><br>
-      <div style="display: flex;">
-        <input type="text" id="item-input" placeholder="例: ✏️ えんぴつ">
-        <button class="btn" style="background:#4a90e2; color:white; margin:0 0 0 5px;" onclick="addItem()">追加</button>
+      <div style="display: flex; flex-direction: column; gap: 5px; margin: 5px 0 10px 0;">
+        <input type="text" id="item-input" placeholder="もちもの (例: ✏️ えんぴつ)">
+        <div style="display: flex;">
+          <input type="text" id="hint-input" placeholder="アクション (例: ふでばこに入れた？)">
+          <button class="btn" style="background:#4a90e2; color:white; margin:0 0 0 5px;" onclick="addItem()">追加</button>
+        </div>
       </div>
+      
       <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+      
       <label style="font-weight:bold;">📋 スプレッドシートから一括追加</label><br>
-      <textarea id="bulk-input" rows="4"></textarea>
+      <p style="font-size:12px; color:#666; margin:5px 0;">「もちもの」と「アクション」の<strong style="color:#d9534f;">2列</strong>をコピーして貼り付けてください。（1列だけでもOK）</p>
+      <textarea id="bulk-input" rows="4" placeholder="✏️ えんぴつ [タブ] ふでばこに入れた？&#10;📓 ノート [タブ] ランドセルに入れた？"></textarea>
       <button class="btn" style="background:#28a745; color:white; width: 100%; margin-top: 5px;" onclick="addBulkItems()">一括追加する</button>
+      
       <div id="edit-item-list" style="margin-top: 25px; border-top: 2px solid #eee; padding-top: 15px;"></div>
+      
       <button class="btn btn-primary" style="background:#4a90e2;" onclick="saveList()">💾 この端末に保存する</button>
       <button class="btn btn-primary" style="background:#eee; color:#333; margin-top:10px;" onclick="goToDashboard()">キャンセル</button>
     </div>
@@ -170,7 +169,7 @@
   <script>
     let appData = {};
     let currentEditingId = null;
-    let tempItems = [];
+    let tempItems = []; // 🌟 {name: "えんぴつ", hint: "ふでばこにいれた？"} の配列
     
     let childCurrentList = [];
     let currentItemIndex = 0;
@@ -199,7 +198,19 @@
 
     function init() {
       const saved = localStorage.getItem('nfc_multi_checklists');
-      if (saved) appData = JSON.parse(saved);
+      if (saved) {
+        let parsedData = JSON.parse(saved);
+        // 🌟 古いデータ形式（文字列の配列）を新しい形式（オブジェクトの配列）に自動変換
+        for (let key in parsedData) {
+          if (parsedData[key].items && parsedData[key].items.length > 0) {
+            if (typeof parsedData[key].items[0] === 'string') {
+              parsedData[key].items = parsedData[key].items.map(i => ({ name: i, hint: '🎒 バッグにいれてね...' }));
+            }
+          }
+        }
+        appData = parsedData;
+        localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+      }
 
       if (!localStorage.getItem('nfc_app_role')) {
         localStorage.setItem('nfc_app_role', 'admin');
@@ -209,25 +220,32 @@
       const listId = urlParams.get('id');
       const action = urlParams.get('action');
 
+      // 🌟 QRコードからのインポート処理
       if (action === 'import') {
         const importId = urlParams.get('id');
         const importTitle = urlParams.get('title');
-        const importItems = urlParams.get('items');
+        const importItemsStr = urlParams.get('items'); // "name|hint,name|hint" の形式
         
-        if (importId && importTitle && importItems) {
+        if (importId && importTitle && importItemsStr) {
           document.getElementById('confirm-list-title').innerText = importTitle;
           const confirmList = document.getElementById('confirm-list-items');
           confirmList.innerHTML = '';
-          importItems.split(',').forEach(item => {
+          
+          const parsedItems = importItemsStr.split(',').map(itemStr => {
+            const parts = itemStr.split('|');
+            return { name: parts[0], hint: parts[1] || '🎒 バッグにいれてね...' };
+          });
+
+          parsedItems.forEach(item => {
             const li = document.createElement('li');
             li.style.padding = '8px 0';
             li.style.borderBottom = '1px dashed #ccc';
-            li.innerText = `・${item}`;
+            li.innerHTML = `<strong>・${item.name}</strong><br><span style="font-size:12px; color:#666;">（${item.hint}）</span>`;
             confirmList.appendChild(li);
           });
 
           document.getElementById('btn-confirm-yes').onclick = () => {
-            appData[importId] = { title: importTitle, items: importItems.split(',') };
+            appData[importId] = { title: importTitle, items: parsedItems };
             localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
             localStorage.setItem('nfc_app_role', 'child'); 
             alert(`✨ リスト「${importTitle}」を登録しました！`);
@@ -313,11 +331,15 @@
         renderDashboard();
       }
     }
+
     function copyText(text) { navigator.clipboard.writeText(text).then(() => alert('NFCシール用URLをコピーしました！')); }
+    
+    // 🌟 共有URL生成時のエンコード処理を変更
     function openShareView(id) {
       const list = appData[id];
       const baseUrl = window.location.href.split('?')[0].split('#')[0];
-      const importUrl = `${baseUrl}?action=import&id=${id}&title=${encodeURIComponent(list.title)}&items=${encodeURIComponent(list.items.join(','))}`;
+      const itemsStr = list.items.map(i => `${i.name}|${i.hint}`).join(',');
+      const importUrl = `${baseUrl}?action=import&id=${id}&title=${encodeURIComponent(list.title)}&items=${encodeURIComponent(itemsStr)}`;
       const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(importUrl)}`;
       document.getElementById('qr-img').src = qrApiUrl;
       switchView('share-view');
@@ -337,28 +359,64 @@
       document.getElementById('bulk-input').value = '';
       renderEditItems();
     }
+
+    // 🌟 1つずつ追加の処理
     function addItem() {
-      const input = document.getElementById('item-input');
-      const val = input.value.trim();
-      if(val) { tempItems.push(val); input.value = ''; renderEditItems(); }
+      const nameInput = document.getElementById('item-input');
+      const hintInput = document.getElementById('hint-input');
+      const nameVal = nameInput.value.trim();
+      const hintVal = hintInput.value.trim() || '🎒 バッグにいれてね...';
+      
+      if(nameVal) { 
+        tempItems.push({ name: nameVal, hint: hintVal }); 
+        nameInput.value = ''; 
+        hintInput.value = '';
+        renderEditItems(); 
+      }
     }
+
+    // 🌟 スプレッドシートからの2列一括追加
     function addBulkItems() {
       const lines = document.getElementById('bulk-input').value.split('\n');
-      lines.forEach(line => { const val = line.trim(); if(val) tempItems.push(val); });
+      let addedCount = 0;
+      
+      lines.forEach(line => { 
+        const parts = line.split('\t'); // タブで分割（スプシの列をコピーするとタブになる）
+        const nameVal = (parts[0] || '').trim();
+        const hintVal = (parts[1] || '').trim() || '🎒 バッグにいれてね...';
+        
+        if(nameVal) {
+          tempItems.push({ name: nameVal, hint: hintVal });
+          addedCount++;
+        }
+      });
+      
       document.getElementById('bulk-input').value = '';
       renderEditItems();
+      if (addedCount > 0) alert(`${addedCount}件のアイテムを追加しました！`);
     }
+
     function removeTempItem(index) { tempItems.splice(index, 1); renderEditItems(); }
+
     function renderEditItems() {
       const container = document.getElementById('edit-item-list');
       container.innerHTML = '';
       tempItems.forEach((item, idx) => {
         const div = document.createElement('div');
         div.className = 'list-item';
-        div.innerHTML = `<span>${item}</span> <span class="delete-text" onclick="removeTempItem(${idx})">✕ 削除</span>`;
+        div.innerHTML = `
+          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+            <div>
+              <span style="font-weight:bold; font-size:18px;">${item.name}</span><br>
+              <span style="font-size:12px; color:#666;">（${item.hint}）</span>
+            </div>
+            <span class="delete-text" onclick="removeTempItem(${idx})">✕ 削除</span>
+          </div>
+        `;
         container.appendChild(div);
       });
     }
+
     function saveList() {
       const title = document.getElementById('list-title-input').value.trim();
       if (!title || tempItems.length === 0) return alert('入力内容を確認してください。');
@@ -367,6 +425,7 @@
       localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
       renderDashboard();
     }
+    
     function goToDashboard() { renderDashboard(); }
     function resetPraiseCollection() {
       if (confirm('本当に図鑑をリセットしますか？\n※集めた言葉や、今日のチェック履歴がすべて消えて最初からになります。')) {
@@ -430,7 +489,7 @@
       renderCurrentChildItem(id);
     }
 
-    // 🌟 タイマー（ロック）機能の実装
+    // 🌟 タイマー（ロック）機能 ＋ カスタム指示テキストの反映
     function renderCurrentChildItem(listId) {
       const container = document.getElementById('checklist');
       container.innerHTML = '';
@@ -442,17 +501,15 @@
         progressText.className = 'progress-text';
         progressText.innerText = `📦 ${currentItemIndex + 1} / ${childCurrentList.length} こめ`;
         
-        // 🌟 最初は「locked」クラスをつけてグレーアウト
         const card = document.createElement('div');
         card.className = 'item-card locked'; 
         
-        // カードの中に青いゲージ（timer-line）を追加
         card.innerHTML = `
           <div class="timer-line" id="timer-line-${currentItemIndex}"></div>
           <div style="z-index:1; position:relative; width:100%; display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; flex-direction:column; text-align:left;">
-              <span style="font-size:12px; color:#d9534f; margin-bottom:5px;" id="action-hint-${currentItemIndex}">🎒 バッグにいれてね...</span>
-              <span>${item}</span>
+              <span style="font-size:14px; color:#d9534f; margin-bottom:5px; font-weight:normal;" id="action-hint-${currentItemIndex}">${item.hint}</span>
+              <span style="font-size:32px;">${item.name}</span>
             </div>
             <div class="check-mark" id="check-mark-${currentItemIndex}">⏳</div>
           </div>
@@ -461,13 +518,11 @@
         container.appendChild(progressText);
         container.appendChild(card);
 
-        // すぐにゲージのアニメーションをスタート（2.5秒）
         setTimeout(() => {
           const line = document.getElementById(`timer-line-${currentItemIndex}`);
           if(line) line.style.width = '100%';
         }, 50);
 
-        // 🌟 2.5秒後にロックを解除する
         let canCheck = false;
         setTimeout(() => {
           canCheck = true;
@@ -475,18 +530,16 @@
           card.style.borderColor = '#4a90e2';
           
           const hint = document.getElementById(`action-hint-${currentItemIndex}`);
-          if(hint) { hint.innerText = '👉 タップしてチェック！'; hint.style.color = '#28a745'; }
+          if(hint) { hint.innerText = '👉 タップしてチェック！'; hint.style.color = '#28a745'; hint.style.fontWeight = 'bold';}
           
           const mark = document.getElementById(`check-mark-${currentItemIndex}`);
           if(mark) { mark.innerText = '✔'; mark.style.borderColor = '#4a90e2'; mark.style.color = '#4a90e2'; }
           
-          // 準備完了の合図として軽く振動（Android用）
           if(navigator.vibrate) navigator.vibrate(30);
         }, 2500);
 
-        // クリック時の処理（ロック中は無視する）
         card.onclick = () => {
-          if (!canCheck) return; // 🌟 ゲージが貯まるまでは押しても何も起きない
+          if (!canCheck) return; 
           checkItem(card, listId, currentItemIndex);
         };
 
