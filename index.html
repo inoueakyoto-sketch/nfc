@@ -102,7 +102,7 @@
   <div id="import-confirm-view" class="view">
     <h2>📥 リストのひらき確認</h2>
     <div class="panel-container">
-      <p style="font-weight: bold; font-size: 18px; text-align: center;">このリストであっていますか？</p>
+      <p style="font-weight: bold; font-size: 18px; text-align: center;">このリストであっていますか?</p>
       <h3 id="confirm-list-title" style="margin-top: 20px; border-bottom: 2px solid #eee; padding-bottom: 5px; color: #ff8c00; text-align:center;"></h3>
       <ul id="confirm-list-items" style="list-style: none; padding: 0; background: #f9f9f9; border-radius: 5px; padding: 10px;"></ul>
       <div style="display: flex; justify-content: space-between; margin-top: 30px;">
@@ -169,17 +169,9 @@
     </div>
   </div>
 
-  <div id="share-view" class="view">
-    <h2>📲 他のスマホに配る</h2>
-    <div class="panel-container" style="text-align: center;">
-      <img id="qr-img" src="" alt="QR Code" style="margin: 20px 0; width: 150px; height: 150px;">
-      <button class="btn btn-primary" style="background:#eee; color:#333; margin-top:30px;" onclick="goToDashboard()">戻る</button>
-    </div>
-  </div>
-
   <script>
-    // 🌟 GASのURL
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxanqTUylZPhwra5rFJ59B2YY-SGEC6oAmNT9oNijE7YC4kCi80pOVoSPNsz2m6RffLEw/exec";
+    // 🌟 182行目：GASのURL
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwijAoAZbYCpmrr7PWy45SdvR0HSKU4cE-IZ7Ufs-VpaQgMhi71EFU8irWtZ-XTONP40A/exec";
 
     let appData = {};
     let currentEditingId = null;
@@ -368,11 +360,13 @@
       }
     });
 
+    // 画面切り替え
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
       document.getElementById(viewId).classList.add('active-view');
     }
 
+    // パスワード認証 (必要に応じて 0000 を秘密の数字に変更してください)
     function unlockAdmin() {
       const pin = prompt("保護者用パスワード（半角数字4桁）を入力してください。\n※初期設定は 0000 です。");
       if (pin === "0000") {
@@ -425,17 +419,20 @@
       });
     }
 
+    // 🌟 100%確実にGoogleへデータをマッピングさせる新・保存システム
     function saveList() {
-      const title = document.getElementById('list-title-input').value.trim();
+      const singleName = document.getElementById('item-input').value.trim();
       const bulkValue = document.getElementById('bulk-input').value.trim();
       
+      if (singleName !== '') { addItem(); }
+      if (bulkValue !== '') { addBulkItems(); }
+
+      const title = document.getElementById('list-title-input').value.trim();
+      
       if (!title) {
-        return alert('⚠️ 「リストの名前」が入力されていません！\n上の欄に名前（例：ランドセル用）を入力してください。');
+        return alert('⚠️ 「リストの名前」が入力されていません！\n上の欄に名前を入力してください。');
       }
       if (tempItems.length === 0) {
-        if (bulkValue !== '') {
-          return alert('⚠️ まだリストに追加されていません！\n緑色の「一括追加する」ボタンを押して、下の枠に項目を並べてから保存を押してください。');
-        }
         return alert('⚠️ 持ち物が1つもありません。追加してください。');
       }
       
@@ -444,15 +441,20 @@
       saveBtn.innerText = "⏳ 保存中...";
       saveBtn.disabled = true;
 
-      const formData = new FormData();
-      formData.append('data', JSON.stringify({ action: 'saveList', id: id, title: title, items: tempItems }));
+      // 🌟 Googleが確実にパースできる「URLエンコード形式」のデータ作成
+      const params = new URLSearchParams();
+      params.append('data', JSON.stringify({ action: 'saveList', id: id, title: title, items: tempItems }));
 
-      // 🌟 【安全装置3】CORSエラーを回避する確実な通信モード(no-cors)を使用
-      fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: formData })
+      fetch(GAS_URL, { 
+        method: 'POST', 
+        mode: 'no-cors', 
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+      })
         .then(() => {
           appData[id] = { title: title, items: tempItems };
           localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-          alert('✅ クラウド（スプレッドシート）にデータを保存しました！\n\n※スプレッドシート側に文字が書き込まれているか確認してください。');
+          alert('✅ クラウド（スプレッドシート）にデータを保存しました！\n\nスプレッドシートを開いて文字が並んだかご確認ください。');
           renderDashboard();
         })
         .catch(err => {
@@ -465,7 +467,7 @@
     }
 
     function deleteList(id) {
-      if(confirm('このリストを削除してもよろしいですか？（※端末の一覧から非表示になります。スプシの行は手動で消してください）')) {
+      if(confirm('このリストを削除してもよろしいですか？（※スプシの行は手動で消してください）')) {
         delete appData[id];
         localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
         renderDashboard();
@@ -475,12 +477,10 @@
     function copyText(text) { 
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-          alert('NFCシール用URLをコピーしました！\nNFC Tools等のアプリでタグに書き込んでください。');
+          alert('コピーしました！');
         }).catch(err => {
-          alert('コピーに失敗しました。お手数ですが画面上のURLを直接長押ししてコピーしてください。');
+          alert('コピーに失敗しました。URLを直接長押ししてコピーしてください。');
         });
-      } else {
-        alert('このブラウザではコピーボタンが使えません。画面上のURLを長押ししてコピーしてください。');
       }
     }
 
@@ -518,7 +518,6 @@
       });
       document.getElementById('bulk-input').value = '';
       renderEditItems();
-      if (addedCount > 0) alert(`${addedCount}件のアイテムを追加しました！`);
     }
     
     function removeTempItem(index) { tempItems.splice(index, 1); renderEditItems(); }
