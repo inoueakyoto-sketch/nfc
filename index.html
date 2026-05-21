@@ -29,43 +29,30 @@
     @keyframes popup { 0% { transform: scale(0); } 100% { transform: scale(1); } }
     .settings-btn { position: absolute; top: 0; right: 10px; font-size: 24px; cursor: pointer; opacity: 0.5; background: none; border: none; }
     
-    /* 🌟 レア度バッジのスタイル */
-    .rarity-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 14px; font-weight: bold; color: white; margin-right: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    .r-N { background: #95a5a6; } /* グレー */
-    .r-R { background: #3498db; } /* ブルー */
-    .r-SR { background: #9b59b6; } /* パープル */
-    .r-SSR { background: #f1c40f; color: #d35400; text-shadow: 1px 1px 0 #fff; } /* ゴールド */
-    .r-UR { 
-      background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
-      background-size: 300% 300%;
-      animation: rainbow 2s ease infinite;
-      color: white;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-      border: 1px solid #fff;
-    }
+    .rarity-badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 14px; font-weight: bold; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); text-align: center; }
+    .r-N { background: linear-gradient(135deg, #bdc3c7, #95a5a6); border: 2px solid #7f8c8d; } 
+    .r-R { background: linear-gradient(135deg, #5dade2, #2980b9); border: 2px solid #1f618d; } 
+    .r-SR { background: linear-gradient(135deg, #af7ac5, #8e44ad); border: 2px solid #6c3483; } 
+    .r-SSR { background: linear-gradient(135deg, #f9e79f, #f1c40f); color: #d35400; border: 2px solid #d4ac0d; text-shadow: 1px 1px 0 #fff; } 
+    .r-UR { background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3); background-size: 300% 300%; animation: rainbow 2s ease infinite; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); border: 2px solid #fff; }
     @keyframes rainbow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-    /* コレクション表示ボタン */
     .collection-btn { background: #fff; border: 3px solid #ff8c00; color: #ff8c00; font-weight: bold; padding: 12px 20px; border-radius: 30px; display: inline-block; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-size: 18px; cursor: pointer; transition: all 0.2s; width: 80%; max-width: 300px;}
     .collection-btn:active { transform: scale(0.95); }
 
-    /* リザルト画面 */
     .summary-box { background: #fff; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left; }
     .summary-box h3 { color: #ff8c00; text-align: center; margin-top: 0; border-bottom: 2px dashed #ff8c00; padding-bottom: 10px; font-size: 20px; }
     .summary-list { list-style: none; padding: 0; margin: 0; }
-    .summary-list li { padding: 15px 5px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: bold; color: #333;}
-    .new-badge { background: #d9534f; color: white; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; animation: pulse 1s infinite; white-space: nowrap; }
+    
+    .new-badge { background: #d9534f; color: white; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; animation: pulse 1s infinite; white-space: nowrap; font-weight:bold;}
     .got-badge { background: #eee; color: #888; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; white-space: nowrap; font-weight: normal;}
     @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-    /* ガチャポップアップ */
-    .praise-popup { position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(255, 255, 255, 0.95); color: #333; padding: 25px; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); z-index: 1000; pointer-events: none; transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 4px solid #ff8c00; width: 85%; max-width: 350px; }
+    .praise-popup { position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(255, 255, 255, 0.98); color: #333; padding: 25px 20px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); z-index: 1000; pointer-events: none; transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 5px solid #ff8c00; width: 85%; max-width: 350px; display: flex; flex-direction: column; align-items: center; }
     .praise-popup.show { transform: translate(-50%, -50%) scale(1); }
-    .praise-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #ccc; padding-bottom: 10px; margin-bottom: 15px; }
-    .praise-number { font-size: 14px; color: #666; font-weight: bold; }
-    .praise-message { font-size: 26px; color: #d9534f; font-weight: bold; margin: 15px 0; line-height: 1.3;}
+    .praise-number { font-size: 16px; color: #666; font-weight: bold; margin-bottom: 10px; border-bottom: 2px dashed #ccc; padding-bottom: 5px; width: 100%; text-align: center; }
+    .praise-message { font-size: 28px; color: #d9534f; font-weight: bold; margin: 15px 0; line-height: 1.3; text-align: center; width: 100%; }
 
-    /* 🌟 図鑑（コレクション）画面のスタイル */
     .stats-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
     .stat-box { background: #fff; padding: 8px 12px; border-radius: 10px; font-size: 14px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; max-height: 60vh; overflow-y: auto; padding: 10px; background: #fff; border-radius: 10px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); }
@@ -73,7 +60,6 @@
     .col-item.unlocked { background: #fff; color: #333; border-color: #ff8c00; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
     .col-rarity { margin-bottom: 5px; }
 
-    /* 保護者用UI */
     .dashboard-card { background: #fff; padding: 15px; margin: 15px auto; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; text-align: left; }
     .dashboard-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
     input[type="text"] { width: 65%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
@@ -126,7 +112,6 @@
   <div id="child-view" class="view">
     <button class="settings-btn" onclick="unlockAdmin()">⚙️</button>
     <h1 id="child-title" style="margin-bottom: 5px;">🎒 もちものチェック</h1>
-    
     <div id="checklist"></div>
     <div id="reward" class="reward-text"></div>
   </div>
@@ -136,7 +121,6 @@
     <button class="collection-btn" style="margin: 0 auto 20px auto; display: block;" onclick="openCollection('dashboard-view')">📖 ほめ言葉図鑑を見る</button>
     <div id="dashboard-lists"></div>
     <button class="btn btn-primary" onclick="openEditView(null)">➕ 新しいリストを作る</button>
-    
     <hr style="margin: 30px 0 10px 0; border: 0; border-top: 1px solid #ccc;">
     <button class="btn" style="background:#d9534f; color:white; width:100%; max-width:500px; padding:15px;" onclick="resetPraiseCollection()">🔄 ほめ言葉図鑑をリセットする</button>
     <button class="btn" style="background:#eee; color:#333; width:100%; max-width:500px; padding:15px; margin-top:15px;" onclick="lockToChildMode()">🔒 子どもモードに戻る</button>
@@ -180,21 +164,15 @@
     let sessionPraises = []; 
     let previousViewForCollection = 'child-home-view';
 
-    // 🌟 300個のほめ言葉（生データ）
+    // 🌟 300個のほめ言葉データ
     const rawPraises = [
-      // --- N (Normal): 150個 (Index 0 ~ 149) ---
       "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！", "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！", "自分でできてエライ！", "確認バッチリだね！", "いいペースだね！", "天才かもしれない！", "お見事です！", "素晴らしい行動力！", "最高だね！", "忘れ物なし！素晴らしい！", "今日も笑顔でいこう！", "ハナマル満点！", "一発でできたね！", "スピード解決だね！", "良い習慣がついてるね！", "さすが、よく分かってる！", "応援してるよ！", "ハイタッチ！", "ニコニコ笑顔がいいね！", "パーフェクト！", "一歩前進だね！", "やる気に満ちてるね！", "その意気だ！", "見事な手際！", "自分で気づけてすごい！", "毎日えらいね！", "今日も一日楽しもう！", "バツグンだね！", "準備の達人！", "100点満点！", "かっこよすぎる！", "先生もびっくりするよ！", "ママもパパも鼻が高いよ！", "さすがだね！", "よくできました！", "その集中力、すごい！", "バッチリ決まったね！", "いいぞいいぞ！", "スーパープレー！", "今日もがんばろう！", "素敵だね！", "グッジョブ！", "毎日すごいね！", "さすがの腕前！", "準備オッケー！", "今日も絶好調！", "いい感じ！", "やる気スイッチONだね！", "すてきな心意気！", "バッチリ準備OK！", "今日もハッピー！", "頼もしいね！", "一安心だね！", "確認のプロ！", "さすがのチェック力！", "今日も元気だね！", "パーフェクト達成！", "すごいぞ、その調子！", "毎日がんばってるね！", "えらい！花丸！", "今日も素晴らしい！", "さすがの準備！", "バッチリすぎる！", "かっこいい！", "今日も最高！", "その意気込みがいいね！", "完璧だね！", "準備万端！", "今日も一日楽しんで！", "さすが！", "その調子！", "マジックみたいだ！", "あっという間に終わったね！", "職人技だね！", "見ていて気持ちがいいよ！", "頼りにしてるよ！", "心がホカホカするよ！", "見ているこっちも嬉しい！", "がんばる姿が素敵！", "毎日成長してるね！", "すごいパワーを感じる！", "どんどん進むね！", "止まらない勢いだ！", "ノリノリだね！", "イケイケゴーゴー！", "テンションMAX！", "心がピカピカだね！", "太陽みたいに眩しい！", "星みたいにキラキラ！", "虹みたいな笑顔！", "お花みたいに素敵！", "大吉だ！", "超ラッキー！", "ハッピーエンド間違いなし！", "ウキウキするね！", "ワクワクが止まらない！", "ササッと終わったね！", "クルッと解決！", "パッと目が覚めるね！", "いい波乗ってんね！", "風を切って走ってる！", "心にズキュンときた！", "胸がキュンとした！", "ホッコリしたよ！", "ウルッときちゃった！", "ジーンときたよ！", "言葉が出ないくらいすごい！", "目からウロコだ！", "ほっぺたが落ちそう！", "頭が下がる思いだよ！", "拍手喝采！", "スタンディングオベーション！", "アンコール！", "ブラビッシモ！", "トレビアン！", "マーベラス！", "ファンタスティック！", "エクセレント！", "アメージング！", "インクレディブル！", "ワンダフル！",
-      // --- R (Rare): 80個 (Index 150 ~ 229) ---
       "レベルアップの音がした！", "経験値ゲットだぜ！", "勇者みたいな行動力！", "ミッションクリア！", "レアな才能はっけん！", "チーターみたいに速い！", "ライオンみたいにカッコいい！", "イルカみたいに賢いね！", "フクロウみたいによく見てる！", "ウサギみたいにピョンピョン進むね！", "宇宙一のスピード！", "ギネス記録にのりそう！", "ノーベル賞ものの大発見！", "金メダル級のすばらしさ！", "世界チャンピオンだ！", "大天才のひらめき！", "スーパーヒーロー参上！", "まるで魔法使い！", "プロフェッショナルだね！", "名人レベル到達！", "師匠と呼ばせて！", "ミラクル連発だね！", "大金星！", "ウルトラC級の技！", "ホームラン！", "ナイスシュート！", "ロケットみたいに速い！", "新幹線クラスのスピード！", "ジェット機みたい！", "光の速さだ！", "タイムアタック大成功！", "探偵みたいによく気づいたね！", "博士級の知識だ！", "リーダーの素質アリ！", "スターの輝き！", "みんなの憧れだね！", "伝説の始まりだ！", "歴史に名を刻んだね！", "神業でたー！", "オーラが出てるよ！", "奇跡の連続だね！", "忍者のように素早い！", "お侍さんのようにカッコいい！", "殿様クラスの大物！", "将軍のような貫禄！", "お姫様みたいに上品！", "地球を救うパワーだ！", "宇宙の果てまで響くよ！", "銀河系で一番！", "ブラックホール級の吸引力！", "流れ星に願いが届いたね！", "100万ボルトのパワー！", "エネルギー満タン！", "フルスロットル！", "エンジン全開！", "ターボチャージャー作動！", "ダイヤモンドみたいに硬い意志！", "ルビーみたいに情熱的！", "サファイアみたいに冷静！", "エメラルドみたいに優しい！", "ゴールド級の輝き！", "百獣の王だ！", "空の王者だ！", "海の覇者だ！", "森の守り神！", "大自然のパワー！", "超ド級の活躍！", "メガトンパンチ級の衝撃！", "ギガントすごい！", "テラ素晴らしい！", "ペタかっこいい！", "お見事、座布団一枚！", "よっ、日本一！", "あっぱれ！", "お祭り騒ぎだ！", "花火が上がったね！", "ドカーンと大成功！", "ピカッと閃いたね！", "雲の上を歩く気分！", "空まで飛んでいきそう！", "宇宙旅行に行けそうだ！",
-      // --- SR (Super Rare): 50個 (Index 230 ~ 279) ---
       "スーパーウルトラハイパーすごい！", "ちょ〜〜〜えらい！", "めっちゃかっこいい！", "バリバリ伝説！", "ゴリゴリ進むね！", "無敵モード突入！", "スター状態だね！", "フィーバータイム！", "確変中！", "ボーナスステージ！", "神引きだね！", "宝箱を発見したね！", "伝説の剣を手に入れた！", "魔法の杖を使いこなしてる！", "天空の城に到達！", "ドラゴンをテイムした！", "妖精さんが拍手してる！", "小人さんが手伝ってくれた？", "天使の微笑みだ！", "女神さまもニッコリ！", "神様もびっくり！", "一石二鳥だね！", "三つ巴の大勝利！", "四つ葉のクローバー見つけた気分！", "五つ星ホテル級！", "第六感が冴えてる！", "七色の虹がかかった！", "八面六臂の大活躍！", "九死に一生の奇跡！", "十全十美だ！", "百点満点！", "千年に一人の逸材！", "万歳三唱！", "億万長者の気分！", "兆級のすばらしさ！", "京（けい）レベルの大発見！", "無量大数すごい！", "無限大の可能性！", "限界突破！", "リミットブレイク！", "覚醒したね！", "ニュータイプだ！", "フォースと共にあらんことを！", "君は魔法使いだ！", "海賊王に俺はなる！", "スーパーサイヤ人だ！", "呼吸の型が完璧！", "領域展開に成功！", "ゴムゴムのぉ〜大成功！", "オラ、ワクワクすっぞ！",
-      // --- SSR (Specially Super Rare): 15個 (Index 280 ~ 294) ---
-      "真実はいつも一つ！", "月に代わっておしおき成功！", "ポケモンマスターになれる！", "スマブラで大乱闘勝利！", "マリオカートで1位！", "テトリスで全消し！", "パズドラで10連コンボ！", "モンストでストライクショット！", "にゃんこ大戦争で完全勝利！", "音ゲーの神様！", "エイムが完璧！", "ビクロイ（ビクトリーロイヤル）！", "ドン勝だ！", "チャンピオン部隊だ！", "最高傑作だね！",
-      // --- UR (Ultra Rare): 5個 (Index 295 ~ 299) ---
+      "真実はいつも一つ！", "月に代わっておしおき成功！", "ポケモンマスターになれる！", "スマブラで大乱闘勝利！", "マリオカートで1位！", "テトリスで全消し！", "パズドラで10連コンボ！", "モンストでストライクショット！", "にゃんこ大戦争で完全勝利！", "音ゲーの神様！", "エイムが完璧！", "ビクロイ！", "ドン勝だ！", "チャンピオン部隊だ！", "最高傑作だね！",
       "ノーベル平和賞じゅしょう！", "うちゅうひこうしになれる！", "だいとうりょうもビックリ！", "おうさまもひれふすレベル！", "かみさまも道をゆずるスゴさ！"
     ];
 
-    // 🌟 レア度を付与したオブジェクト配列を作成
     const praises = rawPraises.map((msg, index) => {
       let rarity = 'N';
       if (index >= 295) rarity = 'UR';
@@ -256,20 +234,14 @@
       }
 
       if (listId) {
-        if (appData[listId]) {
-          renderChildView(listId);
-        } else {
-          switchView('error-view');
-        }
+        if (appData[listId]) { renderChildView(listId); } 
+        else { switchView('error-view'); }
         return;
       }
 
       const role = localStorage.getItem('nfc_app_role');
-      if (role === 'admin') {
-        renderDashboard();
-      } else {
-        renderChildHome();
-      }
+      if (role === 'admin') { renderDashboard(); } 
+      else { renderChildHome(); }
     }
 
     function switchView(viewId) {
@@ -292,18 +264,7 @@
       localStorage.setItem('nfc_app_role', 'child');
       renderChildHome();
     }
-    
-    function resetPraiseCollection() {
-      if (confirm('本当に図鑑（コレクション）をリセットしますか？\n※集めた言葉や、今日のチェック履歴がすべて消えて最初からになります。')) {
-        collectedPraises = [];
-        localStorage.setItem('nfc_praise_collection', JSON.stringify([]));
-        localStorage.setItem('nfc_daily_praises', JSON.stringify({date: "", items: []}));
-        alert('図鑑をリセットしました！最初からスタートします。');
-        renderDashboard();
-      }
-    }
 
-    // ================= ダッシュボード =================
     function renderDashboard() {
       switchView('dashboard-view');
       const container = document.getElementById('dashboard-lists');
@@ -339,6 +300,7 @@
         renderDashboard();
       }
     }
+
     function copyText(text) { navigator.clipboard.writeText(text).then(() => alert('NFCシール用URLをコピーしました！')); }
     function openShareView(id) {
       const list = appData[id];
@@ -349,7 +311,6 @@
       switchView('share-view');
     }
 
-    // ================= 編集画面 =================
     function openEditView(id) {
       switchView('edit-view');
       if (id && appData[id]) {
@@ -395,6 +356,15 @@
       renderDashboard();
     }
     function goToDashboard() { renderDashboard(); }
+    function resetPraiseCollection() {
+      if (confirm('本当に図鑑をリセットしますか？\n※集めた言葉や、今日のチェック履歴がすべて消えて最初からになります。')) {
+        collectedPraises = [];
+        localStorage.setItem('nfc_praise_collection', JSON.stringify([]));
+        localStorage.setItem('nfc_daily_praises', JSON.stringify({date: "", items: []}));
+        alert('図鑑をリセットしました！最初からスタートします。');
+        renderDashboard();
+      }
+    }
 
     // ================= 図鑑（コレクション）機能 =================
     function openCollection(previousView) {
@@ -405,7 +375,6 @@
       const gridContainer = document.getElementById('collection-grid');
       gridContainer.innerHTML = '';
       
-      // レア度ごとのカウント
       const counts = { N: { total: 150, got: 0 }, R: { total: 80, got: 0 }, SR: { total: 50, got: 0 }, SSR: { total: 15, got: 0 }, UR: { total: 5, got: 0 } };
       
       praises.forEach(p => {
@@ -416,7 +385,7 @@
         div.className = `col-item ${isUnlocked ? 'unlocked' : ''}`;
         
         if (isUnlocked) {
-          div.innerHTML = `<div class="col-rarity"><span class="rarity-badge r-${p.rarity}">${p.rarity}</span><br><span style="font-size:10px;color:#999;">No.${p.id}</span></div><div>${p.message}</div>`;
+          div.innerHTML = `<div class="col-rarity"><span class="rarity-badge r-${p.rarity}">✦ ${p.rarity} ✦</span><br><span style="font-size:10px;color:#999;">No.${p.id}</span></div><div>${p.message}</div>`;
         } else {
           div.innerHTML = `<div style="margin-bottom:5px; font-size:10px;">No.${p.id}</div><div style="font-size:24px;">🔒</div><div>???</div>`;
         }
@@ -428,18 +397,13 @@
         <div class="stat-box" style="border-bottom: 3px solid #3498db;">R: ${counts.R.got}/${counts.R.total}</div>
         <div class="stat-box" style="border-bottom: 3px solid #9b59b6;">SR: ${counts.SR.got}/${counts.SR.total}</div>
         <div class="stat-box" style="border-bottom: 3px solid #f1c40f;">SSR: ${counts.SSR.got}/${counts.SSR.total}</div>
-        <div class="stat-box" style="border-bottom: 3px solid #ff00cc;">UR: ${counts.UR.got}/${counts.UR.total}</div>
+        <div class="stat-box" style="border-bottom: 3px solid #ff0000;">UR: ${counts.UR.got}/${counts.UR.total}</div>
       `;
     }
-
-    function closeCollection() {
-      switchView(previousViewForCollection);
-    }
+    function closeCollection() { switchView(previousViewForCollection); }
 
     // ================= 子ども用画面・ガチャ機能 =================
-    function renderChildHome() {
-      switchView('child-home-view');
-    }
+    function renderChildHome() { switchView('child-home-view'); }
 
     function renderChildView(id) {
       switchView('child-view');
@@ -481,9 +445,13 @@
       if (cardElement.classList.contains('checked')) return; 
       cardElement.classList.add('checked');
       
+      // ★ 追加：バイブレーション（Androidのみ動作）
+      if (navigator.vibrate) {
+        navigator.vibrate(50); // 50ミリ秒の短い振動
+      }
+      
       const today = new Date().toLocaleDateString('ja-JP');
       let dailyData = JSON.parse(localStorage.getItem('nfc_daily_praises') || '{"date":"","items":[]}');
-
       if (dailyData.date !== today) { dailyData = { date: today, items: [] }; }
 
       const itemKey = `${listId}_${itemIndex}`;
@@ -493,7 +461,7 @@
         dailyData.items.push(itemKey);
         localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData));
         triggerPraise(); 
-        delay = 2000; // ガチャ演出を見せるために待機時間を少し長めに
+        delay = 2300; 
       }
 
       setTimeout(() => {
@@ -502,21 +470,17 @@
       }, delay);
     }
 
-    // 🌟 排出率に基づいたガチャ抽選ロジック
     function rollGacha() {
       const rand = Math.random() * 100;
       let targetRarity = 'N';
-      
-      if (rand < 1) targetRarity = 'UR';           // 1%
-      else if (rand < 5) targetRarity = 'SSR';     // 4%  (1~5)
-      else if (rand < 20) targetRarity = 'SR';     // 15% (5~20)
-      else if (rand < 50) targetRarity = 'R';      // 30% (20~50)
-      else targetRarity = 'N';                     // 50% (50~100)
+      if (rand < 1) targetRarity = 'UR';           
+      else if (rand < 5) targetRarity = 'SSR';     
+      else if (rand < 20) targetRarity = 'SR';     
+      else if (rand < 50) targetRarity = 'R';      
+      else targetRarity = 'N';                     
 
-      // 選ばれたレア度の中からランダムに1つ選ぶ
       const pool = praises.filter(p => p.rarity === targetRarity);
-      const selected = pool[Math.floor(Math.random() * pool.length)];
-      return selected;
+      return pool[Math.floor(Math.random() * pool.length)];
     }
 
     function triggerPraise() {
@@ -530,7 +494,6 @@
         isNew = true;
       }
       
-      // リザルト画面用に記録
       sessionPraises.push({ ...selectedPraise, isNew });
       
       let popup = document.getElementById('praise-popup');
@@ -542,20 +505,24 @@
       }
       
       popup.innerHTML = `
-        <div class="praise-header">
-          <span class="rarity-badge r-${selectedPraise.rarity}">${selectedPraise.rarity}</span>
-          <span class="praise-number">No.${number} ${isNew ? '<span style="color:red; font-size:12px;">(NEW!)</span>' : ''}</span>
+        <div style="text-align: center; margin-bottom: 10px;">
+          <div class="rarity-badge r-${selectedPraise.rarity}" style="font-size: 24px; padding: 10px 30px; letter-spacing: 2px;">✦ ${selectedPraise.rarity} ✦</div>
         </div>
+        <div class="praise-number">No.${number} ${isNew ? '<span class="new-badge">NEW!</span>' : ''}</div>
         <div class="praise-message">${selectedPraise.message}</div>
-        <div class="praise-progress">図鑑：${collectedPraises.length} / 300</div>
+        <div style="font-size: 14px; color: #4a90e2; font-weight: bold; width: 100%; text-align: right;">図鑑：${collectedPraises.length} / 300</div>
       `;
       
       popup.classList.add('show');
-      setTimeout(() => { popup.classList.remove('show'); }, 1800);
+      setTimeout(() => { popup.classList.remove('show'); }, 2000);
     }
 
-    // 🌟 リザルト（まとめ）画面
     function showCompletionSummary() {
+      // 終了時のバイブレーション演出（Androidのみ）
+      if (navigator.vibrate) {
+        navigator.vibrate([100, 50, 100, 50, 200]); 
+      }
+      
       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }});
       setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
       
@@ -570,15 +537,13 @@
           <ul class="summary-list">`;
         
         sessionPraises.forEach(p => {
-          summaryHTML += `<li>
-            <div style="flex-grow: 1;">
-              <div style="margin-bottom: 5px;">
-                <span class="rarity-badge r-${p.rarity}">${p.rarity}</span>
-                <span style="color:#888; font-size:12px;">No.${p.id}</span>
-              </div>
-              <span style="color:#d9534f; font-size:18px;">${p.message}</span>
+          summaryHTML += `<li style="background: #f9f9f9; margin-bottom: 10px; border-radius: 10px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #eee; display: block;">
+            <div style="margin-bottom: 8px; display: flex; align-items: center;">
+              <span class="rarity-badge r-${p.rarity}" style="font-size:16px; padding: 5px 12px; margin-right: 10px;">✦ ${p.rarity} ✦</span>
+              <span style="color:#888; font-size:14px; font-weight:bold;">No.${p.id}</span>
+              ${p.isNew ? '<span class="new-badge" style="margin-left:auto;">NEW!</span>' : '<span class="got-badge" style="margin-left:auto;">ゲット済</span>'}
             </div>
-            ${p.isNew ? '<span class="new-badge">NEW!</span>' : '<span class="got-badge">ゲット済</span>'}
+            <div style="color:#d9534f; font-size:20px; font-weight:bold; line-height:1.4;">${p.message}</div>
           </li>`;
         });
         
