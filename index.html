@@ -116,17 +116,12 @@
     <h2>🗑 リストの削除</h2>
     <div class="panel-container" style="text-align: center;">
       <p style="font-weight: bold; font-size: 16px; margin-bottom: 20px;">削除の方法を選んでください</p>
-      
       <button class="btn" id="btn-del-cloud" style="background:#d9534f; color:white; width:100%; padding:20px; font-size:16px; margin-bottom:15px; border-radius:10px;" onclick="executeDelete('cloud')">
-        ☁️ 完全に削除する<br>
-        <span style="font-size:12px; font-weight:normal;">（スプレッドシートのデータも消えます）</span>
+        ☁️ 完全に削除する<br><span style="font-size:12px; font-weight:normal;">（スプレッドシートのデータも消えます）</span>
       </button>
-      
       <button class="btn" style="background:#f0ad4e; color:white; width:100%; padding:20px; font-size:16px; margin-bottom:20px; border-radius:10px;" onclick="executeDelete('local')">
-        📱 このスマホからのみ削除する<br>
-        <span style="font-size:12px; font-weight:normal;">（スプレッドシートのデータは残ります）</span>
+        📱 このスマホからのみ削除する<br><span style="font-size:12px; font-weight:normal;">（スプレッドシートのデータは残ります）</span>
       </button>
-      
       <button class="btn" style="background:#eee; color:#333; width:100%; padding:15px;" onclick="closeDeleteConfirm()">キャンセル</button>
     </div>
   </div>
@@ -197,7 +192,6 @@
   </div>
 
   <script>
-    // 🌟 GASのURL
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwijAoAZbYCpmrr7PWy45SdvR0HSKU4cE-IZ7Ufs-VpaQgMhi71EFU8irWtZ-XTONP40A/exec";
 
     let appData = {};
@@ -208,11 +202,11 @@
     let sessionPraises = []; 
     let previousViewForCollection = 'child-home-view';
     let currentLoadedId = null;
-    let listToDelete = null; // 🌟 削除対象のリストIDを一時保存する変数
+    let listToDelete = null;
 
     const rawPraises = [
-      "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！", "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！", "自分でできてエライ！", "確認バッチリだね！", "いいペースだね！", "天才かもしれない！", "お見事です！", "素晴らしい行動力！", "最高だね！", "忘れ物なし！素晴らしい！", "今日も笑顔でいこう！", "ハナマル満点！", "一発でできたね！", "スピード解決だね！", "良い習慣がついてるね！", "さすが、よく分かってる！", "応援してるよ！", "ハイタッチ！", "ニコニコ笑顔がいいね！", "パーフェクト！", "一歩前進だね！", "やる気に満ちてるね！", "その意気だ！", "見事な手際！", "自分で気づけてすごい！", "毎日えらいね！", "今日も一日楽しもう！", "バツグンだね！", "準備の達人！", "100点満点！", "かっこよすぎる！", "先生もびっくりするよ！", "ママもパパも鼻が高いよ！", "さすがだね！", "よくできました！", "その集中力、すごい！", "バッチリ決まったね！", "いいぞいいぞ！", "スーパープレー！", "今日もがんばろう！", "素敵だね！", "グッジョブ！", "毎日すごいね！", "さすがの腕前！", "準備オッケー！", "今日も絶好調！", "いい感じ！", "やる気スイッチONだね！", "すてきな心意気！", "バッチリ準備OK！", "今日もハッピー！", "頼もしいね！", "一安心だね！", "確認のプロ！", "さすがのチェック力！", "今日も元気だね！", "パーフェクト達成！", "すごいぞ、その調子！", "毎日がんばってるね！", "えらい！花丸！", "今日も素晴らしい！", "さすがの準備！", "バッチリすぎる！", "かっこいい！", "今日も最高！", "その意気込みがいいね！", "完璧だね！", "準備万端！", "今日も一日楽しんで！", "さすが！", "その調子！", "マジックみたいだ！", "あっという間に終わったね！", "職人技だね！", "見ていて気持ちがいいよ！", "頼りにしてるよ！", "心がホカホカするよ！", "見ているこっちも嬉しい！", "がんばる姿が素敵！", "毎日成長してるね！", "すごいパワーを感じる！", "どんどん進むね！", "止まらない勢いだ！", "ノリノリだね！", "イケイケゴーゴー！", "テンションMAX！", "心がピカピカだね！", "太陽みたいに眩しい！", "星みたいにキラキラ！", "虹みたいな笑顔！", "お花みたいに素敵！", "大吉だ！", "超ラッキー！", "ハッピーエンド間違いなし！", "ウキウキするね！", "ワクワクが止まらない！", "ササッと終わったね！", "クルッと解決！", "パッと目が覚めるね！", "いい波乗ってんね！", "風を切って走ってる！", "心にズキュンときた！", "胸がキュンとした！", "ホッコリしたよ！", "ウルッときちゃった！", "ジーンときたよ！", "言葉が出ないくらいすごい！", "目からウロコだ！", "ほっぺたが落ちそう！", "頭が下がる思いだよ！", "拍手喝采！", "スタンディングオベーション！", "アンコール！", "ブラビッシモ！", "トレビアン！", "マーベラス！", "ファンタスティック！", "エクセレント！", "アメージング！", "インクレディブル！", "ワンダフル！",
-      "レベルアップの音がした！", "経験値ゲットだぜ！", "勇者みたいな行動力！", "ミッションクリア！", "レアな才能はっけん！", "チーターみたいに速い！", "ライオンみたいにカッコいい！", "イルカみたいに賢いね！", "フクロウみたいによく見てる！", "ウサギみたいにピョンピョン進むね！", "宇宙一のスピード！", "ギネス記録にのりそう！", "ノーベル賞ものの大発見！", "金メダル級のすばらしさ！", "世界チャンピオンだ！", "大天才のひらめき！", "スーパーヒーロー参上！", "まるで魔法使い！", "プロフェッショナルだね！", "名人レベル到達！", "師匠と呼ばせて！", "ミラクル連発だね！", "大金星！", "ウルトラC級の技！", "ホームラン！", "ナイスシュート！", "ロケットみたいに速い！", "新幹線クラスのスピード！", "ジェット機みたい！", "光の速さだ！", "タイムアタック大成功！", "探偵みたいによく気づいたね！", "博士級の知識だ！", "リーダーの素質アリ！", "スターの輝き！", "みんなの憧れだね！", "伝説の始まりだ！", "歴史に名を刻んだね！", "神業でたー！", "オーラが出てるよ！", "奇跡の連続だね！", "忍者のように素早い！", "お侍さんのようにカッコいい！", "殿様クラスの大物！", "将軍のような貫禄！", "お姫様みたいに上品！", "地球を救うパワーだ！", "宇宙の果てまで響くよ！", "銀河系で一番！", "ブラックホール級の吸引力！", "流れ星に願いが届いたね！", "100万ボルトのパワー！", "エネルギー満タン！", "フルスロットル！", "エンジン全開！", "ターボチャージャー作動！", "ダイヤモンドみたいに硬い意志！", "ルビーみたいに情熱的！", "サファイアみたいに冷静！", "エメラルドみたいに優しい！", "ゴールド級の輝き！", "百獣の王だ！", "空の王者だ！", "海の覇者だ！", "森の守り神！", "大自然のパワー！", "超ド級の活躍！", "メガトンパンチ級の衝撃！", "ギガントすごい！", "テラ素晴らしい！", "ペタかっこいい！", "お見事、座布団一枚！", "よっ、日本一！", "あっぱれ！", "お祭り騒ぎだ！", "花火が上がったね！", "ドカーンと大成功！", "ピカッと閃いたね！", "雲の上を歩く気分！", "空まで飛んでいきそう！", "宇宙旅行に行けそうだ！",
+      "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！", "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！", "自分でできてエライ！", "確認バッチリだね！", "いいペースだね！", "天才かもしれない！", "お見事です！", "素晴らしい行動力！", "最高だね！", "忘れ物なし！素晴らしい！", "今日も笑顔でいこう！", "ハナマル満点！", "一発でできたね！", "スピード解決だね！", "良い習慣がついてるね！", "さすが、よく分かってる！", "応援してるよ！", "ハイタッチ！", "ニコニコ笑顔がいいね！", "パーフェクト！", "一歩前進だね！", "やる気に満ちてるね！", "その意意だ！", "見事な手際！", "自分で気づけてすごい！", "毎日えらいね！", "今日も一日楽しもう！", "バツグンだね！", "準備の達人！", "100点満点！", "かっこよすぎる！", "先生もびっくりするよ！", "ママもパパも鼻が高いよ！", "さすがだね！", "よくできました！", "その集中力、すごい！", "バッチリ決まったね！", "いいぞいいぞ！", "スーパープレー！", "今日もがんばろう！", "素敵だね！", "グッジョブ！", "毎日すごいね！", "さすがの腕前！", "準備オッケー！", "今日も絶好調！", "いい感じ！", "やる気スイッチONだね！", "すてきな心意気！", "バッチリ準備OK！", "今日もハッピー！", "頼もしいね！", "一安心だね！", "確認のプロ！", "さすがのチェック力！", "今日も元気だね！", "パーフェクト達成！", "すごいぞ、その調子！", "毎日がんばってるね！", "えらい！花丸！", "今日も素晴らしい！", "さすがの準備！", "バッチリすぎる！", "かっこいい！", "今日も最高！", "その意気込みがいいね！", "完璧だね！", "準備万端！", "今日も一日楽しんで！", "さすが！", "その調子！", "マジックみたいだ！", "あっという間に終わったね！", "職人技だね！", "見ていて気持ちがいいよ！", "頼りにしてるよ！", "心がホカホカするよ！", "見ているこっちも嬉しい！", "がんばる姿が素敵！", "毎日成長してるね！", "すごいパワーを感じる！", "どんどん進むね！", "止まらない勢いだ！", "ノリノリだね！", "イケイケゴーゴー！", "テンションMAX！", "心がピカピカだね！", "太陽みたいに眩しい！", "星みたいにキラキラ！", "虹みたいな笑顔！", "お花みたいに素敵！", "大吉だ！", "超ラッキー！", "ハッピーエンド間違いなし！", "ウキウキするね！", "ワクワクが止まらない！", "ササッと終わったね！", "クルッと解決！", "パッと目が覚めるね！", "いい波乗ってんね！", "風を切って走ってる！", "心にズキュンときた！", "胸がキュンとした！", "ホッコリしたよ！", "ウルッときちゃった！", "ジーンときたよ！", "言葉が出ないくらいすごい！", "目からウロコだ！", "ほっぺたが落ちそう！", "頭が下がる思いだよ！", "拍手喝采！", "スタンディングオベーション！", "アンコール！", "ブラビッシモ！", "トレビアン！", "マーベラス！", "ファンタスティック！", "エクセレント！", "アメージング！", "インクレディブル！", "ワンダフル！",
+      "レベルアップの音がした！", "経験値ゲットだぜ！", "勇者みたいな行動力！", "ミッションクリア！", "レアな才能はっけん！", "チーターみたいに速い！", "ライオンみたいにカッコいい！", "イルカみたいに賢いね！", "フクロウみたいによく見てる！", "ウサギみたいにピョンピョン進むね！", "宇宙一のスピード！", "ギネス記録にのりそう！", "ノーベル賞ものの大発見！", "金メダル級のすばらしさ！", "世界チャンピオンだ！", "大天才のひらめき！", "スーパーヒーロー参上！", "まるで魔法使い！", "プロフェッショナルだね！", "名人レベル到達！", "師匠と呼ばせて！", "ミラクル連発だね！", "大金星！", "ウルトラC級の技！", "ホームラン！", "ナイスシュート！", "ロケットみたいに速い！", "新幹線クラスのスピード！", "ジェット機みたい！", "光の速さだ！", "タイムアタック大成功！", "探偵みたいによく気づいたね！", "博士級の知識だ！", "リーダーの素質アリ！", "スターの輝き！", "みんなの憧れだね！", "伝説の始まりだ！", "歴史に名を刻んだね！", "神業でたー！", "オーラが出てるよ！", "奇跡の連続だね！", "忍者のように素早い！", "お侍さんのようにカッコいい！", "殿様クラスの大物！", "将軍のような貫禄！", "お姫様みたいに上品！", "地球を救うパワーだ！", "宇宙の果てまで響くよ！", "銀河系で一番！", "ブラックホール級 of 吸引力！", "流れ星に願いが届いたね！", "100万ボルトのパワー！", "エネルギー満タン！", "フルスロットル！", "エンジン全開！", "ターボチャージャー作動！", "ダイヤモンドみたいに硬い意志！", "ルビーみたいに情熱的！", "サファイアみたいに冷静！", "エメラルドみたいに優しい！", "ゴールド級の輝き！", "百獣の王だ！", "空の王者だ！", "海の覇者だ！", "森の守り神！", "大自然のパワー！", "超ド級の活躍！", "メガトンパンチ級の衝撃！", "ギガントすごい！", "テラ素晴らしい！", "ペタかっこいい！", "お見事、座布団一枚！", "よっ、日本一！", "あっぱれ！", "お祭り騒ぎだ！", "花火が上がったね！", "ドカーンと大成功！", "ピカッと閃いたね！", "雲の上を歩く気分！", "空まで飛んでいきそう！", "宇宙旅行に行けそうだ！",
       "スーパーウルトラハイパーすごい！", "ちょ〜〜〜えらい！", "めっちゃかっこいい！", "バリバリ伝説！", "ゴリゴリ進むね！", "無敵モード突入！", "スター状態だね！", "フィーバータイム！", "確変中！", "ボーナスステージ！", "神引きだね！", "宝箱を発見したね！", "伝説の剣を手に入れた！", "魔法の杖を使いこなしてる！", "天空の城に到達！", "ドラゴンをテイムした！", "妖精さんが拍手してる！", "小人さんが手伝ってくれた？", "天使の微笑みだ！", "女神さまもニッコリ！", "神様もびっくり！", "一石二鳥だね！", "三つ巴の大勝利！", "四つ葉のクローバー見つけた気分！", "五つ星ホテル級！", "第六感が冴えてる！", "七色の虹がかかった！", "八面六臂の大活躍！", "九死に一生の奇跡！", "十全十美だ！", "百点満点！", "千年に一人の逸材！", "万歳三唱！", "億万長者の気分！", "兆級のすばらしさ！", "京（けい）レベルの大発見！", "無量大数すごい！", "無限大の可能性！", "限界突破！", "リミットブレイク！", "覚醒したね！", "ニュータイプだ！", "フォースと共にあらんことを！", "君は魔法使いだ！", "海賊王に俺はなる！", "スーパーサイヤ人だ！", "呼吸の型が完璧！", "領域展開に成功！", "ゴムゴムのぉ〜大成功！", "オラ、ワクワクすっぞ！",
       "真実はいつも一つ！", "月に代わっておしおき成功！", "ポケモンマスターになれる！", "スマブラで大乱闘勝利！", "マリオカートで1位！", "テトリスで全消し！", "パズドラで10連コンボ！", "モンストでストライクショット！", "にゃんこ大戦争で完全勝利！", "音ゲーの神様！", "エイムが完璧！", "ビクロイ！", "ドン勝だ！", "チャンピオン部隊だ！", "最高傑作だね！",
       "ノーベル平和賞じゅしょう！", "うちゅうひこうしになれる！", "だいとうりょうもビックリ！", "おうさまもひれふすレベル！", "かみさまも道をゆずるスゴさ！"
@@ -243,137 +237,79 @@
 
       try {
         const saved = localStorage.getItem('nfc_multi_checklists');
-        if (saved) {
-          let parsedData = JSON.parse(saved);
-          for (let key in parsedData) {
-            if (parsedData[key].items && parsedData[key].items.length > 0) {
-              if (typeof parsedData[key].items[0] === 'string') {
-                parsedData[key].items = parsedData[key].items.map(i => ({ name: i, hint: '🎒 バッグにいれてね...' }));
-              }
-            }
-          }
-          appData = parsedData;
-          localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-        }
-      } catch (error) {
-        appData = {};
-        localStorage.removeItem('nfc_multi_checklists');
-      }
+        if (saved) { appData = JSON.parse(saved); }
+      } catch (error) { appData = {}; }
 
-      try {
-        collectedPraises = JSON.parse(localStorage.getItem('nfc_praise_collection') || '[]');
-      } catch (e) {
-        collectedPraises = [];
-      }
+      try { collectedPraises = JSON.parse(localStorage.getItem('nfc_praise_collection') || '[]'); } catch (e) { collectedPraises = []; }
 
-      try {
-        if (!localStorage.getItem('nfc_app_role')) {
-          localStorage.setItem('nfc_app_role', 'admin');
-        }
-      } catch (e) {}
+      if (!localStorage.getItem('nfc_app_role')) { localStorage.setItem('nfc_app_role', 'admin'); }
 
       if (action === 'import') {
+        // インポート処理
         const importId = urlParams.get('id');
         const importTitle = urlParams.get('title');
-        const importItemsStr = urlParams.get('items'); 
-        
+        const importItemsStr = urlParams.get('items');
         if (importId && importTitle && importItemsStr) {
           document.getElementById('confirm-list-title').innerText = importTitle;
-          const confirmList = document.getElementById('confirm-list-items');
-          confirmList.innerHTML = '';
-          
+          const confirmList = document.getElementById('confirm-list-items'); confirmList.innerHTML = '';
           const parsedItems = importItemsStr.split(',').map(itemStr => {
-            const parts = itemStr.split('|');
-            return { name: parts[0], hint: parts[1] || '🎒 バッグにいれてね...' };
+            const parts = itemStr.split('|'); return { name: parts[0], hint: parts[1] || '🎒 バッグにいれてね...' };
           });
-
           parsedItems.forEach(item => {
-            const li = document.createElement('li');
-            li.style.padding = '8px 0';
-            li.style.borderBottom = '1px dashed #ccc';
+            const li = document.createElement('li'); li.style.padding = '8px 0'; li.style.borderBottom = '1px dashed #ccc';
             li.innerHTML = `<strong>・${item.name}</strong><br><span style="font-size:12px; color:#666;">（${item.hint}）</span>`;
             confirmList.appendChild(li);
           });
-
           document.getElementById('btn-confirm-yes').onclick = () => {
             appData[importId] = { title: importTitle, items: parsedItems };
             localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-            localStorage.setItem('nfc_app_role', 'child'); 
+            localStorage.setItem('nfc_app_role', 'child');
             alert(`✨ リスト「${importTitle}」を登録しました！`);
             window.history.replaceState({}, '', window.location.href.split('?')[0]);
             renderChildHome();
           };
-
           document.getElementById('btn-confirm-no').onclick = () => {
-            alert('登録をやめました。');
-            window.history.replaceState({}, '', window.location.href.split('?')[0]);
-            renderChildHome();
+            window.history.replaceState({}, '', window.location.href.split('?')[0]); renderChildHome();
           };
-
-          switchView('import-confirm-view');
-          return;
+          switchView('import-confirm-view'); return;
         }
       }
 
       if (listId) {
-        if (currentLoadedId !== listId) {
-          currentLoadedId = listId;
-          fetchListFromCloud(listId); 
-        }
+        if (currentLoadedId !== listId) { currentLoadedId = listId; fetchListFromCloud(listId); }
         return;
       }
-
       const role = localStorage.getItem('nfc_app_role');
-      if (role === 'admin') { renderDashboard(); } 
-      else { renderChildHome(); }
+      if (role === 'admin') { renderDashboard(); } else { renderChildHome(); }
     }
 
     function fetchListFromCloud(listId) {
-      switchView('loading-view'); 
-      
+      switchView('loading-view');
       fetch(`${GAS_URL}?action=getList&id=${listId}`)
         .then(response => response.json())
         .then(data => {
           if (data && data.items && data.items.length > 0) {
-            appData[listId] = data;
-            localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+            appData[listId] = data; localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
             showConfirmView(listId, data);
-          } else {
-            switchView('error-view');
-          }
+          } else { switchView('error-view'); }
         })
         .catch(err => {
-          if (appData[listId]) {
-            showConfirmView(listId, appData[listId]);
-          } else {
-            switchView('error-view');
-          }
+          if (appData[listId]) { showConfirmView(listId, appData[listId]); } else { switchView('error-view'); }
         });
     }
 
     function showConfirmView(listId, listData) {
       document.getElementById('confirm-list-title').innerText = listData.title;
-      const confirmList = document.getElementById('confirm-list-items');
-      confirmList.innerHTML = '';
-      
+      const confirmList = document.getElementById('confirm-list-items'); confirmList.innerHTML = '';
       listData.items.forEach(item => {
-        const li = document.createElement('li');
-        li.style.padding = '8px 0';
-        li.style.borderBottom = '1px dashed #ccc';
+        const li = document.createElement('li'); li.style.padding = '8px 0'; li.style.borderBottom = '1px dashed #ccc';
         li.innerHTML = `<strong>・${item.name}</strong> <span style="font-size:12px; color:#666;">（${item.hint}）</span>`;
         confirmList.appendChild(li);
       });
-
-      document.getElementById('btn-confirm-yes').onclick = () => {
-        renderChildView(listId, listData);
-      };
-
+      document.getElementById('btn-confirm-yes').onclick = () => { renderChildView(listId, listData); };
       document.getElementById('btn-confirm-no').onclick = () => {
-        window.history.replaceState({}, '', window.location.href.split('?')[0]);
-        currentLoadedId = null;
-        renderChildHome();
+        window.history.replaceState({}, '', window.location.href.split('?')[0]); currentLoadedId = null; renderChildHome();
       };
-
       switchView('import-confirm-view');
     }
 
@@ -381,57 +317,33 @@
       if (document.visibilityState === 'visible') {
         const urlParams = new URLSearchParams(window.location.search);
         const listId = urlParams.get('id');
-        if (listId && listId !== currentLoadedId) {
-          currentLoadedId = listId;
-          fetchListFromCloud(listId);
-        }
+        if (listId && listId !== currentLoadedId) { currentLoadedId = listId; fetchListFromCloud(listId); }
       }
     });
 
-    function switchView(viewId) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
-      document.getElementById(viewId).classList.add('active-view');
-    }
-
     function unlockAdmin() {
-      const pin = prompt("保護者用パスワード（半角数字4桁）を入力してください。\n※初期設定は 0000 です。");
+      const pin = prompt("保護者用パスワードを入力してください。");
       if (pin === "0000") {
         localStorage.setItem('nfc_app_role', 'admin');
-        window.history.replaceState({}, '', window.location.href.split('?')[0]);
-        renderDashboard();
-      } else if (pin !== null) {
-        alert("パスワードが違います。");
-      }
+        window.history.replaceState({}, '', window.location.href.split('?')[0]); renderDashboard();
+      } else if (pin !== null) { alert("パスワードが違います。"); }
     }
 
-    function lockToChildMode() {
-      localStorage.setItem('nfc_app_role', 'child');
-      renderChildHome();
-    }
+    function lockToChildMode() { localStorage.setItem('nfc_app_role', 'child'); renderChildHome(); }
 
     function renderDashboard() {
       switchView('dashboard-view');
-      const container = document.getElementById('dashboard-lists');
-      container.innerHTML = '';
+      const container = document.getElementById('dashboard-lists'); container.innerHTML = '';
       const keys = Object.keys(appData);
-      
-      if (keys.length === 0) {
-        container.innerHTML = '<p>まだリストがありません。</p>';
-        return;
-      }
-
+      if (keys.length === 0) { container.innerHTML = '<p>まだリストがありません。</p>'; return; }
       const baseUrl = window.location.href.split('?')[0].split('#')[0];
       keys.forEach(id => {
-        const list = appData[id];
-        const nfcUrl = `${baseUrl}?id=${id}`;
-        const card = document.createElement('div');
-        card.className = 'dashboard-card';
-        
+        const list = appData[id]; const nfcUrl = `${baseUrl}?id=${id}`;
+        const card = document.createElement('div'); card.className = 'dashboard-card';
         card.innerHTML = `
           <div class="dashboard-title">${list.title}</div>
           <div style="font-size: 11px; color: #666; margin-bottom: 15px; background: #eee; padding: 10px; border-radius: 5px; word-break: break-all; border: 1px solid #ccc;">
-            <strong>【タグ書き込み用 URL】</strong><br>
-            <span style="user-select: all;">${nfcUrl}</span>
+            <strong>【タグ書き込み用 URL】</strong><br><span style="user-select: all;">${nfcUrl}</span>
           </div>
           <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
             <button class="btn" style="background:#666; color:white; flex-grow:1;" onclick="copyText('${nfcUrl}')">📋 URLをコピー</button>
@@ -448,192 +360,96 @@
     function saveList() {
       const singleName = document.getElementById('item-input').value.trim();
       const bulkValue = document.getElementById('bulk-input').value.trim();
-      
-      if (singleName !== '') { addItem(); }
-      if (bulkValue !== '') { addBulkItems(); }
-
+      if (singleName !== '') { addItem(); } if (bulkValue !== '') { addBulkItems(); }
       const title = document.getElementById('list-title-input').value.trim();
-      
-      if (!title) {
-        return alert('⚠️ 「リストの名前」が入力されていません！\n上の欄に名前を入力してください。');
-      }
-      if (tempItems.length === 0) {
-        return alert('⚠️ 持ち物が1つもありません。追加してください。');
-      }
-      
+      if (!title) { return alert('⚠️ 「リストの名前」が入力されていません！'); }
+      if (tempItems.length === 0) { return alert('⚠️ 持ち物が1つもありません。'); }
       const id = currentEditingId || "id_" + Date.now().toString();
       const saveBtn = document.querySelector("#edit-view .btn-primary");
-      saveBtn.innerText = "⏳ 保存中...";
-      saveBtn.disabled = true;
-
+      saveBtn.innerText = "⏳ 保存中..."; saveBtn.disabled = true;
       const params = new URLSearchParams();
       params.append('data', JSON.stringify({ action: 'saveList', id: id, title: title, items: tempItems }));
-
       fetch(GAS_URL, { 
-        method: 'POST', 
-        mode: 'no-cors', 
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params.toString()
+        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString()
       })
         .then(() => {
-          appData[id] = { title: title, items: tempItems };
-          localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-          alert('✅ クラウド（スプレッドシート）にデータを保存しました！\n\nスプレッドシートを開いて文字が並んだかご確認ください。');
-          renderDashboard();
+          appData[id] = { title: title, items: tempItems }; localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+          alert('✅ クラウド（スプレッドシート）にデータを保存しました！'); renderDashboard();
         })
-        .catch(err => {
-          alert('通信エラーが起きました。通信環境をご確認ください。');
-        })
-        .finally(() => {
-          saveBtn.innerText = "💾 クラウド（スプシ）に保存する";
-          saveBtn.disabled = false;
-        });
+        .catch(err => { alert('通信エラーが起きました。'); })
+        .finally(() => { saveBtn.innerText = "💾 クラウド（スプシ）に保存する"; saveBtn.disabled = false; });
     }
 
-    // 🌟 削除ボタンを押したときの処理を「ポップアップ呼び出し」に変更
-    function deleteList(id) {
-      listToDelete = id;
-      switchView('delete-confirm-view');
-    }
+    function deleteList(id) { listToDelete = id; switchView('delete-confirm-view'); }
+    function closeDeleteConfirm() { listToDelete = null; renderDashboard(); }
 
-    // 🌟 キャンセルボタン
-    function closeDeleteConfirm() {
-      listToDelete = null;
-      renderDashboard();
-    }
-
-    // 🌟 選んだ方法で削除を実行する関数
     function executeDelete(mode) {
-      if (!listToDelete) return;
-      const id = listToDelete;
-      
+      if (!listToDelete) return; const id = listToDelete;
       if (mode === 'local') {
-        // スマホからのみ削除
-        delete appData[id];
-        localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-        alert('スマホの一覧から削除しました！\n（スプレッドシートにはデータが残っています）');
-        listToDelete = null;
-        renderDashboard();
+        delete appData[id]; localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+        alert('スマホの一覧から削除しました！'); listToDelete = null; renderDashboard();
       } else if (mode === 'cloud') {
-        // クラウドからも完全削除
-        const deleteBtn = document.getElementById("btn-del-cloud");
-        const originalText = deleteBtn.innerHTML;
-        deleteBtn.innerHTML = "⏳ 削除中...";
-        deleteBtn.disabled = true;
-
-        const params = new URLSearchParams();
-        params.append('data', JSON.stringify({ action: 'deleteList', id: id }));
-
+        const deleteBtn = document.getElementById("btn-del-cloud"); const originalText = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = "⏳ 削除中..."; deleteBtn.disabled = true;
+        const params = new URLSearchParams(); params.append('data', JSON.stringify({ action: 'deleteList', id: id }));
         fetch(GAS_URL, { 
-          method: 'POST', 
-          mode: 'no-cors', 
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, 
-          body: params.toString() 
+          method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() 
         })
           .then(() => {
-            delete appData[id];
-            localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-            alert('☁️ クラウドとスマホから完全に削除しました！');
-            listToDelete = null;
-            renderDashboard();
+            delete appData[id]; localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+            alert('☁️ クラウドとスマホから完全に削除しました！'); listToDelete = null; renderDashboard();
           })
-          .catch(err => {
-            alert('通信エラーが起きました。');
-          })
-          .finally(() => {
-            deleteBtn.innerHTML = originalText;
-            deleteBtn.disabled = false;
-          });
+          .catch(err => { alert('通信エラーが起きました。'); })
+          .finally(() => { deleteBtn.innerHTML = originalText; deleteBtn.disabled = false; });
       }
     }
     
-    function copyText(text) { 
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-          alert('コピーしました！');
-        }).catch(err => {
-          alert('コピーに失敗しました。URLを直接長押ししてコピーしてください。');
-        });
-      }
-    }
-
+    function copyText(text) { if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => { alert('コピーしました！'); }); } }
     function openEditView(id) {
       switchView('edit-view');
-      if (id && appData[id]) {
-        currentEditingId = id;
-        document.getElementById('list-title-input').value = appData[id].title;
-        tempItems = [...appData[id].items];
-      } else {
-        currentEditingId = null;
-        document.getElementById('list-title-input').value = '';
-        tempItems = [];
-      }
-      document.getElementById('bulk-input').value = '';
-      renderEditItems();
+      if (id && appData[id]) { currentEditingId = id; document.getElementById('list-title-input').value = appData[id].title; tempItems = [...appData[id].items]; } 
+      else { currentEditingId = null; document.getElementById('list-title-input').value = ''; tempItems = []; }
+      document.getElementById('bulk-input').value = ''; renderEditItems();
     }
-
     function addItem() {
-      const nameInput = document.getElementById('item-input');
-      const hintInput = document.getElementById('hint-input');
-      const nameVal = nameInput.value.trim();
-      const hintVal = hintInput.value.trim() || '🎒 バッグにいれてね...';
+      const nameInput = document.getElementById('item-input'); const hintInput = document.getElementById('hint-input');
+      const nameVal = nameInput.value.trim(); const hintVal = hintInput.value.trim() || '🎒 バッグにいれてね...';
       if(nameVal) { tempItems.push({ name: nameVal, hint: hintVal }); nameInput.value = ''; hintInput.value = ''; renderEditItems(); }
     }
-
     function addBulkItems() {
       const lines = document.getElementById('bulk-input').value.split('\n');
-      let addedCount = 0;
       lines.forEach(line => { 
-        const parts = line.split('\t'); 
-        const nameVal = (parts[0] || '').trim();
-        const hintVal = (parts[1] || '').trim() || '🎒 バッグにいれてね...';
-        if(nameVal) { tempItems.push({ name: nameVal, hint: hintVal }); addedCount++; }
+        const parts = line.split('\t'); const nameVal = (parts[0] || '').trim(); const hintVal = (parts[1] || '').trim() || '🎒 バッグにいれてね...';
+        if(nameVal) { tempItems.push({ name: nameVal, hint: hintVal }); }
       });
-      document.getElementById('bulk-input').value = '';
-      renderEditItems();
+      document.getElementById('bulk-input').value = ''; renderEditItems();
     }
-    
     function removeTempItem(index) { tempItems.splice(index, 1); renderEditItems(); }
-    
     function renderEditItems() {
-      const container = document.getElementById('edit-item-list');
-      container.innerHTML = '';
+      const container = document.getElementById('edit-item-list'); container.innerHTML = '';
       tempItems.forEach((item, idx) => {
-        const div = document.createElement('div');
-        div.className = 'list-item';
+        const div = document.createElement('div'); div.className = 'list-item';
         div.innerHTML = `<div style="display:flex; justify-content:space-between; width:100%; align-items:center;"><div><span style="font-weight:bold; font-size:18px;">${item.name}</span><br><span style="font-size:12px; color:#666;">（${item.hint}）</span></div><span class="delete-text" onclick="removeTempItem(${idx})">✕ 削除</span></div>`;
         container.appendChild(div);
       });
     }
     function goToDashboard() { renderDashboard(); }
-    
     function resetPraiseCollection() {
       if (confirm('本当に図鑑をリセットしますか？')) {
-        collectedPraises = [];
-        localStorage.setItem('nfc_praise_collection', JSON.stringify([]));
-        localStorage.setItem('nfc_daily_praises', JSON.stringify({date: "", items: []}));
-        renderDashboard();
+        collectedPraises = []; localStorage.setItem('nfc_praise_collection', JSON.stringify([])); localStorage.setItem('nfc_daily_praises', JSON.stringify({date: "", items: []})); renderDashboard();
       }
     }
 
     // ================= 図鑑機能 =================
     function openCollection(previousView) {
-      previousViewForCollection = previousView;
-      switchView('collection-view');
-      const statsContainer = document.getElementById('collection-stats');
-      const gridContainer = document.getElementById('collection-grid');
-      gridContainer.innerHTML = '';
+      previousViewForCollection = previousView; switchView('collection-view');
+      const statsContainer = document.getElementById('collection-stats'); const gridContainer = document.getElementById('collection-grid'); gridContainer.innerHTML = '';
       const counts = { N: { total: 150, got: 0 }, R: { total: 80, got: 0 }, SR: { total: 50, got: 0 }, SSR: { total: 15, got: 0 }, UR: { total: 5, got: 0 } };
       praises.forEach(p => {
-        const isUnlocked = collectedPraises.includes(p.id);
-        if (isUnlocked) counts[p.rarity].got++;
-        const div = document.createElement('div');
-        div.className = `col-item ${isUnlocked ? 'unlocked' : ''}`;
-        if (isUnlocked) {
-          div.innerHTML = `<div class="col-rarity"><span class="rarity-badge r-${p.rarity}">✦ ${p.rarity} ✦</span><br><span style="font-size:10px;color:#999;">No.${p.id}</span></div><div>${p.message}</div>`;
-        } else {
-          div.innerHTML = `<div style="margin-bottom:5px; font-size:10px;">No.${p.id}</div><div style="font-size:24px;">🔒</div><div>???</div>`;
-        }
+        const isUnlocked = collectedPraises.includes(p.id); if (isUnlocked) counts[p.rarity].got++;
+        const div = document.createElement('div'); div.className = `col-item ${isUnlocked ? 'unlocked' : ''}`;
+        if (isUnlocked) { div.innerHTML = `<div class="col-rarity"><span class="rarity-badge r-${p.rarity}">✦ ${p.rarity} ✦</span><br><span style="font-size:10px;color:#999;">No.${p.id}</span></div><div>${p.message}</div>`; } 
+        else { div.innerHTML = `<div style="margin-bottom:5px; font-size:10px;">No.${p.id}</div><div style="font-size:24px;">🔒</div><div>???</div>`; }
         gridContainer.appendChild(div);
       });
       statsContainer.innerHTML = `<div class="stat-box" style="border-bottom: 3px solid #95a5a6;">N: ${counts.N.got}/${counts.N.total}</div><div class="stat-box" style="border-bottom: 3px solid #3498db;">R: ${counts.R.got}/${counts.R.total}</div><div class="stat-box" style="border-bottom: 3px solid #9b59b6;">SR: ${counts.SR.got}/${counts.SR.total}</div><div class="stat-box" style="border-bottom: 3px solid #f1c40f;">SSR: ${counts.SSR.got}/${counts.SSR.total}</div><div class="stat-box" style="border-bottom: 3px solid #ff0000;">UR: ${counts.UR.got}/${counts.UR.total}</div>`;
@@ -642,117 +458,79 @@
 
     // ================= 子ども用チェック処理 =================
     function renderChildHome() { switchView('child-home-view'); }
-
     function renderChildView(id, listData) {
-      switchView('child-view');
-      document.getElementById('reward').style.display = 'none';
-      childCurrentList = listData.items;
-      currentItemIndex = 0;
-      sessionPraises = [];
-      renderCurrentChildItem(id);
+      switchView('child-view'); document.getElementById('reward').style.display = 'none';
+      childCurrentList = listData.items; currentItemIndex = 0; sessionPraises = []; renderCurrentChildItem(id);
     }
 
     function renderCurrentChildItem(listId) {
-      const container = document.getElementById('checklist');
-      container.innerHTML = '';
-      
+      const container = document.getElementById('checklist'); container.innerHTML = '';
       if (currentItemIndex < childCurrentList.length) {
         const item = childCurrentList[currentItemIndex];
-        const progressText = document.createElement('div');
-        progressText.className = 'progress-text';
-        progressText.innerText = `📦 ${currentItemIndex + 1} / ${childCurrentList.length} こめ`;
-        
-        const card = document.createElement('div');
-        card.className = 'item-card locked'; 
+        const progressText = document.createElement('div'); progressText.className = 'progress-text'; progressText.innerText = `📦 ${currentItemIndex + 1} / ${childCurrentList.length} こめ`;
+        const card = document.createElement('div'); card.className = 'item-card locked'; 
         card.innerHTML = `<div class="timer-line" id="timer-line-${currentItemIndex}"></div><div style="z-index:1; position:relative; width:100%; display:flex; justify-content:space-between; align-items:center;"><div style="display:flex; flex-direction:column; text-align:left;"><span style="font-size:14px; color:#d9534f; margin-bottom:5px; font-weight:normal;" id="action-hint-${currentItemIndex}">${item.hint}</span><span style="font-size:32px;">${item.name}</span></div><div class="check-mark" id="check-mark-${currentItemIndex}">⏳</div></div>`;
-        
-        container.appendChild(progressText);
-        container.appendChild(card);
-
-        setTimeout(() => {
-          const line = document.getElementById(`timer-line-${currentItemIndex}`);
-          if(line) line.style.width = '100%';
-        }, 50);
-
+        container.appendChild(progressText); container.appendChild(card);
+        setTimeout(() => { const line = document.getElementById(`timer-line-${currentItemIndex}`); if(line) line.style.width = '100%'; }, 50);
         let canCheck = false;
         setTimeout(() => {
-          canCheck = true;
-          card.classList.remove('locked');
-          card.style.borderColor = '#4a90e2';
-          const hint = document.getElementById(`action-hint-${currentItemIndex}`);
-          if(hint) { hint.innerText = '👉 タップしてチェック！'; hint.style.color = '#28a745'; hint.style.fontWeight = 'bold';}
-          const mark = document.getElementById(`check-mark-${currentItemIndex}`);
-          if(mark) { mark.innerText = '✔'; mark.style.borderColor = '#4a90e2'; mark.style.color = '#4a90e2'; }
+          canCheck = true; card.classList.remove('locked'); card.style.borderColor = '#4a90e2';
+          const hint = document.getElementById(`action-hint-${currentItemIndex}`); if(hint) { hint.innerText = '👉 タップしてチェック！'; hint.style.color = '#28a745'; hint.style.fontWeight = 'bold';}
+          const mark = document.getElementById(`check-mark-${currentItemIndex}`); if(mark) { mark.innerText = '✔'; mark.style.borderColor = '#4a90e2'; mark.style.color = '#4a90e2'; }
           if(navigator.vibrate) navigator.vibrate(30);
         }, 2500);
-
         card.onclick = () => { if (!canCheck) return; checkItem(card, listId, currentItemIndex); };
       } else {
+        // 🌟 すべて完了した瞬間にクラウド（スプシ）へ通知を送信
+        logCheckToCloud(listId);
         showCompletionSummary();
       }
     }
 
+    // 🌟 追加：チェック完了の履歴をスプシへ飛ばす関数
+    function logCheckToCloud(listId) {
+      const title = document.getElementById('child-title').innerText;
+      const params = new URLSearchParams();
+      params.append('data', JSON.stringify({ action: 'logCheck', id: listId, title: title }));
+      fetch(GAS_URL, { 
+        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString()
+      }).catch(err => console.error("履歴の送信に失敗しました", err));
+    }
+
     function checkItem(cardElement, listId, itemIndex) {
-      if (cardElement.classList.contains('checked')) return; 
-      cardElement.classList.add('checked');
+      if (cardElement.classList.contains('checked')) return; cardElement.classList.add('checked');
       if (navigator.vibrate) { navigator.vibrate(50); }
-      
       const today = new Date().toLocaleDateString('ja-JP');
       let dailyData = JSON.parse(localStorage.getItem('nfc_daily_praises') || '{"date":"","items":[]}');
       if (dailyData.date !== today) { dailyData = { date: today, items: [] }; }
-
-      const itemKey = `${listId}_${itemIndex}`;
-      let delay = 600; 
-
+      const itemKey = `${listId}_${itemIndex}`; let delay = 600; 
       if (!dailyData.items.includes(itemKey)) {
-        dailyData.items.push(itemKey);
-        localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData));
-        triggerPraise(); 
-        delay = 2300; 
+        dailyData.items.push(itemKey); localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData));
+        triggerPraise(); delay = 2300; 
       }
-
       setTimeout(() => { currentItemIndex++; renderCurrentChildItem(listId); }, delay);
     }
 
     function rollGacha() {
-      const rand = Math.random() * 100;
-      let targetRarity = 'N';
-      if (rand < 1) targetRarity = 'UR';           
-      else if (rand < 5) targetRarity = 'SSR';     
-      else if (rand < 20) targetRarity = 'SR';     
-      else if (rand < 50) targetRarity = 'R';      
-      else targetRarity = 'N';                     
-      const pool = praises.filter(p => p.rarity === targetRarity);
-      return pool[Math.floor(Math.random() * pool.length)];
+      const rand = Math.random() * 100; let targetRarity = 'N';
+      if (rand < 1) targetRarity = 'UR'; else if (rand < 5) targetRarity = 'SSR'; else if (rand < 20) targetRarity = 'SR'; else if (rand < 50) targetRarity = 'R'; else targetRarity = 'N';                     
+      const pool = praises.filter(p => p.rarity === targetRarity); return pool[Math.floor(Math.random() * pool.length)];
     }
 
     function triggerPraise() {
-      const selectedPraise = rollGacha();
-      const number = selectedPraise.id;
-      let isNew = false;
-      if (!collectedPraises.includes(number)) {
-        collectedPraises.push(number);
-        localStorage.setItem('nfc_praise_collection', JSON.stringify(collectedPraises));
-        isNew = true;
-      }
+      const selectedPraise = rollGacha(); const number = selectedPraise.id; let isNew = false;
+      if (!collectedPraises.includes(number)) { collectedPraises.push(number); localStorage.setItem('nfc_praise_collection', JSON.stringify(collectedPraises)); isNew = true; }
       sessionPraises.push({ ...selectedPraise, isNew });
       let popup = document.getElementById('praise-popup');
-      if (!popup) {
-        popup = document.createElement('div');
-        popup.id = 'praise-popup'; popup.className = 'praise-popup';
-        document.body.appendChild(popup);
-      }
+      if (!popup) { popup = document.createElement('div'); popup.id = 'praise-popup'; popup.className = 'praise-popup'; document.body.appendChild(popup); }
       popup.innerHTML = `<div style="text-align: center; margin-bottom: 10px;"><div class="rarity-badge r-${selectedPraise.rarity}" style="font-size: 24px; padding: 10px 30px; letter-spacing: 2px;">✦ ${selectedPraise.rarity} ✦</div></div><div class="praise-number">No.${number} ${isNew ? '<span class="new-badge">NEW!</span>' : ''}</div><div class="praise-message">${selectedPraise.message}</div><div style="font-size: 14px; color: #4a90e2; font-weight: bold; width: 100%; text-align: right;">図鑑：${collectedPraises.length} / 300</div>`;
-      popup.classList.add('show');
-      setTimeout(() => { popup.classList.remove('show'); }, 2000);
+      popup.classList.add('show'); setTimeout(() => { popup.classList.remove('show'); }, 2000);
     }
 
     function showCompletionSummary() {
       if (navigator.vibrate) { navigator.vibrate([100, 50, 100, 50, 200]); }
       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }});
-      
-      const rewardDiv = document.getElementById('reward');
-      rewardDiv.style.display = 'block';
+      const rewardDiv = document.getElementById('reward'); rewardDiv.style.display = 'block';
       let summaryHTML = `🌟 ぜんぶできたね！ 🌟<br>よくできました！`;
       if (sessionPraises.length > 0) {
         summaryHTML += `<div class="summary-box"><h3>🎁 今回あつめた言葉 🎁</h3><ul class="summary-list">`;
