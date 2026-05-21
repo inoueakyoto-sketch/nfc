@@ -90,10 +90,10 @@
   </div>
 
   <div id="import-confirm-view" class="view">
-    <h2>📥 リストのうけとり</h2>
+    <h2>📥 リストのひらき確認</h2>
     <div class="panel-container">
-      <p style="font-weight: bold;">以下のリストを受信しました。<br>このリストで間違いないですか？</p>
-      <h3 id="confirm-list-title" style="margin-top: 20px; border-bottom: 2px solid #eee; padding-bottom: 5px; color: #ff8c00;"></h3>
+      <p style="font-weight: bold; font-size: 18px; text-align: center;">このリストであっていますか？</p>
+      <h3 id="confirm-list-title" style="margin-top: 20px; border-bottom: 2px solid #eee; padding-bottom: 5px; color: #ff8c00; text-align:center;"></h3>
       <ul id="confirm-list-items" style="list-style: none; padding: 0; background: #f9f9f9; border-radius: 5px; padding: 10px;"></ul>
       <div style="display: flex; justify-content: space-between; margin-top: 30px;">
         <button id="btn-confirm-no" class="btn" style="background:#ccc; color:#333; width:48%; padding:15px; font-size:18px;">いいえ</button>
@@ -107,7 +107,7 @@
     <div class="panel-container" style="margin-top: 50px; border: 2px solid #d9534f;">
       <h2 style="color: #d9534f;">⚠️ リストが見つかりません</h2>
       <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; font-size: 14px;">
-        QRコードを標準の「カメラアプリ」で読み取り、「Safari」または「Chrome」で開いて保存し直してください。
+        データベースに該当するIDのリストがありません。URLが正しいかご確認ください。
       </div>
     </div>
   </div>
@@ -120,7 +120,7 @@
   </div>
 
   <div id="dashboard-view" class="view">
-    <h2>🛠 リスト管理画面</h2>
+    <h2>🛠 リスト管理画面（クラウド連動）</h2>
     <button class="collection-btn" style="margin: 0 auto 20px auto; display: block;" onclick="openCollection('dashboard-view')">📖 ほめ言葉図鑑を見る</button>
     <div id="dashboard-lists"></div>
     <button class="btn btn-primary" onclick="openEditView(null)">➕ 新しいリストを作る</button>
@@ -133,7 +133,8 @@
     <h2>📝 リストの作成・編集</h2>
     <div class="panel-container">
       <label style="font-weight:bold;">リストの名前 (例: 🎒ランドセル)</label><br>
-      <input type="text" id="list-title-input" style="width: 100%; box-sizing: border-box; margin: 5px 0 20px 0;"><br>
+      <input type="text" id="list-title-input" style="margin: 5px 0 20px 0;"><br>
+      
       <label style="font-weight:bold;">1つずつ追加</label><br>
       <div style="display: flex; flex-direction: column; gap: 5px; margin: 5px 0 10px 0;">
         <input type="text" id="item-input" placeholder="もちもの (例: ✏️ えんぴつ)">
@@ -142,43 +143,39 @@
           <button class="btn" style="background:#4a90e2; color:white; margin:0 0 0 5px;" onclick="addItem()">追加</button>
         </div>
       </div>
+      
       <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+      
       <label style="font-weight:bold;">📋 スプレッドシートから一括追加</label><br>
       <p style="font-size:12px; color:#666; margin:5px 0;">「もちもの」と「アクション」の2列をコピーして貼り付けてください。</p>
       <textarea id="bulk-input" rows="4" placeholder="✏️ えんぴつ [タブ] ふでばこに入れた？&#10;📓 ノート [タブ] ランドセルに入れた？"></textarea>
       <button class="btn" style="background:#28a745; color:white; width: 100%; margin-top: 5px;" onclick="addBulkItems()">一括追加する</button>
+      
       <div id="edit-item-list" style="margin-top: 25px; border-top: 2px solid #eee; padding-top: 15px;"></div>
-      <button class="btn btn-primary" style="background:#4a90e2;" onclick="saveList()">💾 この端末に保存する</button>
+      
+      <button class="btn btn-primary" style="background:#4a90e2;" onclick="saveList()">💾 クラウド（スプシ）に保存する</button>
       <button class="btn btn-primary" style="background:#eee; color:#333; margin-top:10px;" onclick="goToDashboard()">キャンセル</button>
     </div>
   </div>
 
-  <div id="share-view" class="view">
-    <h2>📲 他のスマホに配る</h2>
-    <div class="panel-container" style="text-align: center;">
-      <img id="qr-img" src="" alt="QR Code" style="margin: 20px 0; width: 150px; height: 150px;">
-      <button class="btn btn-primary" style="background:#eee; color:#333; margin-top:30px;" onclick="goToDashboard()">戻る</button>
-    </div>
-  </div>
-
   <script>
+    // 🌟 あなたから提供されたGASのURLをセットしました！
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwijAoAZbYCpmrr7PWy45SdvR0HSKU4cE-IZ7Ufs-VpaQgMhi71EFU8irWtZ-XTONP40A/exec";
+
     let appData = {};
     let currentEditingId = null;
     let tempItems = [];
-    
     let childCurrentList = [];
     let currentItemIndex = 0;
     let sessionPraises = []; 
     let previousViewForCollection = 'child-home-view';
-    
-    // 🌟 現在表示中のリストID（二重読み込み防止用）
     let currentLoadedId = null;
 
     const rawPraises = [
       "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！", "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！", "自分でできてエライ！", "確認バッチリだね！", "いいペースだね！", "天才かもしれない！", "お見事です！", "素晴らしい行動力！", "最高だね！", "忘れ物なし！素晴らしい！", "今日も笑顔でいこう！", "ハナマル満点！", "一発でできたね！", "スピード解決だね！", "良い習慣がついてるね！", "さすが、よく分かってる！", "応援してるよ！", "ハイタッチ！", "ニコニコ笑顔がいいね！", "パーフェクト！", "一歩前進だね！", "やる気に満ちてるね！", "その意気だ！", "見事な手際！", "自分で気づけてすごい！", "毎日えらいね！", "今日も一日楽しもう！", "バツグンだね！", "準備の達人！", "100点満点！", "かっこよすぎる！", "先生もびっくりするよ！", "ママもパパも鼻が高いよ！", "さすがだね！", "よくできました！", "その集中力、すごい！", "バッチリ決まったね！", "いいぞいいぞ！", "スーパープレー！", "今日もがんばろう！", "素敵だね！", "グッジョブ！", "毎日すごいね！", "さすがの腕前！", "準備オッケー！", "今日も絶好調！", "いい感じ！", "やる気スイッチONだね！", "すてきな心意気！", "バッチリ準備OK！", "今日もハッピー！", "頼もしいね！", "一安心だね！", "確認のプロ！", "さすがのチェック力！", "今日も元気だね！", "パーフェクト達成！", "すごいぞ、その調子！", "毎日がんばってるね！", "えらい！花丸！", "今日も素晴らしい！", "さすがの準備！", "バッチリすぎる！", "かっこいい！", "今日も最高！", "その意気込みがいいね！", "完璧だね！", "準備万端！", "今日も一日楽しんで！", "さすが！", "その調子！", "マジックみたいだ！", "あっという間に終わったね！", "職人技だね！", "見ていて気持ちがいいよ！", "頼りにしてるよ！", "心がホカホカするよ！", "見ているこっちも嬉しい！", "がんばる姿が素敵！", "毎日成長してるね！", "すごいパワーを感じる！", "どんどん進むね！", "止まらない勢いだ！", "ノリノリだね！", "イケイケゴーゴー！", "テンションMAX！", "心がピカピカだね！", "太陽みたいに眩しい！", "星みたいにキラキラ！", "虹みたいな笑顔！", "お花みたいに素敵！", "大吉だ！", "超ラッキー！", "ハッピーエンド間違いなし！", "ウキウキするね！", "ワクワクが止まらない！", "ササッと終わったね！", "クルッと解決！", "パッと目が覚めるね！", "いい波乗ってんね！", "風を切って走ってる！", "心にズキュンときた！", "胸がキュンとした！", "ホッコリしたよ！", "ウルッときちゃった！", "ジーンときたよ！", "言葉が出ないくらいすごい！", "目からウロコだ！", "ほっぺたが落ちそう！", "頭が下がる思いだよ！", "拍手喝采！", "スタンディングオベーション！", "アンコール！", "ブラビッシモ！", "トレビアン！", "マーベラス！", "ファンタスティック！", "エクセレント！", "アメージング！", "インクレディブル！", "ワンダフル！",
       "レベルアップの音がした！", "経験値ゲットだぜ！", "勇者みたいな行動力！", "ミッションクリア！", "レアな才能はっけん！", "チーターみたいに速い！", "ライオンみたいにカッコいい！", "イルカみたいに賢いね！", "フクロウみたいによく見てる！", "ウサギみたいにピョンピョン進むね！", "宇宙一のスピード！", "ギネス記録にのりそう！", "ノーベル賞ものの大発見！", "金メダル級のすばらしさ！", "世界チャンピオンだ！", "大天才のひらめき！", "スーパーヒーロー参上！", "まるで魔法使い！", "プロフェッショナルだね！", "名人レベル到達！", "師匠と呼ばせて！", "ミラクル連発だね！", "大金星！", "ウルトラC級の技！", "ホームラン！", "ナイスシュート！", "ロケットみたいに速い！", "新幹線クラスのスピード！", "ジェット機みたい！", "光の速さだ！", "タイムアタック大成功！", "探偵みたいによく気づいたね！", "博士級の知識だ！", "リーダーの素質アリ！", "スターの輝き！", "みんなの憧れだね！", "伝説の始まりだ！", "歴史に名を刻んだね！", "神業でたー！", "オーラが出てるよ！", "奇跡の連続だね！", "忍者のように素早い！", "お侍さんのようにカッコいい！", "殿様クラスの大物！", "将軍のような貫禄！", "お姫様みたいに上品！", "地球を救うパワーだ！", "宇宙の果てまで響くよ！", "銀河系で一番！", "ブラックホール級の吸引力！", "流れ星に願いが届いたね！", "100万ボルトのパワー！", "エネルギー満タン！", "フルスロットル！", "エンジン全開！", "ターボチャージャー作動！", "ダイヤモンドみたいに硬い意志！", "ルビーみたいに情熱的！", "サファイアみたいに冷静！", "エメラルドみたいに優しい！", "ゴールド級の輝き！", "百獣の王だ！", "空の王者だ！", "海の覇者だ！", "森の守り神！", "大自然のパワー！", "超ド級の活躍！", "メガトンパンチ級の衝撃！", "ギガントすごい！", "テラ素晴らしい！", "ペタかっこいい！", "お見事、座布団一枚！", "よっ、日本一！", "あっぱれ！", "お祭り騒ぎだ！", "花火が上がったね！", "ドカーンと大成功！", "ピカッと閃いたね！", "雲の上を歩く気分！", "空まで飛んでいきそう！", "宇宙旅行に行けそうだ！",
       "スーパーウルトラハイパーすごい！", "ちょ〜〜〜えらい！", "めっちゃかっこいい！", "バリバリ伝説！", "ゴリゴリ進むね！", "無敵モード突入！", "スター状態だね！", "フィーバータイム！", "確変中！", "ボーナスステージ！", "神引きだね！", "宝箱を発見したね！", "伝説の剣を手に入れた！", "魔法の杖を使いこなしてる！", "天空の城に到達！", "ドラゴンをテイムした！", "妖精さんが拍手してる！", "小人さんが手伝ってくれた？", "天使の微笑みだ！", "女神さまもニッコリ！", "神様もびっくり！", "一石二鳥だね！", "三つ巴の大勝利！", "四つ葉のクローバー見つけた気分！", "五つ星ホテル級！", "第六感が冴えてる！", "七色の虹がかかった！", "八面六臂の大活躍！", "九死に一生の奇跡！", "十全十美だ！", "百点満点！", "千年に一人の逸材！", "万歳三唱！", "億万長者の気分！", "兆級のすばらしさ！", "京（けい）レベルの大発見！", "無量大数すごい！", "無限大の可能性！", "限界突破！", "リミットブレイク！", "覚醒したね！", "ニュータイプだ！", "フォースと共にあらんことを！", "君は魔法使いだ！", "海賊王に俺はなる！", "スーパーサイヤ人だ！", "呼吸の型が完璧！", "領域展開に成功！", "ゴムゴムのぉ〜大成功！", "オラ、ワクワクすっぞ！",
-      "真実はいつも一つ！", "月に代わっておしおき成功！", "ポケモンマスターになれる！", "スマブラで大乱闘勝利！", "マリオカートで1位！", "テトリスで全消し！", "パズドラで10連コンボ！", "モンストでストライクショット！", "にゃんこ大戦争で完全勝利！", "音ゲーの神様！", "エイムが完璧！", "ビクロイ！", "ドン勝だ！", "チャンピオン部隊だ！", "最高傑作だね！",
+      "真実時間をいつも一つ！", "月に代わっておしおき成功！", "ポケモンマスターになれる！", "スマブラで大乱闘勝利！", "マリオカートで1位！", "テトリスで全消し！", "パズドラで10連コンボ！", "モンストでストライクショット！", "にゃんこ大戦争で完全勝利！", "音ゲーの神様！", "エイムが完璧！", "ビクロイ！", "ドン勝だ！", "チャンピオン部隊だ！", "最高傑作だね！",
       "ノーベル平和賞じゅしょう！", "うちゅうひこうしになれる！", "だいとうりょうもビックリ！", "おうさまもひれふすレベル！", "かみさまも道をゆずるスゴさ！"
     ];
 
@@ -195,18 +192,7 @@
 
     function init() {
       const saved = localStorage.getItem('nfc_multi_checklists');
-      if (saved) {
-        let parsedData = JSON.parse(saved);
-        for (let key in parsedData) {
-          if (parsedData[key].items && parsedData[key].items.length > 0) {
-            if (typeof parsedData[key].items[0] === 'string') {
-              parsedData[key].items = parsedData[key].items.map(i => ({ name: i, hint: '🎒 バッグにいれてね...' }));
-            }
-          }
-        }
-        appData = parsedData;
-        localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-      }
+      if (saved) appData = JSON.parse(saved);
 
       if (!localStorage.getItem('nfc_app_role')) {
         localStorage.setItem('nfc_app_role', 'admin');
@@ -214,60 +200,12 @@
 
       const urlParams = new URLSearchParams(window.location.search);
       const listId = urlParams.get('id');
-      const action = urlParams.get('action');
 
-      if (action === 'import') {
-        const importId = urlParams.get('id');
-        const importTitle = urlParams.get('title');
-        const importItemsStr = urlParams.get('items'); 
-        
-        if (importId && importTitle && importItemsStr) {
-          document.getElementById('confirm-list-title').innerText = importTitle;
-          const confirmList = document.getElementById('confirm-list-items');
-          confirmList.innerHTML = '';
-          
-          const parsedItems = importItemsStr.split(',').map(itemStr => {
-            const parts = itemStr.split('|');
-            return { name: parts[0], hint: parts[1] || '🎒 バッグにいれてね...' };
-          });
-
-          parsedItems.forEach(item => {
-            const li = document.createElement('li');
-            li.style.padding = '8px 0';
-            li.style.borderBottom = '1px dashed #ccc';
-            li.innerHTML = `<strong>・${item.name}</strong><br><span style="font-size:12px; color:#666;">（${item.hint}）</span>`;
-            confirmList.appendChild(li);
-          });
-
-          document.getElementById('btn-confirm-yes').onclick = () => {
-            appData[importId] = { title: importTitle, items: parsedItems };
-            localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-            localStorage.setItem('nfc_app_role', 'child'); 
-            alert(`✨ リスト「${importTitle}」を登録しました！`);
-            window.history.replaceState({}, '', window.location.href.split('?')[0]);
-            renderChildHome();
-          };
-
-          document.getElementById('btn-confirm-no').onclick = () => {
-            alert('登録をやめました。');
-            window.history.replaceState({}, '', window.location.href.split('?')[0]);
-            init();
-          };
-
-          switchView('import-confirm-view');
-          return;
-        }
-      }
-
-      // 🌟 URLにリストIDがある場合は、前のリストと違う時だけ再描画する（二重表示防止）
       if (listId) {
-        if (appData[listId]) { 
-          if (currentLoadedId !== listId) {
-            currentLoadedId = listId;
-            renderChildView(listId); 
-          }
-        } 
-        else { switchView('error-view'); }
+        if (currentLoadedId !== listId) {
+          currentLoadedId = listId;
+          fetchListFromCloud(listId); 
+        }
         return;
       }
 
@@ -276,49 +214,70 @@
       else { renderChildHome(); }
     }
 
-    // 🌟 スマホのタブ使い回しバグ対策：画面がアクティブになったらURLを監視して強制切り替え
+    function fetchListFromCloud(listId) {
+      if(GAS_URL.includes("貼り付ける")) {
+        alert("エラー：GASのURLが設定されていません。コードの211行目をご確認ください。");
+        return;
+      }
+      
+      switchView('child-home-view'); 
+      
+      fetch(`${GAS_URL}?action=getList&id=${listId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.items && data.items.length > 0) {
+            appData[listId] = data;
+            localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+            showConfirmView(listId, data);
+          } else {
+            switchView('error-view');
+          }
+        })
+        .catch(err => {
+          if (appData[listId]) {
+            showConfirmView(listId, appData[listId]);
+          } else {
+            switchView('error-view');
+          }
+        });
+    }
+
+    function showConfirmView(listId, listData) {
+      document.getElementById('confirm-list-title').innerText = listData.title;
+      const confirmList = document.getElementById('confirm-list-items');
+      confirmList.innerHTML = '';
+      
+      listData.items.forEach(item => {
+        const li = document.createElement('li');
+        li.style.padding = '8px 0';
+        li.style.borderBottom = '1px dashed #ccc';
+        li.innerHTML = `<strong>・${item.name}</strong> <span style="font-size:12px; color:#666;">（${item.hint}）</span>`;
+        confirmList.appendChild(li);
+      });
+
+      document.getElementById('btn-confirm-yes').onclick = () => {
+        renderChildView(listId, listData);
+      };
+
+      document.getElementById('btn-confirm-no').onclick = () => {
+        window.history.replaceState({}, '', window.location.href.split('?')[0]);
+        currentLoadedId = null;
+        renderChildHome();
+      };
+
+      switchView('import-confirm-view');
+    }
+
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         const urlParams = new URLSearchParams(window.location.search);
         const listId = urlParams.get('id');
-        if (listId && listId !== currentLoadedId && appData[listId]) {
+        if (listId && listId !== currentLoadedId) {
           currentLoadedId = listId;
-          renderChildView(listId);
+          fetchListFromCloud(listId);
         }
       }
     });
-
-    window.addEventListener('pageshow', (event) => {
-      if (event.persisted) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const listId = urlParams.get('id');
-        if (listId && listId !== currentLoadedId && appData[listId]) {
-          currentLoadedId = listId;
-          renderChildView(listId);
-        }
-      }
-    });
-
-    function switchView(viewId) {
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
-      document.getElementById(viewId).classList.add('active-view');
-    }
-
-    function unlockAdmin() {
-      const pin = prompt("保護者用パスワード（半角数字4桁）を入力してください。\n※初期設定は 0000 です。");
-      if (pin === "0000") {
-        localStorage.setItem('nfc_app_role', 'admin');
-        window.history.replaceState({}, '', window.location.href.split('?')[0]);
-        renderDashboard();
-      } else if (pin !== null) {
-        alert("パスワードが違います。");
-      }
-    }
-
-    function lockToChildMode() {
-      localStorage.setItem('nfc_app_role', 'child');
-      renderChildHome();
-    }
 
     function renderDashboard() {
       switchView('dashboard-view');
@@ -338,7 +297,6 @@
         const card = document.createElement('div');
         card.className = 'dashboard-card';
         
-        // 🌟 コピーミスを防ぐため、URLを明示＆デザイン改善
         card.innerHTML = `
           <div class="dashboard-title">${list.title}</div>
           <div style="font-size: 11px; color: #666; margin-bottom: 15px; background: #eee; padding: 10px; border-radius: 5px; word-break: break-all; border: 1px solid #ccc;">
@@ -347,7 +305,6 @@
           </div>
           <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:5px; margin-bottom:10px;">
             <button class="btn" style="background:#666; color:white; flex-grow:1;" onclick="copyText('${nfcUrl}')">📋 URLをコピー</button>
-            <button class="btn" style="background:#28a745; color:white; flex-grow:1;" onclick="openShareView('${id}')">📲 子どもに配る</button>
           </div>
           <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:5px;">
             <button class="btn" style="background:#ff8c00; color:white; flex-grow:1;" onclick="openEditView('${id}')">✏️ 編集</button>
@@ -358,15 +315,41 @@
       });
     }
 
+    function saveList() {
+      const title = document.getElementById('list-title-input').value.trim();
+      if (!title || tempItems.length === 0) return alert('入力内容を確認してください。');
+      
+      const id = currentEditingId || "id_" + Date.now().toString();
+      const saveBtn = document.querySelector("#edit-view .btn-primary");
+      saveBtn.innerText = "⏳ 保存中...";
+      saveBtn.disabled = true;
+
+      const formData = new FormData();
+      formData.append('data', JSON.stringify({ action: 'saveList', id: id, title: title, items: tempItems }));
+
+      fetch(GAS_URL, { method: 'POST', body: formData })
+        .then(() => {
+          appData[id] = { title: title, items: tempItems };
+          localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
+          alert('クラウド（スプレッドシート）にデータを保存しました！');
+          renderDashboard();
+        })
+        .catch(err => {
+          alert('通信エラーが起きました。スプレッドシートのGAS設定（全員に公開されているか）をご確認ください。');
+        })
+        .finally(() => {
+          saveBtn.innerText = "💾 この端末に保存する";
+          saveBtn.disabled = false;
+        });
+    }
+
     function deleteList(id) {
-      if(confirm('このリストを削除してもよろしいですか？')) {
+      if(confirm('このリストを削除してもよろしいですか？（※端末の一覧から非表示になります。スプシの行は手動で消してください）')) {
         delete appData[id];
         localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
         renderDashboard();
       }
     }
-
-    // 🌟 コピー機能の堅牢化（失敗時も通知する）
     function copyText(text) { 
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
@@ -377,16 +360,6 @@
       } else {
         alert('このブラウザではコピーボタンが使えません。画面上のURLを長押ししてコピーしてください。');
       }
-    }
-
-    function openShareView(id) {
-      const list = appData[id];
-      const baseUrl = window.location.href.split('?')[0].split('#')[0];
-      const itemsStr = list.items.map(i => `${i.name}|${i.hint}`).join(',');
-      const importUrl = `${baseUrl}?action=import&id=${id}&title=${encodeURIComponent(list.title)}&items=${encodeURIComponent(itemsStr)}`;
-      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(importUrl)}`;
-      document.getElementById('qr-img').src = qrApiUrl;
-      switchView('share-view');
     }
 
     function openEditView(id) {
@@ -409,13 +382,7 @@
       const hintInput = document.getElementById('hint-input');
       const nameVal = nameInput.value.trim();
       const hintVal = hintInput.value.trim() || '🎒 バッグにいれてね...';
-      
-      if(nameVal) { 
-        tempItems.push({ name: nameVal, hint: hintVal }); 
-        nameInput.value = ''; 
-        hintInput.value = '';
-        renderEditItems(); 
-      }
+      if(nameVal) { tempItems.push({ name: nameVal, hint: hintVal }); nameInput.value = ''; hintInput.value = ''; renderEditItems(); }
     }
 
     function addBulkItems() {
@@ -431,67 +398,40 @@
       renderEditItems();
       if (addedCount > 0) alert(`${addedCount}件のアイテムを追加しました！`);
     }
-
     function removeTempItem(index) { tempItems.splice(index, 1); renderEditItems(); }
-
     function renderEditItems() {
       const container = document.getElementById('edit-item-list');
       container.innerHTML = '';
       tempItems.forEach((item, idx) => {
         const div = document.createElement('div');
         div.className = 'list-item';
-        div.innerHTML = `
-          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-            <div>
-              <span style="font-weight:bold; font-size:18px;">${item.name}</span><br>
-              <span style="font-size:12px; color:#666;">（${item.hint}）</span>
-            </div>
-            <span class="delete-text" onclick="removeTempItem(${idx})">✕ 削除</span>
-          </div>
-        `;
+        div.innerHTML = `<div style="display:flex; justify-content:space-between; width:100%; align-items:center;"><div><span style="font-weight:bold; font-size:18px;">${item.name}</span><br><span style="font-size:12px; color:#666;">（${item.hint}）</span></div><span class="delete-text" onclick="removeTempItem(${idx})">✕ 削除</span></div>`;
         container.appendChild(div);
       });
     }
-
-    function saveList() {
-      const title = document.getElementById('list-title-input').value.trim();
-      if (!title || tempItems.length === 0) return alert('入力内容を確認してください。');
-      const id = currentEditingId || Date.now().toString();
-      appData[id] = { title: title, items: tempItems };
-      localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-      renderDashboard();
-    }
-
     function goToDashboard() { renderDashboard(); }
-    
     function resetPraiseCollection() {
-      if (confirm('本当に図鑑をリセットしますか？\n※集めた言葉や、今日のチェック履歴がすべて消えて最初からになります。')) {
+      if (confirm('本当に図鑑をリセットしますか？')) {
         collectedPraises = [];
         localStorage.setItem('nfc_praise_collection', JSON.stringify([]));
         localStorage.setItem('nfc_daily_praises', JSON.stringify({date: "", items: []}));
-        alert('図鑑をリセットしました！最初からスタートします。');
         renderDashboard();
       }
     }
 
-    // ================= 図鑑（コレクション）機能 =================
+    // ================= 図鑑機能 =================
     function openCollection(previousView) {
       previousViewForCollection = previousView;
       switchView('collection-view');
-      
       const statsContainer = document.getElementById('collection-stats');
       const gridContainer = document.getElementById('collection-grid');
       gridContainer.innerHTML = '';
-      
       const counts = { N: { total: 150, got: 0 }, R: { total: 80, got: 0 }, SR: { total: 50, got: 0 }, SSR: { total: 15, got: 0 }, UR: { total: 5, got: 0 } };
-      
       praises.forEach(p => {
         const isUnlocked = collectedPraises.includes(p.id);
         if (isUnlocked) counts[p.rarity].got++;
-        
         const div = document.createElement('div');
         div.className = `col-item ${isUnlocked ? 'unlocked' : ''}`;
-        
         if (isUnlocked) {
           div.innerHTML = `<div class="col-rarity"><span class="rarity-badge r-${p.rarity}">✦ ${p.rarity} ✦</span><br><span style="font-size:10px;color:#999;">No.${p.id}</span></div><div>${p.message}</div>`;
         } else {
@@ -499,28 +439,15 @@
         }
         gridContainer.appendChild(div);
       });
-
-      statsContainer.innerHTML = `
-        <div class="stat-box" style="border-bottom: 3px solid #95a5a6;">N: ${counts.N.got}/${counts.N.total}</div>
-        <div class="stat-box" style="border-bottom: 3px solid #3498db;">R: ${counts.R.got}/${counts.R.total}</div>
-        <div class="stat-box" style="border-bottom: 3px solid #9b59b6;">SR: ${counts.SR.got}/${counts.SR.total}</div>
-        <div class="stat-box" style="border-bottom: 3px solid #f1c40f;">SSR: ${counts.SSR.got}/${counts.SSR.total}</div>
-        <div class="stat-box" style="border-bottom: 3px solid #ff0000;">UR: ${counts.UR.got}/${counts.UR.total}</div>
-      `;
+      statsContainer.innerHTML = `<div class="stat-box" style="border-bottom: 3px solid #95a5a6;">N: ${counts.N.got}/${counts.N.total}</div><div class="stat-box" style="border-bottom: 3px solid #3498db;">R: ${counts.R.got}/${counts.R.total}</div><div class="stat-box" style="border-bottom: 3px solid #9b59b6;">SR: ${counts.SR.got}/${counts.SR.total}</div><div class="stat-box" style="border-bottom: 3px solid #f1c40f;">SSR: ${counts.SSR.got}/${counts.SSR.total}</div><div class="stat-box" style="border-bottom: 3px solid #ff0000;">UR: ${counts.UR.got}/${counts.UR.total}</div>`;
     }
     function closeCollection() { switchView(previousViewForCollection); }
 
-    // ================= 子ども用画面・ガチャ機能 =================
-    function renderChildHome() { switchView('child-home-view'); }
-
-    function renderChildView(id) {
+    // ================= 子ども用チェック処理 =================
+    function renderChildView(id, listData) {
       switchView('child-view');
       document.getElementById('reward').style.display = 'none';
-      
-      const listData = appData[id];
-      document.getElementById('child-title').innerText = listData.title;
       childCurrentList = listData.items;
-      
       currentItemIndex = 0;
       sessionPraises = [];
       renderCurrentChildItem(id);
@@ -532,24 +459,13 @@
       
       if (currentItemIndex < childCurrentList.length) {
         const item = childCurrentList[currentItemIndex];
-        
         const progressText = document.createElement('div');
         progressText.className = 'progress-text';
         progressText.innerText = `📦 ${currentItemIndex + 1} / ${childCurrentList.length} こめ`;
         
         const card = document.createElement('div');
         card.className = 'item-card locked'; 
-        
-        card.innerHTML = `
-          <div class="timer-line" id="timer-line-${currentItemIndex}"></div>
-          <div style="z-index:1; position:relative; width:100%; display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; flex-direction:column; text-align:left;">
-              <span style="font-size:14px; color:#d9534f; margin-bottom:5px; font-weight:normal;" id="action-hint-${currentItemIndex}">${item.hint}</span>
-              <span style="font-size:32px;">${item.name}</span>
-            </div>
-            <div class="check-mark" id="check-mark-${currentItemIndex}">⏳</div>
-          </div>
-        `;
+        card.innerHTML = `<div class="timer-line" id="timer-line-${currentItemIndex}"></div><div style="z-index:1; position:relative; width:100%; display:flex; justify-content:space-between; align-items:center;"><div style="display:flex; flex-direction:column; text-align:left;"><span style="font-size:14px; color:#d9534f; margin-bottom:5px; font-weight:normal;" id="action-hint-${currentItemIndex}">${item.hint}</span><span style="font-size:32px;">${item.name}</span></div><div class="check-mark" id="check-mark-${currentItemIndex}">⏳</div></div>`;
         
         container.appendChild(progressText);
         container.appendChild(card);
@@ -564,21 +480,14 @@
           canCheck = true;
           card.classList.remove('locked');
           card.style.borderColor = '#4a90e2';
-          
           const hint = document.getElementById(`action-hint-${currentItemIndex}`);
           if(hint) { hint.innerText = '👉 タップしてチェック！'; hint.style.color = '#28a745'; hint.style.fontWeight = 'bold';}
-          
           const mark = document.getElementById(`check-mark-${currentItemIndex}`);
           if(mark) { mark.innerText = '✔'; mark.style.borderColor = '#4a90e2'; mark.style.color = '#4a90e2'; }
-          
           if(navigator.vibrate) navigator.vibrate(30);
         }, 2500);
 
-        card.onclick = () => {
-          if (!canCheck) return; 
-          checkItem(card, listId, currentItemIndex);
-        };
-
+        card.onclick = () => { if (!canCheck) return; checkItem(card, listId, currentItemIndex); };
       } else {
         showCompletionSummary();
       }
@@ -587,7 +496,6 @@
     function checkItem(cardElement, listId, itemIndex) {
       if (cardElement.classList.contains('checked')) return; 
       cardElement.classList.add('checked');
-      
       if (navigator.vibrate) { navigator.vibrate(50); }
       
       const today = new Date().toLocaleDateString('ja-JP');
@@ -604,10 +512,7 @@
         delay = 2300; 
       }
 
-      setTimeout(() => {
-        currentItemIndex++;
-        renderCurrentChildItem(listId);
-      }, delay);
+      setTimeout(() => { currentItemIndex++; renderCurrentChildItem(listId); }, delay);
     }
 
     function rollGacha() {
@@ -618,7 +523,6 @@
       else if (rand < 20) targetRarity = 'SR';     
       else if (rand < 50) targetRarity = 'R';      
       else targetRarity = 'N';                     
-
       const pool = praises.filter(p => p.rarity === targetRarity);
       return pool[Math.floor(Math.random() * pool.length)];
     }
@@ -626,73 +530,40 @@
     function triggerPraise() {
       const selectedPraise = rollGacha();
       const number = selectedPraise.id;
-
       let isNew = false;
       if (!collectedPraises.includes(number)) {
         collectedPraises.push(number);
         localStorage.setItem('nfc_praise_collection', JSON.stringify(collectedPraises));
         isNew = true;
       }
-      
       sessionPraises.push({ ...selectedPraise, isNew });
-      
       let popup = document.getElementById('praise-popup');
       if (!popup) {
         popup = document.createElement('div');
-        popup.id = 'praise-popup';
-        popup.className = 'praise-popup';
+        popup.id = 'praise-popup'; popup.className = 'praise-popup';
         document.body.appendChild(popup);
       }
-      
-      popup.innerHTML = `
-        <div style="text-align: center; margin-bottom: 10px;">
-          <div class="rarity-badge r-${selectedPraise.rarity}" style="font-size: 24px; padding: 10px 30px; letter-spacing: 2px;">✦ ${selectedPraise.rarity} ✦</div>
-        </div>
-        <div class="praise-number">No.${number} ${isNew ? '<span class="new-badge">NEW!</span>' : ''}</div>
-        <div class="praise-message">${selectedPraise.message}</div>
-        <div style="font-size: 14px; color: #4a90e2; font-weight: bold; width: 100%; text-align: right;">図鑑：${collectedPraises.length} / 300</div>
-      `;
-      
+      popup.innerHTML = `<div style="text-align: center; margin-bottom: 10px;"><div class="rarity-badge r-${selectedPraise.rarity}" style="font-size: 24px; padding: 10px 30px; letter-spacing: 2px;">✦ ${selectedPraise.rarity} ✦</div></div><div class="praise-number">No.${number} ${isNew ? '<span class="new-badge">NEW!</span>' : ''}</div><div class="praise-message">${selectedPraise.message}</div><div style="font-size: 14px; color: #4a90e2; font-weight: bold; width: 100%; text-align: right;">図鑑：${collectedPraises.length} / 300</div>`;
       popup.classList.add('show');
       setTimeout(() => { popup.classList.remove('show'); }, 2000);
     }
 
     function showCompletionSummary() {
       if (navigator.vibrate) { navigator.vibrate([100, 50, 100, 50, 200]); }
-      
       confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }});
-      setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
       
       const rewardDiv = document.getElementById('reward');
       rewardDiv.style.display = 'block';
-      
       let summaryHTML = `🌟 ぜんぶできたね！ 🌟<br>よくできました！`;
-      
       if (sessionPraises.length > 0) {
-        summaryHTML += `<div class="summary-box">
-          <h3>🎁 今回あつめた言葉 🎁</h3>
-          <ul class="summary-list">`;
-        
+        summaryHTML += `<div class="summary-box"><h3>🎁 今回あつめた言葉 🎁</h3><ul class="summary-list">`;
         sessionPraises.forEach(p => {
-          summaryHTML += `<li style="background: #f9f9f9; margin-bottom: 10px; border-radius: 10px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #eee; display: block;">
-            <div style="margin-bottom: 8px; display: flex; align-items: center;">
-              <span class="rarity-badge r-${p.rarity}" style="font-size:16px; padding: 5px 12px; margin-right: 10px;">✦ ${p.rarity} ✦</span>
-              <span style="color:#888; font-size:14px; font-weight:bold;">No.${p.id}</span>
-              ${p.isNew ? '<span class="new-badge" style="margin-left:auto;">NEW!</span>' : '<span class="got-badge" style="margin-left:auto;">ゲット済</span>'}
-            </div>
-            <div style="color:#d9534f; font-size:20px; font-weight:bold; line-height:1.4;">${p.message}</div>
-          </li>`;
+          summaryHTML += `<li style="background: #f9f9f9; margin-bottom: 10px; border-radius: 10px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #eee; display: block;"><div style="margin-bottom: 8px; display: flex; align-items: center;"><span class="rarity-badge r-${p.rarity}" style="font-size:16px; padding: 5px 12px; margin-right: 10px;">✦ ${p.rarity} ✦</span><span style="color:#888; font-size:14px; font-weight:bold;">No.${p.id}</span>${p.isNew ? '<span class="new-badge" style="margin-left:auto;">NEW!</span>' : '<span class="got-badge" style="margin-left:auto;">ゲット済</span>'}</div><div style="color:#d9534f; font-size:20px; font-weight:bold; line-height:1.4;">${p.message}</div></li>`;
         });
-        
-        summaryHTML += `</ul></div>
-        <button class="collection-btn" style="width: 100%; margin-top: 15px;" onclick="openCollection('child-view')">📖 ほめ言葉図鑑を見る</button>`;
+        summaryHTML += `</ul></div><button class="collection-btn" style="width: 100%; margin-top: 15px;" onclick="openCollection('child-view')">📖 ほめ言葉図鑑を見る</button>`;
       } else {
-        summaryHTML += `<div class="summary-box" style="text-align:center; color:#666; font-size:16px;">
-          きょうの言葉はぜんぶ集め終わってるよ！<br>またあした挑戦してね！
-        </div>
-        <button class="collection-btn" style="width: 100%; margin-top: 15px;" onclick="openCollection('child-view')">📖 ほめ言葉図鑑を見る</button>`;
+        summaryHTML += `<div class="summary-box" style="text-align:center; color:#666; font-size:16px;">きょうの言葉はぜんぶ集め終わってるよ！<br>またあした挑戦してね！</div><button class="collection-btn" style="width: 100%; margin-top: 15px;" onclick="openCollection('child-view')">📖 ほめ言葉図鑑を見る</button>`;
       }
-      
       rewardDiv.innerHTML = summaryHTML;
     }
 
