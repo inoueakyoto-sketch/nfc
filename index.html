@@ -16,11 +16,14 @@
     .panel-container { background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left;}
 
     #child-view, #child-home-view, #error-view, #import-confirm-view { position: relative; }
-    .item-card { background: #ffffff; margin: 15px auto; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-size: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; user-select: none; }
+    
+    /* 🌟 1つずつ表示用のスタイル */
+    .progress-text { font-size: 22px; font-weight: bold; color: #4a90e2; margin-bottom: 10px; }
+    .item-card { background: #ffffff; margin: 15px auto; padding: 30px 20px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); font-size: 28px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: all 0.3s ease; user-select: none; border: 4px solid transparent;}
     .item-card:active { transform: scale(0.95); }
     .item-card.checked { background: #d4edda; color: #155724; border-color: #28a745; }
-    .check-mark { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 24px; color: transparent; }
-    .item-card.checked .check-mark { background: #28a745; border-color: #28a745; color: white; }
+    .check-mark { width: 50px; height: 50px; border-radius: 50%; border: 4px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 30px; color: transparent; transition: all 0.3s ease;}
+    .item-card.checked .check-mark { background: #28a745; border-color: #28a745; color: white; transform: scale(1.1); }
     
     .reward-text { font-size: 32px; color: #ff8c00; font-weight: bold; margin-top: 20px; display: none; animation: popup 0.5s ease-out; }
     @keyframes popup { 0% { transform: scale(0); } 100% { transform: scale(1); } }
@@ -28,12 +31,23 @@
     
     .collection-status { background: #fff; border: 2px solid #ff8c00; color: #ff8c00; font-weight: bold; padding: 10px; border-radius: 20px; display: inline-block; margin-top: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
+    /* 🌟 今回集めた言葉一覧（リザルト）のスタイル */
+    .summary-box { background: #fff; padding: 20px; border-radius: 15px; margin-top: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: left; }
+    .summary-box h3 { color: #ff8c00; text-align: center; margin-top: 0; border-bottom: 2px dashed #ff8c00; padding-bottom: 10px; font-size: 20px; }
+    .summary-list { list-style: none; padding: 0; margin: 0; }
+    .summary-list li { padding: 12px 5px; border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: bold; color: #333;}
+    .summary-list li:last-child { border-bottom: none; }
+    .new-badge { background: #d9534f; color: white; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; animation: pulse 1s infinite; white-space: nowrap; }
+    .got-badge { background: #eee; color: #888; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; white-space: nowrap; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
     .praise-popup { position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(255, 255, 255, 0.95); color: #333; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 1000; pointer-events: none; transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 5px solid #ff8c00; width: 80%; max-width: 350px; }
     .praise-popup.show { transform: translate(-50%, -50%) scale(1); }
     .praise-number { font-size: 16px; color: #666; font-weight: bold; margin-bottom: 10px; text-align: left; border-bottom: 2px dashed #ccc; padding-bottom: 5px; }
     .praise-message { font-size: 26px; color: #d9534f; font-weight: bold; margin: 15px 0; }
     .praise-progress { font-size: 14px; color: #4a90e2; font-weight: bold; text-align: right; }
 
+    /* 保護者用UI */
     .dashboard-card { background: #fff; padding: 15px; margin: 15px auto; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; text-align: left; }
     .dashboard-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
     input[type="text"] { width: 65%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; }
@@ -82,8 +96,10 @@
     <button class="settings-btn" onclick="unlockAdmin()">⚙️</button>
     <h1 id="child-title">🎒 もちものチェック</h1>
     <div id="child-collection" class="collection-status" style="font-size: 14px; padding: 5px 15px; margin-bottom: 10px;"></div>
+    
     <div id="checklist"></div>
-    <div id="reward" class="reward-text">🌟 ぜんぶできたね！ 🌟<br>よくできました！</div>
+    
+    <div id="reward" class="reward-text"></div>
   </div>
 
   <div id="dashboard-view" class="view">
@@ -129,10 +145,12 @@
     let appData = {};
     let currentEditingId = null;
     let tempItems = [];
+    
+    // 🌟 進行状況を管理する変数
     let childCurrentList = [];
-    let checkedCount = 0;
+    let currentItemIndex = 0;
+    let sessionPraises = []; // 今回のリストで引いた言葉のリスト
 
-    // 🌟 300個のほめ言葉コレクション
     const praiseList = [
       "すごい！バッチリだね！", "今日も絶好調だね！", "その調子！応援してるよ！", "さすがの集中力！", "準備カンペキ！",
       "やったね！大成功！", "頼りになるね！", "てきぱき動けてるね！", "かっこいいぞ！", "キラキラ輝いてるよ！",
@@ -191,7 +209,7 @@
       "ゼルダ姫も喜んでる！", "カービィみたいに何でもできる！", "スプラトゥーンみたいにカラフル！", "マイクラで大建築した気分！", "あつ森で星5つの島だね！",
       "ポケモンマスターになれる！", "スマブラで大乱闘勝利！", "マリオカートで1位！", "テトリスで全消し！", "パズドラで10連コンボ！",
       "モンストでストライクショット！", "にゃんこ大戦争で完全勝利！", "太鼓の達人でフルコンボ！", "プロセカでオールパーフェクト！", "音ゲーの神様！",
-      "エイムが完璧！", "ヘッドショット決まった！", "ビクロイ（ビクトリーロイヤル）！", "ドン勝だ！", "チャンピオン部隊だ！",
+      "エイムが完璧！", "ヘッドショット決まった！", "ビクロイ！", "ドン勝だ！", "チャンピオン部隊だ！",
       "最高傑作だね！", "名作の誕生！", "国宝に指定しよう！", "世界遺産レベル！", "宇宙遺産だ！",
       "君の笑顔がプライスレス！", "お金じゃ買えない価値がある！", "一生の宝物だ！", "歴史の教科書に載るよ！", "銅像を建てよう！",
       "偉人伝になるよ！", "映画化決定！", "全米が泣いた！", "アカデミー賞受賞！", "グラミー賞も夢じゃない！",
@@ -214,14 +232,12 @@
       const listId = urlParams.get('id');
       const action = urlParams.get('action');
 
-      // ★ QRコードを読み取ってインポートする時の処理
       if (action === 'import') {
         const importId = urlParams.get('id');
         const importTitle = urlParams.get('title');
         const importItems = urlParams.get('items');
         
         if (importId && importTitle && importItems) {
-          // すぐに保存せず、確認画面を表示する
           document.getElementById('confirm-list-title').innerText = importTitle;
           const confirmList = document.getElementById('confirm-list-items');
           confirmList.innerHTML = '';
@@ -233,22 +249,19 @@
             confirmList.appendChild(li);
           });
 
-          // 「はい」を押した時
           document.getElementById('btn-confirm-yes').onclick = () => {
             appData[importId] = { title: importTitle, items: importItems.split(',') };
             localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-            localStorage.setItem('nfc_app_role', 'child'); // 子どもモードに切り替え
-            
+            localStorage.setItem('nfc_app_role', 'child'); 
             alert(`✨ リスト「${importTitle}」を登録しました！`);
             window.history.replaceState({}, '', window.location.href.split('?')[0]);
             renderChildHome();
           };
 
-          // 「いいえ」を押した時
           document.getElementById('btn-confirm-no').onclick = () => {
             alert('登録をやめました。');
             window.history.replaceState({}, '', window.location.href.split('?')[0]);
-            init(); // 元の画面に戻る
+            init();
           };
 
           switchView('import-confirm-view');
@@ -294,7 +307,6 @@
       renderChildHome();
     }
     
-    // ★ リセット機能
     function resetPraiseCollection() {
       if (confirm('本当に図鑑（コレクション）をリセットしますか？\n※集めた言葉や、今日のチェック履歴がすべて消えて最初からになります。')) {
         collectedPraises = [];
@@ -425,6 +437,7 @@
       updateCollectionStatus();
     }
 
+    // 🌟 1つずつ表示する機能のスタート
     function renderChildView(id) {
       switchView('child-view');
       document.getElementById('reward').style.display = 'none';
@@ -433,50 +446,72 @@
       const listData = appData[id];
       document.getElementById('child-title').innerText = listData.title;
       childCurrentList = listData.items;
-      checkedCount = 0;
-
-      const container = document.getElementById('checklist');
-      container.innerHTML = '';
-      childCurrentList.forEach((item, index) => {
-        const card = document.createElement('div');
-        card.className = 'item-card';
-        card.onclick = () => toggleCheck(card, id, index);
-        card.innerHTML = `<span>${item}</span><div class="check-mark">✔</div>`;
-        container.appendChild(card);
-      });
+      
+      // 変数のリセット
+      currentItemIndex = 0;
+      sessionPraises = [];
+      
+      renderCurrentChildItem(id);
     }
 
-    function toggleCheck(cardElement, listId, itemIndex) {
-      if (cardElement.classList.contains('checked')) {
-        cardElement.classList.remove('checked');
-        checkedCount--;
-      } else {
-        cardElement.classList.add('checked');
-        checkedCount++;
-        
-        const today = new Date().toLocaleDateString('ja-JP');
-        let dailyData = JSON.parse(localStorage.getItem('nfc_daily_praises') || '{"date":"","items":[]}');
-
-        if (dailyData.date !== today) {
-          dailyData = { date: today, items: [] };
-        }
-
-        const itemKey = `${listId}_${itemIndex}`;
-
-        if (!dailyData.items.includes(itemKey)) {
-          dailyData.items.push(itemKey);
-          localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData));
-          triggerPraise(); 
-        }
-      }
+    // 🌟 現在の番号のアイテムだけを画面に描画する
+    function renderCurrentChildItem(listId) {
+      const container = document.getElementById('checklist');
+      container.innerHTML = '';
       
-      if (checkedCount === childCurrentList.length) {
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }});
-        document.getElementById('reward').style.display = 'block';
-        setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
-      } else {
-        document.getElementById('reward').style.display = 'none';
+      // まだチェックする項目が残っている場合
+      if (currentItemIndex < childCurrentList.length) {
+        const item = childCurrentList[currentItemIndex];
+        
+        // 進捗テキストの表示（例： 1 / 5 個目）
+        const progressText = document.createElement('div');
+        progressText.className = 'progress-text';
+        progressText.innerText = `📦 ${currentItemIndex + 1} / ${childCurrentList.length} こめ`;
+        
+        // カードの表示
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.onclick = () => checkItem(card, listId, currentItemIndex);
+        card.innerHTML = `<span>${item}</span><div class="check-mark">✔</div>`;
+        
+        container.appendChild(progressText);
+        container.appendChild(card);
+      } 
+      // すべてチェックし終わった場合（リザルト画面へ）
+      else {
+        showCompletionSummary();
       }
+    }
+
+    // 🌟 アイテムをタップした時の処理
+    function checkItem(cardElement, listId, itemIndex) {
+      if (cardElement.classList.contains('checked')) return; // 連打防止
+      
+      cardElement.classList.add('checked');
+      
+      const today = new Date().toLocaleDateString('ja-JP');
+      let dailyData = JSON.parse(localStorage.getItem('nfc_daily_praises') || '{"date":"","items":[]}');
+
+      if (dailyData.date !== today) {
+        dailyData = { date: today, items: [] };
+      }
+
+      const itemKey = `${listId}_${itemIndex}`;
+      let delay = 600; // すでに引いたことがある場合は短めに次の問題へ進む
+
+      // まだ今日褒められていない項目ならガチャを回す
+      if (!dailyData.items.includes(itemKey)) {
+        dailyData.items.push(itemKey);
+        localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData));
+        triggerPraise(); 
+        delay = 1800; // ポップアップが表示されるため、長めに待ってから次へ進む
+      }
+
+      // 少し待ってから次の項目を描画
+      setTimeout(() => {
+        currentItemIndex++;
+        renderCurrentChildItem(listId);
+      }, delay);
     }
 
     function triggerPraise() {
@@ -493,6 +528,9 @@
         updateCollectionStatus(); 
       }
       
+      // 今回のリザルト用に記録
+      sessionPraises.push({ number, message, isNew });
+      
       let popup = document.getElementById('praise-popup');
       if (!popup) {
         popup = document.createElement('div');
@@ -508,10 +546,45 @@
       `;
       
       popup.classList.add('show');
+      setTimeout(() => { popup.classList.remove('show'); }, 1500);
+    }
+
+    // 🌟 ぜんぶ終わった後のリザルト（まとめ）画面
+    function showCompletionSummary() {
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }});
+      setTimeout(() => confetti({ particleCount: 100, spread: 100, origin: { y: 0.6 } }), 500);
       
-      setTimeout(() => {
-        popup.classList.remove('show');
-      }, 1800);
+      const rewardDiv = document.getElementById('reward');
+      rewardDiv.style.display = 'block';
+      
+      let summaryHTML = `🌟 ぜんぶできたね！ 🌟<br>よくできました！`;
+      
+      // 今回引いた言葉があれば一覧表示する
+      if (sessionPraises.length > 0) {
+        summaryHTML += `<div class="summary-box">
+          <h3>🎁 今回あつめた言葉 🎁</h3>
+          <ul class="summary-list">`;
+        
+        sessionPraises.forEach(p => {
+          summaryHTML += `<li>
+            <div style="flex-grow: 1;">
+              <span style="color:#888; font-size:12px;">No.${p.number}</span><br>
+              <span style="color:#d9534f; font-size:18px;">${p.message}</span>
+            </div>
+            ${p.isNew ? '<span class="new-badge">NEW!</span>' : '<span class="got-badge">ゲット済</span>'}
+          </li>`;
+        });
+        
+        summaryHTML += `</ul></div>`;
+      } 
+      // スパム防止に引っかかって今回1つも引けなかった場合
+      else {
+        summaryHTML += `<div class="summary-box" style="text-align:center; color:#666; font-size:16px;">
+          きょうの言葉はぜんぶ集め終わってるよ！<br>またあした挑戦してね！
+        </div>`;
+      }
+      
+      rewardDiv.innerHTML = summaryHTML;
     }
 
     init();
