@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>もちものチェック</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
@@ -17,7 +20,6 @@
 
     #child-view, #child-home-view, #error-view, #import-confirm-view, #collection-view, #loading-view { position: relative; }
     
-    /* 1つずつ表示用 */
     .progress-text { font-size: 22px; font-weight: bold; color: #4a90e2; margin-bottom: 10px; }
     .item-card { background: #ffffff; margin: 15px auto; padding: 30px 20px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); font-size: 28px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; transition: all 0.3s ease; user-select: none; border: 4px solid transparent; position: relative; overflow: hidden; }
     .item-card:active { transform: scale(0.95); }
@@ -140,8 +142,8 @@
   <div id="edit-view" class="view">
     <h2>📝 リストの作成・編集</h2>
     <div class="panel-container">
-      <label style="font-weight:bold;">リストの名前 (例: 🎒ランドセル)</label><br>
-      <input type="text" id="list-title-input" style="margin: 5px 0 20px 0;"><br>
+      <label style="font-weight:bold;">リストの名前 <span style="color:red;">（※必須）</span></label><br>
+      <input type="text" id="list-title-input" placeholder="例: Aくんランドセル用" style="margin: 5px 0 20px 0;"><br>
       
       <label style="font-weight:bold;">1つずつ追加</label><br>
       <div style="display: flex; flex-direction: column; gap: 5px; margin: 5px 0 10px 0;">
@@ -157,7 +159,8 @@
       <label style="font-weight:bold;">📋 スプレッドシートから一括追加</label><br>
       <p style="font-size:12px; color:#666; margin:5px 0;">「もちもの」と「アクション」の2列をコピーして貼り付けてください。</p>
       <textarea id="bulk-input" rows="4" placeholder="✏️ えんぴつ [タブ] ふでばこに入れた？&#10;📓 ノート [タブ] ランドセルに入れた？"></textarea>
-      <button class="btn" style="background:#28a745; color:white; width: 100%; margin-top: 5px;" onclick="addBulkItems()">一括追加する</button>
+      
+      <button class="btn" style="background:#28a745; color:white; width: 100%; margin-top: 5px; padding: 15px; font-size: 16px;" onclick="addBulkItems()">⬇️ 一括追加する（必ず押してください） ⬇️</button>
       
       <div id="edit-item-list" style="margin-top: 25px; border-top: 2px solid #eee; padding-top: 15px;"></div>
       
@@ -207,20 +210,17 @@
     let collectedPraises = [];
 
     function init() {
-      // URLパラメータの取得
       const urlParams = new URLSearchParams(window.location.search);
       const listId = urlParams.get('id');
       const action = urlParams.get('action');
 
-      // 🌟 【安全装置1】緊急リセットコマンド（URLの末尾に ?reset=1 をつけると発動）
       if (urlParams.get('reset') === '1') {
         localStorage.clear();
-        alert('アプリのデータをすべてリセットしました。');
+        alert('アプリのデータをすべてリセットし、最新の状態にしました！');
         window.location.href = window.location.href.split('?')[0];
         return;
       }
 
-      // 🌟 【安全装置2】データが壊れていた場合に備えて安全に読み込む
       try {
         const saved = localStorage.getItem('nfc_multi_checklists');
         if (saved) {
@@ -236,7 +236,6 @@
           localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
         }
       } catch (error) {
-        console.error("データの読み込みに失敗しました。データを初期化します。", error);
         appData = {};
         localStorage.removeItem('nfc_multi_checklists');
       }
@@ -253,7 +252,6 @@
         }
       } catch (e) {}
 
-      // 🌟 QRコードからのインポート処理
       if (action === 'import') {
         const importId = urlParams.get('id');
         const importTitle = urlParams.get('title');
@@ -297,7 +295,6 @@
         }
       }
 
-      // 🌟 NFCタグ等からリストIDが指定されて開かれた場合
       if (listId) {
         if (currentLoadedId !== listId) {
           currentLoadedId = listId;
@@ -306,7 +303,6 @@
         return;
       }
 
-      // パラメータがない通常のアクセス
       const role = localStorage.getItem('nfc_app_role');
       if (role === 'admin') { renderDashboard(); } 
       else { renderChildHome(); }
@@ -431,7 +427,17 @@
 
     function saveList() {
       const title = document.getElementById('list-title-input').value.trim();
-      if (!title || tempItems.length === 0) return alert('入力内容を確認してください。');
+      const bulkValue = document.getElementById('bulk-input').value.trim();
+      
+      if (!title) {
+        return alert('⚠️ 「リストの名前」が入力されていません！\n上の欄に名前（例：ランドセル用）を入力してください。');
+      }
+      if (tempItems.length === 0) {
+        if (bulkValue !== '') {
+          return alert('⚠️ まだリストに追加されていません！\n緑色の「一括追加する」ボタンを押して、下の枠に項目を並べてから保存を押してください。');
+        }
+        return alert('⚠️ 持ち物が1つもありません。追加してください。');
+      }
       
       const id = currentEditingId || "id_" + Date.now().toString();
       const saveBtn = document.querySelector("#edit-view .btn-primary");
@@ -441,15 +447,16 @@
       const formData = new FormData();
       formData.append('data', JSON.stringify({ action: 'saveList', id: id, title: title, items: tempItems }));
 
-      fetch(GAS_URL, { method: 'POST', body: formData })
+      // 🌟 【安全装置3】CORSエラーを回避する確実な通信モード(no-cors)を使用
+      fetch(GAS_URL, { method: 'POST', mode: 'no-cors', body: formData })
         .then(() => {
           appData[id] = { title: title, items: tempItems };
           localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
-          alert('クラウド（スプレッドシート）にデータを保存しました！');
+          alert('✅ クラウド（スプレッドシート）にデータを保存しました！\n\n※スプレッドシート側に文字が書き込まれているか確認してください。');
           renderDashboard();
         })
         .catch(err => {
-          alert('通信エラーが起きました。スプレッドシートのGAS設定をご確認ください。');
+          alert('通信エラーが起きました。通信環境をご確認ください。');
         })
         .finally(() => {
           saveBtn.innerText = "💾 クラウド（スプシ）に保存する";
@@ -458,12 +465,13 @@
     }
 
     function deleteList(id) {
-      if(confirm('このリストを削除してもよろしいですか？')) {
+      if(confirm('このリストを削除してもよろしいですか？（※端末の一覧から非表示になります。スプシの行は手動で消してください）')) {
         delete appData[id];
         localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData));
         renderDashboard();
       }
     }
+    
     function copyText(text) { 
       if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
@@ -512,7 +520,9 @@
       renderEditItems();
       if (addedCount > 0) alert(`${addedCount}件のアイテムを追加しました！`);
     }
+    
     function removeTempItem(index) { tempItems.splice(index, 1); renderEditItems(); }
+    
     function renderEditItems() {
       const container = document.getElementById('edit-item-list');
       container.innerHTML = '';
@@ -524,6 +534,7 @@
       });
     }
     function goToDashboard() { renderDashboard(); }
+    
     function resetPraiseCollection() {
       if (confirm('本当に図鑑をリセットしますか？')) {
         collectedPraises = [];
@@ -683,7 +694,6 @@
       rewardDiv.innerHTML = summaryHTML;
     }
 
-    // 🌟 すべての準備ができたら実行
     init();
   </script>
 </body>
