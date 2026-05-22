@@ -51,7 +51,7 @@
     .summary-list { list-style: none; padding: 0; margin: 0; }
     .new-badge { background: #d9534f; color: white; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; animation: pulse 1s infinite; white-space: nowrap; font-weight:bold;}
     .got-badge { background: #eee; color: #888; padding: 4px 8px; border-radius: 10px; font-size: 12px; margin-left: 10px; white-space: nowrap; font-weight: normal;}
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
     .praise-popup { position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(255, 255, 255, 0.98); color: #333; padding: 25px 20px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); z-index: 1000; pointer-events: none; transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 5px solid #ff8c00; width: 85%; max-width: 350px; display: flex; flex-direction: column; align-items: center; }
     .praise-popup.show { transform: translate(-50%, -50%) scale(1); }
@@ -67,7 +67,7 @@
 
     .dashboard-card { background: #fff; padding: 15px; margin: 15px auto; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; text-align: left; }
     .dashboard-title { font-size: 20px; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-    input[type="text"] { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;}
+    input[type="text"], select { width: 100%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;}
     textarea { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
     .list-item { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; flex-direction: column; align-items: flex-start; }
     .delete-text { color: red; cursor: pointer; font-weight: bold; padding: 5px; }
@@ -163,7 +163,13 @@
     <h2>📝 リストの作成・編集</h2>
     <div class="panel-container">
       <label style="font-weight:bold;">リストの名前 <span style="color:red;">（※必須）</span></label><br>
-      <input type="text" id="list-title-input" placeholder="例: Aくんランドセル用" style="margin: 5px 0 20px 0;"><br>
+      <input type="text" id="list-title-input" placeholder="例: 手洗い場用" style="margin: 5px 0 15px 0;"><br>
+
+      <label style="font-weight:bold;">🔄 繰り返し設定</label><br>
+      <select id="allow-repeat-input" style="margin: 5px 0 20px 0;">
+        <option value="false">制限あり（1日1回まで。2回目はガチャなし）</option>
+        <option value="true">制限なし（何度でも最初からチェック可能！）</option>
+      </select><br>
       
       <label style="font-weight:bold;">1つずつ追加</label><br>
       <div style="display: flex; flex-direction: column; gap: 5px; margin: 5px 0 10px 0;">
@@ -209,7 +215,6 @@
       window.location.href = window.location.href.split('?')[0];
     }
 
-    // 🌟 183行目付近：あなたの最新・正しいGAS URLに修正済みです！
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxanqTUylZPhwra5rFJ59B2YY-SGEC6oAmNT9oNijE7YC4kCi80pOVoSPNsz2m6RffLEw/exec";
 
     let appData = {};
@@ -240,13 +245,6 @@
     });
 
     let collectedPraises = [];
-
-    const fetchWithTimeout = (url, options, timeout = 5000) => {
-      return Promise.race([
-        fetch(url, options),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
-      ]);
-    };
 
     function init() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -321,7 +319,7 @@
       document.getElementById('error-msg-box').innerHTML = `
         <strong style="color:#d9534f; font-size:18px;">【通信がブロックされました】</strong><br><br>
         セキュリティ制限により、Googleからリストを取得できませんでした。<br><br>
-        GASのデプロイ時に、アクセスできるユーザーが<strong>「全員 (Anyone)」</strong>になっていない可能性が非常に高いです。パソコンから設定を見直してください。
+        GASのデプロイ時に、アクセスできるユーザーが<strong>「全員 (Anyone)」</strong>になっている可能性が非常に高いです。パソコンから設定を見直してください。
       `;
     }
 
@@ -339,14 +337,6 @@
       };
       switchView('import-confirm-view');
     }
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        const urlParams = new URLSearchParams(window.location.search);
-        const listId = urlParams.get('id');
-        if (listId && listId !== currentLoadedId) { currentLoadedId = listId; fetchListFromCloud(listId); }
-      }
-    });
 
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
@@ -375,9 +365,13 @@
       const baseUrl = window.location.href.split('?')[0].split('#')[0];
       keys.forEach(id => {
         const list = appData[id]; const nfcUrl = `${baseUrl}?id=${id}`;
+        
+        // 繰り返し設定の表示用
+        const repeatText = list.allowRepeat ? "🔁 制限なし" : "🕒 1日1回まで";
+
         const card = document.createElement('div'); card.className = 'dashboard-card';
         card.innerHTML = `
-          <div class="dashboard-title">${list.title}</div>
+          <div class="dashboard-title">${list.title} <span style="font-size:12px; font-weight:normal; color:#fff; background:${list.allowRepeat ? '#28a745' : '#6c757d'}; padding:2px 6px; border-radius:10px; margin-left:5px;">${repeatText}</span></div>
           <div style="font-size: 11px; color: #666; margin-bottom: 15px; background: #eee; padding: 10px; border-radius: 5px; word-break: break-all; border: 1px solid #ccc;">
             <strong>【タグ書き込み用 URL】</strong><br><span style="user-select: all;">${nfcUrl}</span>
           </div>
@@ -400,15 +394,20 @@
       const title = document.getElementById('list-title-input').value.trim();
       if (!title) { return alert('⚠️ 「リストの名前」が入力されていません！'); }
       if (tempItems.length === 0) { return alert('⚠️ 持ち物が1つもありません。'); }
+      
       const id = currentEditingId || "id_" + Date.now().toString();
+      
+      // 🌟 追加：繰り返し設定の取得
+      const allowRepeat = document.getElementById('allow-repeat-input').value === "true";
+      
       const saveBtn = document.querySelector("#edit-view .btn-primary");
       saveBtn.innerText = "⏳ 保存中..."; saveBtn.disabled = true;
       const params = new URLSearchParams();
-      params.append('data', JSON.stringify({ action: 'saveList', id: id, title: title, items: tempItems }));
+      params.append('data', JSON.stringify({ action: 'saveList', id: id, title: title, items: tempItems, allowRepeat: allowRepeat }));
       
       fetch(GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() })
         .then(() => {
-          appData[id] = { title: title, items: tempItems }; 
+          appData[id] = { title: title, items: tempItems, allowRepeat: allowRepeat }; 
           try { localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData)); } catch(e){}
           alert('✅ クラウド（スプレッドシート）にデータを保存しました！'); renderDashboard();
         })
@@ -451,12 +450,24 @@
     }
     
     function copyText(text) { if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => { alert('コピーしました！'); }); } }
+    
     function openEditView(id) {
       switchView('edit-view');
-      if (id && appData[id]) { currentEditingId = id; document.getElementById('list-title-input').value = appData[id].title; tempItems = [...appData[id].items]; } 
-      else { currentEditingId = null; document.getElementById('list-title-input').value = ''; tempItems = []; }
+      if (id && appData[id]) { 
+        currentEditingId = id; 
+        document.getElementById('list-title-input').value = appData[id].title; 
+        tempItems = [...appData[id].items];
+        // 🌟 追加：編集時に過去の繰り返し設定を読み込む
+        document.getElementById('allow-repeat-input').value = appData[id].allowRepeat ? "true" : "false";
+      } else { 
+        currentEditingId = null; 
+        document.getElementById('list-title-input').value = ''; 
+        tempItems = []; 
+        document.getElementById('allow-repeat-input').value = "false";
+      }
       document.getElementById('bulk-input').value = ''; renderEditItems();
     }
+
     function addItem() {
       const nameInput = document.getElementById('item-input'); const hintInput = document.getElementById('hint-input');
       const nameVal = nameInput.value.trim(); const hintVal = hintInput.value.trim() || '🎒 バッグにいれてね...';
@@ -567,10 +578,18 @@
         }
       } catch(e) {}
 
+      // 🌟 追加：このリストが「何度でもOK」かどうかを判定
+      const isRepeatable = appData[listId] ? appData[listId].allowRepeat : false;
+
       const itemKey = `${listId}_${itemIndex}`; let delay = 600; 
-      if (!dailyData.items.includes(itemKey)) {
-        dailyData.items.push(itemKey); 
-        try { localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData)); } catch(e){}
+      
+      // 🌟 修正：制限なしの場合は、常にガチャ演出を出して記録もする
+      if (isRepeatable || !dailyData.items.includes(itemKey)) {
+        if (!isRepeatable) {
+          // 制限ありの場合のみ、今日終わったマークをつける
+          dailyData.items.push(itemKey); 
+          try { localStorage.setItem('nfc_daily_praises', JSON.stringify(dailyData)); } catch(e){}
+        }
         triggerPraise(); delay = 2300; 
       }
       setTimeout(() => { currentItemIndex++; renderCurrentChildItem(listId); }, delay);
