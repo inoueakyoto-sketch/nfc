@@ -71,8 +71,6 @@
     textarea { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
     .list-item { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; flex-direction: column; align-items: flex-start; }
     .delete-text { color: red; cursor: pointer; font-weight: bold; padding: 5px; }
-    
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
   </style>
 </head>
 <body>
@@ -200,7 +198,6 @@
   </div>
 
   <script>
-    // フリーズ対策：5秒間読み込み画面が続いたら脱出ボタンを出す
     setTimeout(() => {
       const rescueBtn = document.getElementById('rescue-btn');
       if(rescueBtn) rescueBtn.style.display = 'inline-block';
@@ -212,8 +209,8 @@
       window.location.href = window.location.href.split('?')[0];
     }
 
-    // 🌟 GASのURL（ここにあなたのURLが入ります）
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwijAoAZbYCpmrr7PWy45SdvR0HSKU4cE-IZ7Ufs-VpaQgMhi71EFU8irWtZ-XTONP40A/exec";
+    // 🌟 183行目付近：あなたの最新・正しいGAS URLに修正済みです！
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxanqTUylZPhwra5rFJ59B2YY-SGEC6oAmNT9oNijE7YC4kCi80pOVoSPNsz2m6RffLEw/exec";
 
     let appData = {};
     let currentEditingId = null;
@@ -244,10 +241,25 @@
 
     let collectedPraises = [];
 
+    const fetchWithTimeout = (url, options, timeout = 5000) => {
+      return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
+      ]);
+    };
+
     function init() {
       const urlParams = new URLSearchParams(window.location.search);
       const listId = urlParams.get('id');
-      
+      const action = urlParams.get('action');
+
+      if (urlParams.get('reset') === '1') {
+        try { localStorage.clear(); } catch(e){}
+        alert('アプリのデータをすべてリセットし、最新の状態にしました！');
+        window.location.href = window.location.href.split('?')[0];
+        return;
+      }
+
       try {
         const saved = localStorage.getItem('nfc_multi_checklists');
         if (saved) { appData = JSON.parse(saved); }
@@ -327,6 +339,14 @@
       };
       switchView('import-confirm-view');
     }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        const urlParams = new URLSearchParams(window.location.search);
+        const listId = urlParams.get('id');
+        if (listId && listId !== currentLoadedId) { currentLoadedId = listId; fetchListFromCloud(listId); }
+      }
+    });
 
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
@@ -421,7 +441,6 @@
       }
     }
     
-    // 🌟 【新規機能】ダッシュボードから一発で通信テストするボタン
     function testLogCheck() {
       const params = new URLSearchParams();
       params.append('data', JSON.stringify({ action: 'logCheck', id: 'TEST_ID', title: 'テスト送信の確認' }));
@@ -512,14 +531,12 @@
         }, 2500);
         card.onclick = () => { if (!canCheck) return; checkItem(card, listId, currentItemIndex); };
       } else {
-        // 🌟 最終対策：通信が終わるのを「待ってから」完了画面を出す
         document.getElementById('checklist').innerHTML = '<div style="margin-top:40px;"><h1 style="font-size:40px; animation: pulse 1s infinite;">📡</h1><h3 style="color:#ff8c00;">データを送信中...</h3></div>';
 
         const title = appData[listId] ? appData[listId].title : "もちものチェック";
         const params = new URLSearchParams();
         params.append('data', JSON.stringify({ action: 'logCheck', id: listId, title: title }));
 
-        // 一括保存と同じ「100%成功するPOST通信」で送信
         fetch(GAS_URL, {
           method: 'POST',
           mode: 'no-cors',
@@ -527,11 +544,11 @@
           body: params.toString()
         })
         .then(() => {
-          setTimeout(showCompletionSummary, 500); // 通信成功後に紙吹雪
+          setTimeout(showCompletionSummary, 500); 
         })
         .catch(err => {
           console.error(err);
-          setTimeout(showCompletionSummary, 500); // エラーが起きても進める
+          setTimeout(showCompletionSummary, 500); 
         });
       }
     }
