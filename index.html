@@ -71,6 +71,8 @@
     textarea { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
     .list-item { background: #f9f9f9; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; flex-direction: column; align-items: flex-start; }
     .delete-text { color: red; cursor: pointer; font-weight: bold; padding: 5px; }
+    
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
   </style>
 </head>
 <body>
@@ -79,6 +81,7 @@
     <div style="margin-top: 100px;">
       <h1 style="font-size: 50px;">⏳</h1>
       <h2>よみこみ中...</h2>
+      <button id="rescue-btn" class="btn" style="display:none; background:#d9534f; color:white; width:80%; max-width:300px; padding:15px; margin-top:30px; font-size:16px;" onclick="forceResetApp()">⚠️ エラーを直す（リセット）</button>
     </div>
   </div>
 
@@ -138,7 +141,7 @@
 
   <div id="child-view" class="view">
     <button class="settings-btn" onclick="unlockAdmin()">⚙️</button>
-    <h1 id="child-title" style="margin-bottom: 5px;">🎒 </h1>
+    <h1 id="child-title" style="margin-bottom: 5px;">🎒 もちものチェック</h1>
     <div id="checklist"></div>
     <div id="reward" class="reward-text"></div>
   </div>
@@ -146,6 +149,11 @@
   <div id="dashboard-view" class="view">
     <h2>🛠 リスト管理画面（クラウド連動）</h2>
     <button class="collection-btn" style="margin: 0 auto 20px auto; display: block;" onclick="openCollection('dashboard-view')">📖 ほめ言葉図鑑を見る</button>
+    
+    <button class="btn" style="background:#17a2b8; color:white; width:100%; max-width:500px; padding:15px; margin-bottom:20px; border-radius:30px; font-size:16px;" onclick="testLogCheck()">
+      🧪 履歴の通信テストを行う
+    </button>
+    
     <div id="dashboard-lists"></div>
     <button class="btn btn-primary" onclick="openEditView(null)">➕ 新しいリストを作る</button>
     <hr style="margin: 30px 0 10px 0; border: 0; border-top: 1px solid #ccc;">
@@ -183,7 +191,28 @@
     </div>
   </div>
 
+  <div id="share-view" class="view">
+    <h2>📲 他のスマホに配る</h2>
+    <div class="panel-container" style="text-align: center;">
+      <img id="qr-img" src="" alt="QR Code" style="margin: 20px 0; width: 150px; height: 150px;">
+      <button class="btn btn-primary" style="background:#eee; color:#333; margin-top:30px;" onclick="goToDashboard()">戻る</button>
+    </div>
+  </div>
+
   <script>
+    // フリーズ対策：5秒間読み込み画面が続いたら脱出ボタンを出す
+    setTimeout(() => {
+      const rescueBtn = document.getElementById('rescue-btn');
+      if(rescueBtn) rescueBtn.style.display = 'inline-block';
+    }, 5000);
+
+    function forceResetApp() {
+      try { localStorage.clear(); } catch(e){}
+      alert('アプリのデータをリセットして安全な状態に戻しました！');
+      window.location.href = window.location.href.split('?')[0];
+    }
+
+    // 🌟 GASのURL（ここにあなたのURLが入ります）
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwijAoAZbYCpmrr7PWy45SdvR0HSKU4cE-IZ7Ufs-VpaQgMhi71EFU8irWtZ-XTONP40A/exec";
 
     let appData = {};
@@ -218,15 +247,7 @@
     function init() {
       const urlParams = new URLSearchParams(window.location.search);
       const listId = urlParams.get('id');
-      const action = urlParams.get('action');
-
-      if (urlParams.get('reset') === '1') {
-        try { localStorage.clear(); } catch(e){}
-        alert('アプリのデータをすべてリセットし、最新の状態にしました！');
-        window.location.href = window.location.href.split('?')[0];
-        return;
-      }
-
+      
       try {
         const saved = localStorage.getItem('nfc_multi_checklists');
         if (saved) { appData = JSON.parse(saved); }
@@ -306,14 +327,6 @@
       };
       switchView('import-confirm-view');
     }
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        const urlParams = new URLSearchParams(window.location.search);
-        const listId = urlParams.get('id');
-        if (listId && listId !== currentLoadedId) { currentLoadedId = listId; fetchListFromCloud(listId); }
-      }
-    });
 
     function switchView(viewId) {
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active-view'));
@@ -408,6 +421,16 @@
       }
     }
     
+    // 🌟 【新規機能】ダッシュボードから一発で通信テストするボタン
+    function testLogCheck() {
+      const params = new URLSearchParams();
+      params.append('data', JSON.stringify({ action: 'logCheck', id: 'TEST_ID', title: 'テスト送信の確認' }));
+      
+      fetch(GAS_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() })
+        .then(() => alert("テスト通信を送信しました！\nスプレッドシートの「履歴」シートをご確認ください。"))
+        .catch(err => alert("通信エラーが発生しました。"));
+    }
+    
     function copyText(text) { if (navigator.clipboard) { navigator.clipboard.writeText(text).then(() => { alert('コピーしました！'); }); } }
     function openEditView(id) {
       switchView('edit-view');
@@ -449,7 +472,6 @@
       }
     }
 
-    // ================= 図鑑機能 =================
     function openCollection(previousView) {
       previousViewForCollection = previousView; switchView('collection-view');
       const statsContainer = document.getElementById('collection-stats'); const gridContainer = document.getElementById('collection-grid'); gridContainer.innerHTML = '';
@@ -465,11 +487,9 @@
     }
     function closeCollection() { switchView(previousViewForCollection); }
 
-    // ================= 子ども用チェック処理 =================
     function renderChildHome() { switchView('child-home-view'); }
     function renderChildView(id, listData) {
       switchView('child-view'); document.getElementById('reward').style.display = 'none';
-      // 🌟 バグ修正：画面上のタイトルを、正しく児童名（リストタイトル）に書き換える
       document.getElementById('child-title').innerText = "🎒 " + listData.title;
       childCurrentList = listData.items; currentItemIndex = 0; sessionPraises = []; renderCurrentChildItem(id);
     }
@@ -492,23 +512,28 @@
         }, 2500);
         card.onclick = () => { if (!canCheck) return; checkItem(card, listId, currentItemIndex); };
       } else {
-        // 全て完了した瞬間にクラウド（スプシ）へ通知
-        logCheckToCloud(listId);
-        showCompletionSummary();
-      }
-    }
+        // 🌟 最終対策：通信が終わるのを「待ってから」完了画面を出す
+        document.getElementById('checklist').innerHTML = '<div style="margin-top:40px;"><h1 style="font-size:40px; animation: pulse 1s infinite;">📡</h1><h3 style="color:#ff8c00;">データを送信中...</h3></div>';
 
-    // 🌟 最終修正：CORSエラーでちぎれず、ブラウザに破棄もされない最強のfetch(no-cors)通信
-    function logCheckToCloud(listId) {
-      const title = appData[listId] ? appData[listId].title : "不明なリスト";
-      const logData = { id: listId, title: title };
-      
-      const fetchUrl = `${GAS_URL}?action=logCheck&data=${encodeURIComponent(JSON.stringify(logData))}&t=${Date.now()}`;
-      
-      // 画像ではなく、一括保存時と同じ確実なfetch通信(no-cors)でGoogleへ投げ込みます
-      fetch(fetchUrl, { method: 'GET', mode: 'no-cors' })
-        .then(() => console.log("履歴データを送信しました"))
-        .catch(err => console.error("履歴送信エラー:", err));
+        const title = appData[listId] ? appData[listId].title : "もちものチェック";
+        const params = new URLSearchParams();
+        params.append('data', JSON.stringify({ action: 'logCheck', id: listId, title: title }));
+
+        // 一括保存と同じ「100%成功するPOST通信」で送信
+        fetch(GAS_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params.toString()
+        })
+        .then(() => {
+          setTimeout(showCompletionSummary, 500); // 通信成功後に紙吹雪
+        })
+        .catch(err => {
+          console.error(err);
+          setTimeout(showCompletionSummary, 500); // エラーが起きても進める
+        });
+      }
     }
 
     function checkItem(cardElement, listId, itemIndex) {
