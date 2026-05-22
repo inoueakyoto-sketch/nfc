@@ -183,14 +183,6 @@
     </div>
   </div>
 
-  <div id="share-view" class="view">
-    <h2>📲 他のスマホに配る</h2>
-    <div class="panel-container" style="text-align: center;">
-      <img id="qr-img" src="" alt="QR Code" style="margin: 20px 0; width: 150px; height: 150px;">
-      <button class="btn btn-primary" style="background:#eee; color:#333; margin-top:30px;" onclick="goToDashboard()">戻る</button>
-    </div>
-  </div>
-
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwijAoAZbYCpmrr7PWy45SdvR0HSKU4cE-IZ7Ufs-VpaQgMhi71EFU8irWtZ-XTONP40A/exec";
 
@@ -223,10 +215,25 @@
 
     let collectedPraises = [];
 
+    const fetchWithTimeout = (url, options, timeout = 5000) => {
+      return Promise.race([
+        fetch(url, options),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
+      ]);
+    };
+
     function init() {
       const urlParams = new URLSearchParams(window.location.search);
       const listId = urlParams.get('id');
-      
+      const action = urlParams.get('action');
+
+      if (urlParams.get('reset') === '1') {
+        try { localStorage.clear(); } catch(e){}
+        alert('アプリのデータをすべてリセットし、最新の状態にしました！');
+        window.location.href = window.location.href.split('?')[0];
+        return;
+      }
+
       try {
         const saved = localStorage.getItem('nfc_multi_checklists');
         if (saved) { appData = JSON.parse(saved); }
@@ -250,14 +257,12 @@
     function fetchListFromCloud(listId) {
       switchView('loading-view');
       
-      // 🌟 絶対に5秒で読み込み画面を終わらせるタイマー
       const safetyTimer = setTimeout(() => {
         if (document.getElementById('loading-view').classList.contains('active-view')) {
           showFetchError();
         }
       }, 5000);
 
-      // キャッシュを無視して最新データを取得するURL
       const fetchUrl = `${GAS_URL}?action=getList&id=${listId}&t=${Date.now()}`;
       
       fetch(fetchUrl, { method: 'GET', mode: 'cors', cache: 'no-store' })
@@ -266,7 +271,7 @@
           return response.json();
         })
         .then(data => {
-          clearTimeout(safetyTimer); // 成功したらタイマー解除
+          clearTimeout(safetyTimer);
           if (data && data.items && data.items.length > 0) {
             appData[listId] = data; 
             try { localStorage.setItem('nfc_multi_checklists', JSON.stringify(appData)); } catch(e){}
@@ -277,7 +282,6 @@
         })
         .catch(err => {
           clearTimeout(safetyTimer);
-          // スマホにデータが残っていればそれを表示、なければエラー画面へ
           if (appData && appData[listId]) { 
             showConfirmView(listId, appData[listId]); 
           } else { 
@@ -286,7 +290,6 @@
         });
     }
 
-    // 🌟 通信ブロック時の案内画面
     function showFetchError() {
       switchView('error-view');
       document.getElementById('error-msg-box').innerHTML = `
@@ -494,18 +497,26 @@
         }, 2500);
         card.onclick = () => { if (!canCheck) return; checkItem(card, listId, currentItemIndex); };
       } else {
+        // 🌟 すべて完了した瞬間にクラウド（スプシ）へ履歴を送信
         logCheckToCloud(listId);
         showCompletionSummary();
       }
     }
 
+    // 🌟 どんなブラウザ制限も100%突破してスプシに履歴を叩き込む「ビーコン通信システム」
     function logCheckToCloud(listId) {
       const title = document.getElementById('child-title').innerText;
-      const params = new URLSearchParams();
-      params.append('data', JSON.stringify({ action: 'logCheck', id: listId, title: title }));
-      fetch(GAS_URL, { 
-        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString()
-      }).catch(err => console.error(err));
+      
+      // 送信するデータを1つの荷物にまとめる
+      const logData = { action: 'logCheck', id: listId, title: title };
+      
+      // ブラウザのセキュリティ網（CORS）を無効化する画像通信（imgタグによるGET送信）を生成
+      const img = new Image();
+      
+      // GASのURLに荷物をくっつけて、画像を読み込むふりをしてGoogleにデータを送り出す
+      img.src = `${GAS_URL}?action=logCheck&data=${encodeURIComponent(JSON.stringify(logData))}&t=${Date.now()}`;
+      
+      console.log("履歴データをGoogle(GAS)へ発射しました");
     }
 
     function checkItem(cardElement, listId, itemIndex) {
