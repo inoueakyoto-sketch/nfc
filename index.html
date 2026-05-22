@@ -138,7 +138,7 @@
 
   <div id="child-view" class="view">
     <button class="settings-btn" onclick="unlockAdmin()">⚙️</button>
-    <h1 id="child-title" style="margin-bottom: 5px;">🎒 もちものチェック</h1>
+    <h1 id="child-title" style="margin-bottom: 5px;">🎒 </h1>
     <div id="checklist"></div>
     <div id="reward" class="reward-text"></div>
   </div>
@@ -214,13 +214,6 @@
     });
 
     let collectedPraises = [];
-
-    const fetchWithTimeout = (url, options, timeout = 5000) => {
-      return Promise.race([
-        fetch(url, options),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
-      ]);
-    };
 
     function init() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -476,6 +469,8 @@
     function renderChildHome() { switchView('child-home-view'); }
     function renderChildView(id, listData) {
       switchView('child-view'); document.getElementById('reward').style.display = 'none';
+      // 🌟 バグ修正：画面上のタイトルを、正しく児童名（リストタイトル）に書き換える
+      document.getElementById('child-title').innerText = "🎒 " + listData.title;
       childCurrentList = listData.items; currentItemIndex = 0; sessionPraises = []; renderCurrentChildItem(id);
     }
 
@@ -497,26 +492,23 @@
         }, 2500);
         card.onclick = () => { if (!canCheck) return; checkItem(card, listId, currentItemIndex); };
       } else {
-        // 🌟 すべて完了した瞬間にクラウド（スプシ）へ履歴を送信
+        // 全て完了した瞬間にクラウド（スプシ）へ通知
         logCheckToCloud(listId);
         showCompletionSummary();
       }
     }
 
-    // 🌟 どんなブラウザ制限も100%突破してスプシに履歴を叩き込む「ビーコン通信システム」
+    // 🌟 最終修正：CORSエラーでちぎれず、ブラウザに破棄もされない最強のfetch(no-cors)通信
     function logCheckToCloud(listId) {
-      const title = document.getElementById('child-title').innerText;
+      const title = appData[listId] ? appData[listId].title : "不明なリスト";
+      const logData = { id: listId, title: title };
       
-      // 送信するデータを1つの荷物にまとめる
-      const logData = { action: 'logCheck', id: listId, title: title };
+      const fetchUrl = `${GAS_URL}?action=logCheck&data=${encodeURIComponent(JSON.stringify(logData))}&t=${Date.now()}`;
       
-      // ブラウザのセキュリティ網（CORS）を無効化する画像通信（imgタグによるGET送信）を生成
-      const img = new Image();
-      
-      // GASのURLに荷物をくっつけて、画像を読み込むふりをしてGoogleにデータを送り出す
-      img.src = `${GAS_URL}?action=logCheck&data=${encodeURIComponent(JSON.stringify(logData))}&t=${Date.now()}`;
-      
-      console.log("履歴データをGoogle(GAS)へ発射しました");
+      // 画像ではなく、一括保存時と同じ確実なfetch通信(no-cors)でGoogleへ投げ込みます
+      fetch(fetchUrl, { method: 'GET', mode: 'no-cors' })
+        .then(() => console.log("履歴データを送信しました"))
+        .catch(err => console.error("履歴送信エラー:", err));
     }
 
     function checkItem(cardElement, listId, itemIndex) {
